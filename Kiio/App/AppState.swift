@@ -1,0 +1,83 @@
+import Foundation
+import Combine
+
+enum RootRoute {
+    case splash
+    case language
+    case welcome
+    case auth
+    case main
+}
+
+enum MainTab: Hashable {
+    case home
+    case chat
+    case device
+    case profile
+
+    var localizationKey: String {
+        switch self {
+        case .home: return "tab.home"
+        case .chat: return "tab.chat"
+        case .device: return "tab.device"
+        case .profile: return "tab.profile"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .home: return "house"
+        case .chat: return "bubble.left.and.bubble.right"
+        case .device: return "dot.radiowaves.left.and.right"
+        case .profile: return "person"
+        }
+    }
+}
+
+@MainActor
+final class AppState: ObservableObject {
+    @Published var rootRoute: RootRoute = .splash
+    @Published var selectedTab: MainTab = .home
+    @Published var locale: String
+
+    private let settings: LocalSettingsStore
+
+    init(settings: LocalSettingsStore) {
+        self.settings = settings
+        self.locale = settings.locale
+    }
+
+    func finishSplash(isAuthenticated: Bool) {
+        if !settings.didChooseLanguage {
+            rootRoute = .language
+        } else if !settings.didSeeWelcome {
+            rootRoute = .welcome
+        } else {
+            rootRoute = isAuthenticated ? .main : .auth
+        }
+    }
+
+    func completeLanguage(_ locale: String) {
+        settings.markLanguageDone(locale)
+        self.locale = settings.locale
+        rootRoute = .welcome
+    }
+
+    func setLocale(_ locale: String) {
+        settings.locale = locale
+        self.locale = settings.locale
+    }
+
+    func completeWelcome(isAuthenticated: Bool) {
+        settings.markWelcomeDone()
+        rootRoute = isAuthenticated ? .main : .auth
+    }
+
+    func showAuth() {
+        rootRoute = .auth
+    }
+
+    func showMain() {
+        rootRoute = .main
+    }
+}
