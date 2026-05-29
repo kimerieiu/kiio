@@ -331,32 +331,33 @@ private struct ChatSessionDetailScene: View {
     var body: some View {
         List {
             if store.isLoadingHistory {
-                ProgressView(L10n.tr("common.loading", locale: appState.locale))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .listRowBackground(Color.clear)
+                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                    .kiioListCardRow()
             } else if store.messages.isEmpty {
                 KiioEmptyStateView(
                     systemImage: "bubble.left.and.bubble.right",
                     title: L10n.tr("chat.detail.empty.title", locale: appState.locale),
                     message: L10n.tr("chat.detail.empty.message", locale: appState.locale)
                 )
-                .listRowBackground(Color.clear)
+                .kiioListCardRow()
             } else {
                 if let dateTitle = dateTitle {
                     Text(dateTitle)
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(KiioTheme.mutedText)
                         .frame(maxWidth: .infinity, alignment: .center)
-                        .listRowBackground(Color.clear)
+                        .kiioListHeaderRow()
                 }
 
                 ForEach(store.messages) { message in
                     ChatMessageRow(message: message)
+                        .kiioListCardRow()
                 }
             }
         }
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .navigationTitle("#\(session.sessionId.prefix(8))")
         .task {
             await store.loadHistory(agent: agent, session: session)

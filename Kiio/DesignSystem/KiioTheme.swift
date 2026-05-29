@@ -9,6 +9,8 @@ enum KiioTheme {
     static let accent = KiioColors.accent
     static let accentSoft = KiioColors.accentSoft
     static let success = KiioColors.success
+    static let warning = KiioColors.warning
+    static let info = KiioColors.info
     static let danger = KiioColors.danger
 
     static let cardRadius: CGFloat = 18

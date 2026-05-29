@@ -20,31 +20,33 @@ private struct ReminderListScene: View {
     var body: some View {
         List {
             Section {
-                Picker("", selection: Binding(
-                    get: { store.selectedFilter },
-                    set: { filter in Task { await store.selectFilter(filter) } }
-                )) {
-                    ForEach(ReminderTaskFilter.allCases) { filter in
-                        Text(filterTitle(filter))
-                            .tag(filter)
+                KiioCard(padding: 8, radius: 16) {
+                    Picker("", selection: Binding(
+                        get: { store.selectedFilter },
+                        set: { filter in Task { await store.selectFilter(filter) } }
+                    )) {
+                        ForEach(ReminderTaskFilter.allCases) { filter in
+                            Text(filterTitle(filter))
+                                .tag(filter)
+                        }
                     }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
+                .kiioListHeaderRow()
             }
             .listRowBackground(Color.clear)
 
             if store.isLoading {
-                ProgressView(L10n.tr("common.loading", locale: appState.locale))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .listRowBackground(Color.clear)
+                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                    .kiioListCardRow()
             } else if store.tasks.isEmpty {
                 KiioEmptyStateView(
                     systemImage: "bell",
                     title: L10n.tr("reminder.empty.title", locale: appState.locale),
                     message: L10n.tr("reminder.empty.message", locale: appState.locale)
                 )
-                .listRowBackground(Color.clear)
+                .kiioListCardRow()
             } else {
                 ForEach(store.tasks) { task in
                     NavigationLink {
@@ -78,6 +80,7 @@ private struct ReminderListScene: View {
                             .tint(KiioTheme.success)
                         }
                     }
+                    .kiioListCardRow()
                 }
 
                 KiioPaginationFooter(
@@ -88,10 +91,12 @@ private struct ReminderListScene: View {
                 ) {
                     Task { await store.loadMoreTasks() }
                 }
+                .kiioListCardRow()
             }
         }
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .navigationTitle(L10n.tr("reminder.title", locale: appState.locale))
         .task { await refreshFromBackend() }
         .refreshable { await refreshFromBackend() }
@@ -178,23 +183,27 @@ private struct ReminderDetailScene: View {
     var body: some View {
         List {
             if store.isLoading {
-                ProgressView(L10n.tr("common.loading", locale: appState.locale))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .listRowBackground(Color.clear)
+                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                    .kiioListCardRow()
             } else if let task = store.detail {
                 Section {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text(task.displayTitle)
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundStyle(KiioTheme.text)
-                        if let status = task.status {
-                            Text(status)
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(KiioTheme.accent)
+                    KiioCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack(alignment: .top, spacing: 12) {
+                                KiioIconBadge(systemImage: "bell", size: 48, iconSize: 20)
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(task.displayTitle)
+                                        .font(.system(size: 24, weight: .bold))
+                                        .foregroundStyle(KiioTheme.text)
+                                    if let status = task.status {
+                                        KiioStatusBadge(text: status, tone: statusTone(status))
+                                    }
+                                }
+                            }
                         }
                     }
-                    .padding(.vertical, 8)
                 }
+                .kiioListCardRow()
 
                 if let content = task.displayContent {
                     Section(L10n.tr("common.content", locale: appState.locale)) {
@@ -247,11 +256,12 @@ private struct ReminderDetailScene: View {
                     title: L10n.tr("reminder.detail.empty.title", locale: appState.locale),
                     message: L10n.tr("reminder.detail.empty.message", locale: appState.locale)
                 )
-                .listRowBackground(Color.clear)
+                .kiioListCardRow()
             }
         }
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .navigationTitle(L10n.tr("common.detail", locale: appState.locale))
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -326,38 +336,70 @@ private struct ReminderDetailScene: View {
                 .multilineTextAlignment(.trailing)
         }
     }
+
+    private func statusTone(_ status: String) -> KiioBadgeTone {
+        switch status {
+        case "active":
+            return .success
+        case "cancelled", "expired":
+            return .muted
+        case "failed":
+            return .danger
+        default:
+            return .accent
+        }
+    }
 }
 
 private struct ReminderTaskRow: View {
     let task: ReminderTaskDTO
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(task.displayTitle)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(KiioTheme.text)
-                Spacer()
-                if let status = task.status {
-                    Text(status)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(KiioTheme.accent)
+        HStack(alignment: .top, spacing: 12) {
+            KiioIconBadge(systemImage: "bell", size: 42, iconSize: 17)
+
+            VStack(alignment: .leading, spacing: 7) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(task.displayTitle)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(KiioTheme.text)
+                        .lineLimit(2)
+                    Spacer()
+                    if let status = task.status {
+                        KiioStatusBadge(text: status, tone: statusTone)
+                    }
+                }
+
+                if let content = task.displayContent, content != task.displayTitle {
+                    Text(content)
+                        .font(.system(size: 13))
+                        .foregroundStyle(KiioTheme.secondaryText)
+                        .lineLimit(2)
+                }
+
+                if let remindAt = task.remindAt {
+                    KiioMetaPill(icon: "clock", text: remindAt)
                 }
             }
-
-            if let content = task.displayContent, content != task.displayTitle {
-                Text(content)
-                    .font(.system(size: 13))
-                    .foregroundStyle(KiioTheme.secondaryText)
-                    .lineLimit(2)
-            }
-
-            if let remindAt = task.remindAt {
-                Label(remindAt, systemImage: "clock")
-                    .font(.system(size: 12))
-                    .foregroundStyle(KiioTheme.mutedText)
-            }
         }
-        .padding(.vertical, 4)
+        .padding(15)
+        .background(KiioTheme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.8), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
+    }
+
+    private var statusTone: KiioBadgeTone {
+        switch task.status {
+        case "active":
+            return .success
+        case "cancelled", "expired":
+            return .muted
+        default:
+            return .accent
+        }
     }
 }

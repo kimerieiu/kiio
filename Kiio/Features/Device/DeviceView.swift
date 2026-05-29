@@ -819,6 +819,9 @@ struct DeviceDetailView: View {
             }
         }
         .navigationTitle(currentDevice.displayName)
+        .scrollContentBackground(.hidden)
+        .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .onChange(of: bootstrapStore.devices) { _ in
             syncCurrentDevice()
         }
@@ -879,6 +882,7 @@ struct DeviceDetailView: View {
                 }
             }
             .padding(20)
+            .background(KiioTheme.background.ignoresSafeArea())
             .navigationTitle(L10n.tr("device.rename", locale: appState.locale))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

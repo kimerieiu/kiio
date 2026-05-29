@@ -6,6 +6,7 @@ enum RootRoute {
     case language
     case welcome
     case auth
+    case invite
     case main
 }
 
@@ -77,7 +78,14 @@ final class AppState: ObservableObject {
         rootRoute = .auth
     }
 
-    func showMain() {
+    func showInvite() {
+        rootRoute = .invite
+    }
+
+    func showMain(selectedTab: MainTab? = nil) {
+        if let selectedTab {
+            self.selectedTab = selectedTab
+        }
         rootRoute = .main
     }
 }

@@ -9,5 +9,7 @@ enum KiioColors {
     static let accent = Color(red: 168 / 255, green: 152 / 255, blue: 128 / 255)
     static let accentSoft = Color(red: 168 / 255, green: 152 / 255, blue: 128 / 255).opacity(0.14)
     static let success = Color(red: 52 / 255, green: 168 / 255, blue: 89 / 255)
+    static let warning = Color(red: 255 / 255, green: 149 / 255, blue: 0 / 255)
+    static let info = Color(red: 0 / 255, green: 122 / 255, blue: 255 / 255)
     static let danger = Color(red: 190 / 255, green: 76 / 255, blue: 76 / 255)
 }

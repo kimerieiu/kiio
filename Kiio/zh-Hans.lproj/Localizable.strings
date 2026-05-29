@@ -13,6 +13,7 @@
 "common.confirm" = "确认";
 "common.save" = "保存";
 "common.edit" = "编辑";
+"common.refresh" = "刷新";
 "common.all" = "全部";
 "common.detail" = "详情";
 "common.content" = "内容";
@@ -52,12 +53,33 @@
 "welcome.slides.s3.title" = "连接你的伙伴";
 "welcome.slides.s3.sub" = "绑定 Kiio 设备，查看聊天历史，并让原生 App 保持同步。";
 
+"invite.title" = "设置你的 Kiio 智能伙伴";
+"invite.subtitle" = "账号已创建完成。你可以现在连接设备，也可以先进入 App 熟悉一下。";
+"invite.companionTitle" = "智能伙伴设置";
+"invite.companionPending" = "Kiio 正在准备你的智能伙伴。如果暂时无法绑定，可以先进入 App，稍后刷新重试。";
+"invite.companionSummary" = "%d 个智能体已就绪，当前已绑定 %d 台设备。";
+"invite.nextSteps" = "下一步";
+"invite.step.setup.title" = "连接设备 Wi-Fi";
+"invite.step.setup.subtitle" = "按照配网引导打开 Kiio 设备门户，并完成网络配置。";
+"invite.step.bind.title" = "使用设备码绑定";
+"invite.step.bind.subtitle" = "扫描二维码，或输入设备屏幕上的 6 位设备码。";
+"invite.step.explore.title" = "先逛逛";
+"invite.step.explore.subtitle" = "之后可以回到设备页，通过右上角加号继续添加智能伙伴。";
+"invite.addDevice" = "添加设备";
+"invite.browseFirst" = "先逛逛";
+
 "auth.mode.password" = "密码";
 "auth.mode.code" = "验证码";
 "auth.mode.register" = "注册";
 "auth.mode.forgot" = "重置";
 "auth.title" = "登录 Kiio";
 "auth.subtitle" = "欢迎回来。登录后即可管理你的 Kiio 设备与对话。";
+"auth.codeSubtitle" = "不想输入密码时，可以使用邮箱验证码快速登录。";
+"auth.registerTitle" = "创建 Kiio 账号";
+"auth.registerSubtitle" = "验证邮箱并设置密码。注册完成后，你可以连接第一台设备。";
+"auth.forgotTitle" = "重置密码";
+"auth.forgotSubtitle" = "验证邮箱后，为你的 Kiio 账号设置一个新密码。";
+"auth.signInMethod" = "登录方式";
 "auth.email.placeholder" = "邮箱";
 "auth.password.placeholder" = "密码";
 "auth.newPassword.placeholder" = "新密码";
@@ -71,6 +93,10 @@
 "auth.codeSent" = "邮箱验证码已发送。";
 "auth.invalidEmail" = "请先输入有效邮箱。";
 "auth.resetSuccess" = "密码重置成功。";
+"auth.forgotPasswordLink" = "忘记密码？";
+"auth.noAccountPrompt" = "还没有 Kiio 账号？";
+"auth.createAccountLink" = "创建账号";
+"auth.haveAccountPrompt" = "已有账号？";
 
 "home.companionReady" = "伙伴已就绪";
 "home.morning" = "上午好";
@@ -263,10 +289,28 @@
 "profile.settingsSubtitle" = "语言、账号与登录状态";
 "profile.signOut" = "退出登录";
 "profile.signOutSubtitle" = "清除本地令牌";
+"profile.proTitle" = "Kiio Pro";
+"profile.proDesc" = "管理订阅权益和使用额度。";
+"profile.manageSubscription" = "管理";
+"profile.orders" = "订单";
+"profile.ordersSub" = "查看订阅订单和支付状态";
+"profile.currentVersion" = "当前版本";
 "settings.title" = "设置";
 "settings.account" = "账号";
 "settings.language" = "语言";
 "settings.about" = "关于";
+"settings.notificationsPrivacy" = "通知与隐私";
+"settings.support" = "支持";
+"settings.push" = "推送通知";
+"settings.pushSub" = "iOS 端尚未接入后端通知偏好。";
+"settings.privacy" = "隐私";
+"settings.privacySub" = "隐私控制项等待产品确认后接入。";
+"settings.security" = "安全";
+"settings.securitySub" = "账号安全信息当前沿用主账号流程。";
+"settings.help" = "帮助";
+"settings.helpSub" = "帮助中心内容暂未在此版本接入。";
+"settings.agreement" = "用户协议";
+"settings.agreementSub" = "iOS 路由确认后将在这里打开法律文档。";
 
 "common.loadMore" = "加载更多";
 "common.loadingMore" = "正在加载更多...";
@@ -324,8 +368,14 @@
 "device.provisioning.step3.title" = "返回 App 绑定";
 "device.provisioning.step3.desc" = "当设备显示 6 位设备码后，回到这里完成绑定。";
 "device.provisioning.openSettings" = "Wi-Fi 设置";
-"device.provisioning.openSettingsSub" = "请在 iOS 设置中手动打开";
+"device.provisioning.openSettingsSub" = "打开 iOS 设置后，请手动进入 Wi-Fi";
 "device.provisioning.portal" = "设备门户";
+"device.provisioning.copyPortal" = "复制门户地址";
+"device.provisioning.openSettingsHint" = "已打开设置。请进入 Wi-Fi，并连接 Kiio 设备热点。";
+"device.provisioning.openSettingsFailed" = "请手动打开系统设置，然后进入 Wi-Fi。";
+"device.provisioning.portalOpened" = "正在通过浏览器打开设备门户。";
+"device.provisioning.portalOpenFailed" = "如果门户无法打开，请先连接设备 Wi-Fi，再访问 192.168.4.1。";
+"device.provisioning.portalCopied" = "设备门户地址已复制。";
 "device.provisioning.tipsTitle" = "提示";
 "device.provisioning.tip0" = "配网时请让手机和设备保持在附近。";
 "device.provisioning.tip1" = "如果看不到设备热点，请重启设备并等待进入配网模式。";
@@ -338,6 +388,10 @@
 "device.pairing.manualTitle" = "手动输入";
 "device.pairing.manualSub" = "确认设备屏幕上显示的 6 位数字。";
 "device.pairing.success" = "设备已绑定";
+"device.pairing.agentMissingTitle" = "智能伙伴仍在初始化";
+"device.pairing.agentMissingMessage" = "绑定设备前需要默认智能伙伴。请等待账号初始化完成后刷新重试。";
+"device.pairing.agentStillMissing" = "暂时还没有可用智能伙伴，请稍后再试。";
+"device.pairing.codeInvalid" = "请输入设备屏幕上显示的 6 位设备码。";
 "device.scan.title" = "扫描设备二维码";
 "device.scan.invalidQRCode" = "这不是支持的 Kiio 设备二维码。";
 "device.scan.bindFailed" = "设备绑定失败，请稍后重试。";
@@ -388,3 +442,11 @@
 "profile.signOutConfirm" = "退出登录并清除此设备上的本地令牌？";
 "profile.role.admin" = "管理员";
 "profile.role.user" = "用户";
+
+"subscription.title" = "Kiio Pro";
+"subscription.placeholder.message" = "确认 iOS 支付渠道后，订阅详情会显示在这里。";
+"subscription.placeholder.billing" = "支付渠道";
+"subscription.placeholder.billingSub" = "当前 Web 流程使用后端 manual 支付；iOS 购买流程会单独处理。";
+"orders.title" = "订单";
+"orders.empty.title" = "暂无订单";
+"orders.empty.message" = "启用 iOS 订单流程后，订阅订单和支付状态会显示在这里。";

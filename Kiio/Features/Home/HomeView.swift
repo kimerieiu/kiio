@@ -5,13 +5,15 @@ struct HomeView: View {
     @EnvironmentObject private var bootstrapStore: BootstrapStore
 
     @State private var viewMode: HomeViewMode = .card
+    @State private var currentCard = 0
+    @GestureState private var cardDragOffset: CGFloat = 0
 
     private let tools: [HomeToolItem] = [
-        HomeToolItem(icon: "bell", categoryKey: "home.category.productivity", titleKey: "home.tool.reminders.title", subtitleKey: "home.tool.reminders.subtitle", destination: .reminder, accent: Color(red: 123 / 255, green: 158 / 255, blue: 201 / 255), backgroundStart: Color(red: 123 / 255, green: 158 / 255, blue: 201 / 255), backgroundEnd: Color(red: 91 / 255, green: 127 / 255, blue: 168 / 255)),
-        HomeToolItem(icon: "wallet.pass", categoryKey: "home.category.finance", titleKey: "home.tool.accounting.title", subtitleKey: "home.tool.accounting.subtitle", destination: .accounting, accent: Color(red: 95 / 255, green: 168 / 255, blue: 130 / 255), backgroundStart: Color(red: 139 / 255, green: 196 / 255, blue: 169 / 255), backgroundEnd: Color(red: 95 / 255, green: 168 / 255, blue: 130 / 255)),
-        HomeToolItem(icon: "tshirt", categoryKey: "home.category.life", titleKey: "home.tool.outfit.title", subtitleKey: "home.tool.outfit.subtitle", destination: .outfit, accent: Color(red: 168 / 255, green: 123 / 255, blue: 138 / 255), backgroundStart: Color(red: 201 / 255, green: 168 / 255, blue: 180 / 255), backgroundEnd: Color(red: 168 / 255, green: 123 / 255, blue: 138 / 255)),
-        HomeToolItem(icon: "newspaper", categoryKey: "home.category.info", titleKey: "home.tool.news.title", subtitleKey: "home.tool.news.subtitle", destination: .news, accent: Color(red: 123 / 255, green: 123 / 255, blue: 168 / 255), backgroundStart: Color(red: 168 / 255, green: 168 / 255, blue: 201 / 255), backgroundEnd: Color(red: 123 / 255, green: 123 / 255, blue: 168 / 255)),
-        HomeToolItem(icon: "envelope", categoryKey: "home.category.communication", titleKey: "home.tool.mail.title", subtitleKey: "home.tool.mail.subtitle", destination: .mail, accent: Color(red: 184 / 255, green: 92 / 255, blue: 110 / 255), backgroundStart: Color(red: 217 / 255, green: 137 / 255, blue: 122 / 255), backgroundEnd: Color(red: 184 / 255, green: 92 / 255, blue: 110 / 255))
+        HomeToolItem(icon: "bell", categoryKey: "home.category.productivity", titleKey: "home.tool.reminders.title", subtitleKey: "home.tool.reminders.subtitle", destination: .reminder, accent: KiioTheme.accent, softTint: Color(red: 237 / 255, green: 232 / 255, blue: 225 / 255)),
+        HomeToolItem(icon: "wallet.pass", categoryKey: "home.category.finance", titleKey: "home.tool.accounting.title", subtitleKey: "home.tool.accounting.subtitle", destination: .accounting, accent: Color(red: 139 / 255, green: 122 / 255, blue: 101 / 255), softTint: Color(red: 221 / 255, green: 213 / 255, blue: 200 / 255)),
+        HomeToolItem(icon: "tshirt", categoryKey: "home.category.life", titleKey: "home.tool.outfit.title", subtitleKey: "home.tool.outfit.subtitle", destination: .outfit, accent: Color(red: 120 / 255, green: 109 / 255, blue: 96 / 255), softTint: Color(red: 230 / 255, green: 224 / 255, blue: 215 / 255)),
+        HomeToolItem(icon: "newspaper", categoryKey: "home.category.info", titleKey: "home.tool.news.title", subtitleKey: "home.tool.news.subtitle", destination: .news, accent: Color(red: 107 / 255, green: 90 / 255, blue: 77 / 255), softTint: Color(red: 224 / 255, green: 218 / 255, blue: 209 / 255)),
+        HomeToolItem(icon: "envelope", categoryKey: "home.category.communication", titleKey: "home.tool.mail.title", subtitleKey: "home.tool.mail.subtitle", destination: .mail, accent: Color(red: 184 / 255, green: 92 / 255, blue: 110 / 255), softTint: Color(red: 239 / 255, green: 220 / 255, blue: 222 / 255))
     ]
 
     var body: some View {
@@ -53,6 +55,10 @@ struct HomeView: View {
             .padding(4)
             .background(KiioTheme.surface)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(.white.opacity(0.8), lineWidth: 1)
+            )
         }
     }
 
@@ -69,15 +75,13 @@ struct HomeView: View {
                 Text(greeting)
                     .font(.system(size: 18, weight: .bold))
                     .foregroundStyle(KiioTheme.text)
-                HStack(spacing: 6) {
-                    Text(L10n.tr("home.companionReady", locale: appState.locale))
-                    Text("•")
-                    Text(L10n.tr("home.mood.askByVoice", locale: appState.locale))
-                }
-                .font(.system(size: 12))
-                .foregroundStyle(KiioTheme.secondaryText)
-                .lineLimit(1)
+                    .lineLimit(1)
+                Text("\(L10n.tr("home.companionReady", locale: appState.locale)) / \(L10n.tr("home.mood.askByVoice", locale: appState.locale))")
+                    .font(.system(size: 12))
+                    .foregroundStyle(KiioTheme.secondaryText)
+                    .lineLimit(2)
             }
+            .layoutPriority(1)
 
             Spacer()
 
@@ -96,25 +100,131 @@ struct HomeView: View {
         .padding(16)
         .background(KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.8), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.035), radius: 14, y: 6)
     }
 
     private var toolCarousel: some View {
-        VStack(spacing: 10) {
-            TabView {
-                ForEach(tools) { tool in
-                    NavigationLink {
-                        toolDestination(tool.destination)
+        VStack(spacing: 14) {
+            GeometryReader { proxy in
+                let cardWidth = min(max(proxy.size.width * 0.72, 232), 274)
+
+                ZStack {
+                    ForEach(Array(tools.enumerated()), id: \.element.id) { index, tool in
+                        let style = flowStyle(for: index, cardWidth: cardWidth)
+
+                        NavigationLink {
+                            toolDestination(tool.destination)
+                        } label: {
+                            HomeFeatureCard(tool: tool)
+                                .frame(width: cardWidth)
+                        }
+                        .buttonStyle(.plain)
+                        .rotation3DEffect(.degrees(style.rotation), axis: (x: 0, y: 1, z: 0), perspective: 0.74)
+                        .scaleEffect(style.scale)
+                        .offset(x: style.xOffset)
+                        .opacity(style.opacity)
+                        .zIndex(style.zIndex)
+                        .allowsHitTesting(index == currentCard)
+                        .accessibilityHidden(index != currentCard)
+                    }
+                }
+                .frame(width: proxy.size.width, height: 286)
+                .contentShape(Rectangle())
+            }
+            .frame(height: 286)
+            .simultaneousGesture(cardDragGesture)
+            .animation(.spring(response: 0.42, dampingFraction: 0.86), value: currentCard)
+            .animation(.interactiveSpring(response: 0.26, dampingFraction: 0.88), value: cardDragOffset)
+
+            HStack(spacing: 8) {
+                ForEach(tools.indices, id: \.self) { index in
+                    Button {
+                        withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
+                            currentCard = index
+                        }
                     } label: {
-                        HomeFeatureCard(tool: tool)
-                            .padding(.horizontal, 2)
+                        Capsule()
+                            .fill(index == currentCard ? KiioTheme.accent : KiioTheme.accent.opacity(0.24))
+                            .frame(width: index == currentCard ? 18 : 6, height: 6)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(L10n.tr(tools[index].titleKey, locale: appState.locale))
                 }
             }
-            .frame(height: 318)
-            .tabViewStyle(.page(indexDisplayMode: .always))
-            .indexViewStyle(.page(backgroundDisplayMode: .always))
         }
+    }
+
+    private var cardDragGesture: some Gesture {
+        DragGesture(minimumDistance: 12)
+            .updating($cardDragOffset) { value, state, _ in
+                state = value.translation.width
+            }
+            .onEnded { value in
+                let threshold: CGFloat = 44
+                guard tools.count > 1 else { return }
+
+                if value.translation.width < -threshold {
+                    moveCard(by: 1)
+                } else if value.translation.width > threshold {
+                    moveCard(by: -1)
+                }
+            }
+    }
+
+    private func moveCard(by step: Int) {
+        guard !tools.isEmpty else { return }
+
+        withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
+            currentCard = (currentCard + step + tools.count) % tools.count
+        }
+    }
+
+    private func flowStyle(for index: Int, cardWidth: CGFloat) -> HomeFlowCardStyle {
+        let offset = circularOffset(for: index)
+        let absOffset = abs(offset)
+
+        if absOffset == 0 {
+            let rotation = max(-16, min(16, -Double(cardDragOffset / 14)))
+            return HomeFlowCardStyle(
+                xOffset: cardDragOffset * 0.42,
+                rotation: rotation,
+                scale: 1,
+                opacity: 1,
+                zIndex: 10
+            )
+        }
+
+        guard absOffset <= 2 else {
+            return HomeFlowCardStyle(xOffset: 0, rotation: 0, scale: 0.76, opacity: 0, zIndex: 0)
+        }
+
+        let sign: CGFloat = offset < 0 ? -1 : 1
+        let depth = CGFloat(absOffset)
+        let xOffset = sign * cardWidth * (0.64 + 0.48 * (depth - 1)) + cardDragOffset * 0.16
+        let scale: CGFloat = absOffset == 1 ? 0.94 : 0.82
+        let opacity: Double = absOffset == 1 ? 0.62 : 0.1
+
+        return HomeFlowCardStyle(
+            xOffset: xOffset,
+            rotation: -Double(sign) * 44,
+            scale: scale,
+            opacity: opacity,
+            zIndex: Double(10 - absOffset)
+        )
+    }
+
+    private func circularOffset(for index: Int) -> Int {
+        let total = tools.count
+        guard total > 0 else { return 0 }
+
+        var offset = index - currentCard
+        if offset > total / 2 { offset -= total }
+        if offset < -total / 2 { offset += total }
+        return offset
     }
 
     private var toolList: some View {
@@ -171,6 +281,14 @@ struct HomeView: View {
     }
 }
 
+private struct HomeFlowCardStyle {
+    let xOffset: CGFloat
+    let rotation: Double
+    let scale: CGFloat
+    let opacity: Double
+    let zIndex: Double
+}
+
 private struct HomeFeatureCard: View {
     @EnvironmentObject private var appState: AppState
     let tool: HomeToolItem
@@ -178,56 +296,82 @@ private struct HomeFeatureCard: View {
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             LinearGradient(
-                colors: [tool.backgroundStart, tool.backgroundEnd],
+                colors: [
+                    KiioTheme.surface,
+                    tool.softTint.opacity(0.42),
+                    KiioTheme.surface.opacity(0.96)
+                ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
 
-            Image(systemName: tool.icon)
-                .font(.system(size: 120, weight: .thin))
-                .foregroundStyle(.white.opacity(0.08))
-                .offset(x: 120, y: -60)
+            Circle()
+                .fill(tool.softTint.opacity(0.5))
+                .frame(width: 184, height: 184)
+                .offset(x: 178, y: 106)
 
-            VStack(alignment: .leading, spacing: 18) {
+            Image(systemName: tool.icon)
+                .font(.system(size: 112, weight: .thin))
+                .foregroundStyle(tool.accent.opacity(0.08))
+                .offset(x: 116, y: -66)
+
+            VStack(alignment: .leading, spacing: 16) {
                 HStack {
                     Image(systemName: tool.icon)
                         .font(.system(size: 22, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(tool.accent)
                         .frame(width: 48, height: 48)
-                        .background(.white.opacity(0.16))
+                        .background(tool.softTint.opacity(0.72))
                         .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
 
                     Spacer()
 
                     Text(L10n.tr(tool.categoryKey, locale: appState.locale))
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.9))
+                        .foregroundStyle(tool.accent)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 7)
-                        .background(.white.opacity(0.14))
+                        .background(tool.softTint.opacity(0.65))
                         .clipShape(Capsule())
                 }
 
                 Spacer()
 
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 10) {
                     Text(L10n.tr(tool.titleKey, locale: appState.locale))
-                        .font(.system(size: 30, weight: .bold))
-                        .foregroundStyle(.white)
+                        .font(.system(size: 29, weight: .bold))
+                        .foregroundStyle(KiioTheme.text)
                         .lineLimit(2)
                     Text(L10n.tr(tool.subtitleKey, locale: appState.locale))
                         .font(.system(size: 15))
-                        .foregroundStyle(.white.opacity(0.78))
+                        .foregroundStyle(KiioTheme.secondaryText)
                         .lineSpacing(3)
                         .lineLimit(3)
+                }
+
+                HStack {
+                    Capsule()
+                        .fill(tool.accent)
+                        .frame(width: 34, height: 4)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(tool.accent)
+                        .frame(width: 34, height: 34)
+                        .background(Color.white.opacity(0.7))
+                        .clipShape(Circle())
                 }
             }
             .padding(22)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 292)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .shadow(color: tool.backgroundEnd.opacity(0.24), radius: 18, y: 10)
+        .frame(height: 278)
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(.white.opacity(0.84), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.05), radius: 18, y: 8)
     }
 }
 
@@ -241,7 +385,7 @@ private struct HomeListCard: View {
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(tool.accent)
                 .frame(width: 44, height: 44)
-                .background(tool.accent.opacity(0.13))
+                .background(tool.softTint.opacity(0.7))
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             VStack(alignment: .leading, spacing: 5) {
@@ -249,12 +393,16 @@ private struct HomeListCard: View {
                     Text(L10n.tr(tool.titleKey, locale: appState.locale))
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(KiioTheme.text)
+                        .lineLimit(1)
+
+                    Spacer(minLength: 8)
+
                     Text(L10n.tr(tool.categoryKey, locale: appState.locale))
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(tool.accent)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 4)
-                        .background(tool.accent.opacity(0.12))
+                        .background(tool.softTint.opacity(0.7))
                         .clipShape(Capsule())
                 }
 
@@ -263,16 +411,22 @@ private struct HomeListCard: View {
                     .foregroundStyle(KiioTheme.secondaryText)
                     .lineLimit(2)
             }
-
-            Spacer()
+            .layoutPriority(1)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(KiioTheme.mutedText)
         }
         .padding(16)
+        .frame(minHeight: 88)
         .background(KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.8), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
     }
 }
 
@@ -288,8 +442,7 @@ private struct HomeToolItem: Identifiable {
     let subtitleKey: String
     let destination: HomeToolDestination
     let accent: Color
-    let backgroundStart: Color
-    let backgroundEnd: Color
+    let softTint: Color
 
     var id: String { titleKey }
 }

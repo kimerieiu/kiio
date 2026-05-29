@@ -20,16 +20,15 @@ private struct NewsListScene: View {
     var body: some View {
         List {
             if store.isLoading {
-                ProgressView(L10n.tr("common.loading", locale: appState.locale))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .listRowBackground(Color.clear)
+                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                    .kiioListCardRow()
             } else if store.records.isEmpty {
                 KiioEmptyStateView(
                     systemImage: "newspaper",
                     title: L10n.tr("news.empty.title", locale: appState.locale),
                     message: L10n.tr("news.empty.message", locale: appState.locale)
                 )
-                .listRowBackground(Color.clear)
+                .kiioListCardRow()
             } else {
                 ForEach(store.records) { record in
                     NavigationLink {
@@ -44,6 +43,7 @@ private struct NewsListScene: View {
                             Label(L10n.tr("common.delete", locale: appState.locale), systemImage: "trash")
                         }
                     }
+                    .kiioListCardRow()
                 }
 
                 KiioPaginationFooter(
@@ -54,10 +54,12 @@ private struct NewsListScene: View {
                 ) {
                     Task { await store.loadMoreRecords() }
                 }
+                .kiioListCardRow()
             }
         }
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .navigationTitle(navigationTitle)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -145,28 +147,42 @@ private struct NewsDetailScene: View {
     var body: some View {
         List {
             if store.isLoading {
-                ProgressView(L10n.tr("common.loading", locale: appState.locale))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .listRowBackground(Color.clear)
+                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                    .kiioListCardRow()
             } else if let record = store.detail {
                 Section {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text(record.displayTitle)
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundStyle(KiioTheme.text)
-                        HStack(spacing: 8) {
-                            if let source = record.source ?? record.categoryName {
-                                Text(source)
+                    KiioCard {
+                        VStack(alignment: .leading, spacing: 12) {
+                            if let thumbnailURL = record.thumbnailUrl,
+                               let url = URL(string: thumbnailURL) {
+                                AsyncImage(url: url) { image in
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                } placeholder: {
+                                    KiioTheme.accentSoft
+                                }
+                                .frame(height: 150)
+                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                             }
-                            if let time = record.relativeTime ?? record.newsDate ?? record.createdAt {
-                                Text(time)
+
+                            Text(record.displayTitle)
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundStyle(KiioTheme.text)
+                                .lineLimit(4)
+
+                            HStack(spacing: 6) {
+                                if let source = record.source ?? record.categoryName {
+                                    KiioMetaPill(icon: "newspaper", text: source, tone: .accent)
+                                }
+                                if let time = record.relativeTime ?? record.newsDate ?? record.createdAt {
+                                    KiioMetaPill(icon: "clock", text: time)
+                                }
                             }
                         }
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(KiioTheme.secondaryText)
                     }
-                    .padding(.vertical, 8)
                 }
+                .kiioListCardRow()
 
                 if let summary = record.summary, !summary.isEmpty {
                     Section(L10n.tr("common.summary", locale: appState.locale)) {
@@ -212,11 +228,12 @@ private struct NewsDetailScene: View {
                     title: L10n.tr("news.detail.empty.title", locale: appState.locale),
                     message: L10n.tr("news.detail.empty.message", locale: appState.locale)
                 )
-                .listRowBackground(Color.clear)
+                .kiioListCardRow()
             }
         }
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .navigationTitle(L10n.tr("common.detail", locale: appState.locale))
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -269,33 +286,61 @@ private struct NewsRecordRow: View {
     let record: NewsRecordDTO
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(record.displayTitle)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(KiioTheme.text)
-                .lineLimit(2)
+        HStack(alignment: .top, spacing: 12) {
+            thumbnail
 
-            if let summary = record.displaySummary {
-                Text(summary)
-                    .font(.system(size: 13))
-                    .foregroundStyle(KiioTheme.secondaryText)
-                    .lineLimit(3)
-            }
+            VStack(alignment: .leading, spacing: 8) {
+                Text(record.displayTitle)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(KiioTheme.text)
+                    .lineLimit(2)
 
-            HStack(spacing: 8) {
-                if let categoryName = record.categoryName {
-                    Text(categoryName)
+                if let summary = record.displaySummary {
+                    Text(summary)
+                        .font(.system(size: 13))
+                        .foregroundStyle(KiioTheme.secondaryText)
+                        .lineLimit(3)
                 }
-                if let source = record.source {
-                    Text(source)
+
+                HStack(spacing: 6) {
+                    if let categoryName = record.categoryName {
+                        KiioMetaPill(icon: nil, text: categoryName, tone: .accent)
+                    }
+                    if let source = record.source {
+                        KiioMetaPill(icon: nil, text: source)
+                    }
                 }
+
                 if let relativeTime = record.relativeTime ?? record.newsDate {
-                    Text(relativeTime)
+                    KiioMetaPill(icon: "clock", text: relativeTime)
                 }
             }
-            .font(.system(size: 12))
-            .foregroundStyle(KiioTheme.mutedText)
         }
-        .padding(.vertical, 4)
+        .padding(15)
+        .background(KiioTheme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.8), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
+    }
+
+    @ViewBuilder
+    private var thumbnail: some View {
+        if let rawURL = record.thumbnailUrl,
+           let url = URL(string: rawURL) {
+            AsyncImage(url: url) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+            } placeholder: {
+                KiioTheme.accentSoft
+            }
+            .frame(width: 66, height: 66)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        } else {
+            KiioIconBadge(systemImage: "newspaper", size: 48, iconSize: 19)
+        }
     }
 }

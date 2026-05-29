@@ -1,8 +1,14 @@
 import SwiftUI
+import UIKit
 
 struct DeviceProvisioningGuideView: View {
     @EnvironmentObject private var appState: AppState
+    @Environment(\.openURL) private var openURL
     let onContinue: () -> Void
+
+    @State private var actionMessage: String?
+
+    private let portalURLString = "http://192.168.4.1"
 
     var body: some View {
         ScrollView {
@@ -67,17 +73,35 @@ struct DeviceProvisioningGuideView: View {
     }
 
     private var quickActions: some View {
-        HStack(spacing: 12) {
-            DeviceGuideAction(
-                icon: "gearshape",
-                title: L10n.tr("device.provisioning.openSettings", locale: appState.locale),
-                subtitle: L10n.tr("device.provisioning.openSettingsSub", locale: appState.locale)
-            )
-            DeviceGuideAction(
-                icon: "globe",
-                title: L10n.tr("device.provisioning.portal", locale: appState.locale),
-                subtitle: "192.168.4.1"
-            )
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 12) {
+                DeviceGuideAction(
+                    icon: "gearshape",
+                    title: L10n.tr("device.provisioning.openSettings", locale: appState.locale),
+                    subtitle: L10n.tr("device.provisioning.openSettingsSub", locale: appState.locale)
+                ) {
+                    openSystemSettings()
+                }
+
+                DeviceGuideAction(
+                    icon: "globe",
+                    title: L10n.tr("device.provisioning.portal", locale: appState.locale),
+                    subtitle: "192.168.4.1"
+                ) {
+                    openDevicePortal()
+                }
+            }
+
+            KiioSecondaryButton(title: L10n.tr("device.provisioning.copyPortal", locale: appState.locale)) {
+                copyPortalAddress()
+            }
+
+            if let actionMessage {
+                Text(actionMessage)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(KiioTheme.secondaryText)
+                    .padding(.horizontal, 4)
+            }
         }
     }
 
@@ -103,6 +127,35 @@ struct DeviceProvisioningGuideView: View {
             }
         }
     }
+
+    private func openSystemSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else {
+            actionMessage = L10n.tr("device.provisioning.openSettingsFailed", locale: appState.locale)
+            return
+        }
+        openURL(url) { accepted in
+            actionMessage = accepted
+                ? L10n.tr("device.provisioning.openSettingsHint", locale: appState.locale)
+                : L10n.tr("device.provisioning.openSettingsFailed", locale: appState.locale)
+        }
+    }
+
+    private func openDevicePortal() {
+        guard let url = URL(string: portalURLString) else {
+            actionMessage = L10n.tr("device.provisioning.portalOpenFailed", locale: appState.locale)
+            return
+        }
+        openURL(url) { accepted in
+            actionMessage = accepted
+                ? L10n.tr("device.provisioning.portalOpened", locale: appState.locale)
+                : L10n.tr("device.provisioning.portalOpenFailed", locale: appState.locale)
+        }
+    }
+
+    private func copyPortalAddress() {
+        UIPasteboard.general.string = portalURLString
+        actionMessage = L10n.tr("device.provisioning.portalCopied", locale: appState.locale)
+    }
 }
 
 struct DevicePairingGuideView: View {
@@ -114,17 +167,21 @@ struct DevicePairingGuideView: View {
     @State private var code = ""
     @State private var alertMessage: String?
     @State private var didBind = false
+    @State private var isRefreshingAgent = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 heading
+                if bootstrapStore.agents.isEmpty {
+                    agentUnavailableCard
+                }
                 scannerVisual
                 manualInput
                 KiioPrimaryButton(
                     title: didBind ? L10n.tr("device.pairing.success", locale: appState.locale) : L10n.tr("device.bind", locale: appState.locale),
                     isLoading: deviceStore.isBinding,
-                    isDisabled: code.count != 6 || didBind
+                    isDisabled: !canSubmitManualCode
                 ) {
                     Task { await bindDevice() }
                 }
@@ -133,6 +190,9 @@ struct DevicePairingGuideView: View {
         }
         .background(KiioTheme.background.ignoresSafeArea())
         .navigationTitle(L10n.tr("device.pairing.title", locale: appState.locale))
+        .task {
+            await bootstrapStore.ensureLoaded()
+        }
         .kiioErrorAlert(message: $alertMessage, locale: appState.locale)
     }
 
@@ -145,6 +205,46 @@ struct DevicePairingGuideView: View {
                 .font(.system(size: 14))
                 .foregroundStyle(KiioTheme.secondaryText)
                 .lineSpacing(3)
+        }
+    }
+
+    private var agentUnavailableCard: some View {
+        KiioCard {
+            HStack(alignment: .top, spacing: 14) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(KiioTheme.accent)
+                    .frame(width: 44, height: 44)
+                    .background(KiioTheme.accentSoft)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 7) {
+                    Text(L10n.tr("device.pairing.agentMissingTitle", locale: appState.locale))
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(KiioTheme.text)
+                    Text(L10n.tr("device.pairing.agentMissingMessage", locale: appState.locale))
+                        .font(.system(size: 13))
+                        .foregroundStyle(KiioTheme.secondaryText)
+                        .lineSpacing(3)
+
+                    Button {
+                        Task { await refreshAgentContext() }
+                    } label: {
+                        HStack(spacing: 8) {
+                            if isRefreshingAgent || bootstrapStore.isLoading {
+                                ProgressView()
+                            }
+                            Text(L10n.tr("common.refresh", locale: appState.locale))
+                                .font(.system(size: 13, weight: .semibold))
+                        }
+                        .foregroundStyle(KiioTheme.accent)
+                    }
+                    .disabled(isRefreshingAgent || bootstrapStore.isLoading)
+                    .padding(.top, 4)
+                }
+
+                Spacer()
+            }
         }
     }
 
@@ -184,7 +284,8 @@ struct DevicePairingGuideView: View {
             }
         }
         .buttonStyle(.plain)
-        .disabled(didBind || deviceStore.isBinding)
+        .disabled(!canOpenScanner)
+        .opacity(canOpenScanner ? 1 : 0.58)
     }
 
     private var manualInput: some View {
@@ -217,8 +318,26 @@ struct DevicePairingGuideView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     }
                 }
+
+                if !code.isEmpty && code.count < 6 {
+                    Text(L10n.tr("device.pairing.codeInvalid", locale: appState.locale))
+                        .font(.system(size: 12))
+                        .foregroundStyle(KiioTheme.danger)
+                }
             }
         }
+    }
+
+    private var selectedAgentId: String? {
+        bootstrapStore.agents.first?.id
+    }
+
+    private var canOpenScanner: Bool {
+        selectedAgentId != nil && !didBind && !deviceStore.isBinding
+    }
+
+    private var canSubmitManualCode: Bool {
+        selectedAgentId != nil && code.count == 6 && !didBind
     }
 
     private func character(at index: Int) -> String {
@@ -228,8 +347,14 @@ struct DevicePairingGuideView: View {
     }
 
     private func bindDevice() async {
-        guard let agentId = bootstrapStore.agents.first?.id else {
-            alertMessage = L10n.tr("device.noAgent", locale: appState.locale)
+        guard let agentId = selectedAgentId else {
+            alertMessage = L10n.tr("device.pairing.agentMissingMessage", locale: appState.locale)
+            await refreshAgentContext(showFailure: false)
+            return
+        }
+
+        guard code.count == 6 else {
+            alertMessage = L10n.tr("device.pairing.codeInvalid", locale: appState.locale)
             return
         }
 
@@ -240,6 +365,17 @@ struct DevicePairingGuideView: View {
             }
         } else {
             alertMessage = deviceStore.errorMessage
+        }
+    }
+
+    private func refreshAgentContext(showFailure: Bool = true) async {
+        guard !isRefreshingAgent else { return }
+        isRefreshingAgent = true
+        defer { isRefreshingAgent = false }
+
+        let didRefresh = await bootstrapStore.refresh()
+        if showFailure && (!didRefresh || bootstrapStore.agents.isEmpty) {
+            alertMessage = bootstrapStore.errorMessage ?? L10n.tr("device.pairing.agentStillMissing", locale: appState.locale)
         }
     }
 }
@@ -276,27 +412,37 @@ private struct DeviceGuideAction: View {
     let icon: String
     let title: String
     let subtitle: String
+    let action: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: icon)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(KiioTheme.accent)
-                .frame(width: 34, height: 34)
-                .background(KiioTheme.accentSoft)
-                .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: icon)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(KiioTheme.accent)
+                        .frame(width: 34, height: 34)
+                        .background(KiioTheme.accentSoft)
+                        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+                    Spacer()
+                    Image(systemName: "arrow.up.forward")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(KiioTheme.mutedText)
+                }
 
-            Text(title)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(KiioTheme.text)
-            Text(subtitle)
-                .font(.system(size: 12))
-                .foregroundStyle(KiioTheme.secondaryText)
-                .lineLimit(2)
+                Text(title)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(KiioTheme.text)
+                Text(subtitle)
+                    .font(.system(size: 12))
+                    .foregroundStyle(KiioTheme.secondaryText)
+                    .lineLimit(2)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, minHeight: 118, alignment: .leading)
+            .background(KiioTheme.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, minHeight: 118, alignment: .leading)
-        .background(KiioTheme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .buttonStyle(.plain)
     }
 }

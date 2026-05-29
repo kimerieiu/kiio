@@ -20,31 +20,33 @@ private struct AccountingListScene: View {
     var body: some View {
         List {
             Section {
-                Picker("", selection: Binding(
-                    get: { store.selectedFilter },
-                    set: { filter in Task { await store.selectFilter(filter) } }
-                )) {
-                    ForEach(AccountingBillFilter.allCases) { filter in
-                        Text(filterTitle(filter))
-                            .tag(filter)
+                KiioCard(padding: 8, radius: 16) {
+                    Picker("", selection: Binding(
+                        get: { store.selectedFilter },
+                        set: { filter in Task { await store.selectFilter(filter) } }
+                    )) {
+                        ForEach(AccountingBillFilter.allCases) { filter in
+                            Text(filterTitle(filter))
+                                .tag(filter)
+                        }
                     }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
+                .kiioListHeaderRow()
             }
             .listRowBackground(Color.clear)
 
             if store.isLoading {
-                ProgressView(L10n.tr("common.loading", locale: appState.locale))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .listRowBackground(Color.clear)
+                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                    .kiioListCardRow()
             } else if store.bills.isEmpty {
                 KiioEmptyStateView(
                     systemImage: "wallet.pass",
                     title: L10n.tr("accounting.empty.title", locale: appState.locale),
                     message: L10n.tr("accounting.empty.message", locale: appState.locale)
                 )
-                .listRowBackground(Color.clear)
+                .kiioListCardRow()
             } else {
                 Section(filterTitle(store.selectedFilter)) {
                     ForEach(store.bills) { bill in
@@ -66,6 +68,7 @@ private struct AccountingListScene: View {
                                     .tint(KiioTheme.success)
                                 }
                             }
+                            .kiioListCardRow()
                     }
 
                     KiioPaginationFooter(
@@ -76,11 +79,13 @@ private struct AccountingListScene: View {
                     ) {
                         Task { await store.loadMore() }
                     }
+                    .kiioListCardRow()
                 }
             }
         }
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .navigationTitle(L10n.tr("accounting.title", locale: appState.locale))
         .task { await refreshFromBackend() }
         .refreshable { await refreshFromBackend() }
@@ -168,21 +173,30 @@ private struct AccountingDetailScene: View {
     var body: some View {
         List {
             if store.isLoading {
-                ProgressView(L10n.tr("common.loading", locale: appState.locale))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .listRowBackground(Color.clear)
+                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                    .kiioListCardRow()
             } else if let bill = store.detail {
                 Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(amountText(for: bill))
-                            .font(.system(size: 32, weight: .bold))
-                            .foregroundStyle(amountColor(for: bill))
-                        Text(bill.displayTitle)
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(KiioTheme.text)
+                    KiioCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack(alignment: .top, spacing: 12) {
+                                KiioIconBadge(systemImage: "wallet.pass", tone: typeTone(for: bill), size: 48, iconSize: 20)
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(amountText(for: bill))
+                                        .font(.system(size: 32, weight: .bold))
+                                        .foregroundStyle(amountColor(for: bill))
+                                    Text(bill.displayTitle)
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundStyle(KiioTheme.text)
+                                    if let status = bill.status {
+                                        KiioStatusBadge(text: status, tone: statusTone(status))
+                                    }
+                                }
+                            }
+                        }
                     }
-                    .padding(.vertical, 8)
                 }
+                .kiioListCardRow()
 
                 Section(L10n.tr("common.detail", locale: appState.locale)) {
                     labeled(L10n.tr("common.type", locale: appState.locale), bill.billType)
@@ -220,11 +234,12 @@ private struct AccountingDetailScene: View {
                     title: L10n.tr("accounting.detail.empty.title", locale: appState.locale),
                     message: L10n.tr("accounting.detail.empty.message", locale: appState.locale)
                 )
-                .listRowBackground(Color.clear)
+                .kiioListCardRow()
             }
         }
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .navigationTitle(L10n.tr("common.detail", locale: appState.locale))
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -316,6 +331,21 @@ private struct AccountingDetailScene: View {
         default:
             return KiioTheme.danger
         }
+    }
+
+    private func typeTone(for bill: AccountingBillDTO) -> KiioBadgeTone {
+        switch bill.billType {
+        case "income":
+            return .success
+        case "transfer":
+            return .accent
+        default:
+            return .danger
+        }
+    }
+
+    private func statusTone(_ status: String) -> KiioBadgeTone {
+        status == "pending_confirm" ? .warning : .accent
     }
 
     private func labeled(_ title: String, _ value: String?) -> some View {
@@ -481,6 +511,8 @@ private struct AccountingBillFormView: View {
             }
             .navigationTitle(L10n.tr("accounting.editBill", locale: appState.locale))
             .navigationBarTitleDisplayMode(.inline)
+            .scrollContentBackground(.hidden)
+            .background(KiioTheme.background.ignoresSafeArea())
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(L10n.tr("common.cancel", locale: appState.locale)) {
@@ -674,31 +706,79 @@ private struct AccountingBillRow: View {
     let bill: AccountingBillDTO
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(bill.displayTitle)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(KiioTheme.text)
-                Spacer()
-                Text(bill.displayAmount)
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundStyle(KiioTheme.accent)
-            }
+        HStack(alignment: .top, spacing: 12) {
+            KiioIconBadge(systemImage: iconName, tone: tone, size: 42, iconSize: 17)
 
-            HStack(spacing: 8) {
-                if let billType = bill.billType {
-                    Text(billType)
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(bill.displayTitle)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(KiioTheme.text)
+                        .lineLimit(2)
+                    Spacer()
+                    Text(amountText)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(tone.color)
                 }
-                if let accountName = bill.accountName {
-                    Text(accountName)
+
+                HStack(spacing: 6) {
+                    if let billType = bill.billType {
+                        KiioMetaPill(icon: nil, text: billType, tone: tone)
+                    }
+                    if let accountName = bill.accountName {
+                        KiioMetaPill(icon: "creditcard", text: accountName)
+                    }
                 }
+
                 if let occurredAt = bill.occurredAt {
-                    Text(occurredAt)
+                    KiioMetaPill(icon: "clock", text: occurredAt)
+                }
+
+                if bill.status == "pending_confirm" {
+                    KiioStatusBadge(text: bill.status ?? "", tone: .warning)
                 }
             }
-            .font(.system(size: 12))
-            .foregroundStyle(KiioTheme.secondaryText)
         }
-        .padding(.vertical, 4)
+        .padding(15)
+        .background(KiioTheme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.8), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
+    }
+
+    private var amountText: String {
+        switch bill.billType {
+        case "income":
+            return "+\(bill.displayAmount)"
+        case "transfer":
+            return bill.displayAmount
+        default:
+            return "-\(bill.displayAmount)"
+        }
+    }
+
+    private var iconName: String {
+        switch bill.billType {
+        case "income":
+            return "arrow.down.left"
+        case "transfer":
+            return "arrow.left.arrow.right"
+        default:
+            return "arrow.up.right"
+        }
+    }
+
+    private var tone: KiioBadgeTone {
+        switch bill.billType {
+        case "income":
+            return .success
+        case "transfer":
+            return .accent
+        default:
+            return .danger
+        }
     }
 }

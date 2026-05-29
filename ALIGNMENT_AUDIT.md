@@ -18,7 +18,7 @@ entry points in the iOS app.
 | Device dashboard | device | Aligned | Dashboard, add sheet, device metrics, list/detail entry, agent language preference. |
 | Device list / detail | device-list / device-detail | Aligned | Device list, detail hero, identity/firmware, rename, auto update, refresh status, re-provision, unbind. |
 | Provisioning / pairing | device-provisioning2 / device-pairing2 / device-scan | Aligned | Native guide, AVFoundation QR scanning, and manual six-digit fallback binding are present. |
-| Profile | profile | Aligned with boundary | Account, assets, device/outfit/settings/about/sign out. Subscription and orders hidden. |
-| Settings | settings / settings-language | iOS-native equivalent | Account summary, sign out, app language, about/API/version. Non-closed privacy/help/security pages hidden. |
+| Profile | profile | Aligned with boundary | Account, assets, subscription/order placeholders, device/outfit/settings/about/sign out. Subscription and orders are visual entry points, but payment/order business remains TODO. |
+| Settings | settings / settings-language | iOS-native equivalent | Account summary, app language, agent language, about/API/version, and native TODO rows for non-closed privacy/help/security routes. |
 | Realtime sync | notify-client / sync store | Partially aligned | Tool pages use dirty refresh. Device pages now refresh through bootstrap for future device notify modules; backend currently publishes tool modules only. Chat and Profile remain bootstrap/manual refresh. |
-| Business boundary | subscription / order / SM2 / multi-agent / manual bill | Deferred | No active iOS entry points should be added for this phase. |
+| Business boundary | subscription / order / SM2 / multi-agent / manual bill | Deferred | Subscription and order pages are placeholder entry points only. No payment/order backend or App Store purchase flow is treated as complete. |

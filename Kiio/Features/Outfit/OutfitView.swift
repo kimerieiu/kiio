@@ -20,31 +20,33 @@ private struct OutfitListScene: View {
     var body: some View {
         List {
             Section {
-                Picker("", selection: Binding(
-                    get: { store.selectedFilter },
-                    set: { filter in Task { await store.selectFilter(filter) } }
-                )) {
-                    ForEach(OutfitFilter.allCases) { filter in
-                        Text(filterTitle(filter))
-                            .tag(filter)
+                KiioCard(padding: 8, radius: 16) {
+                    Picker("", selection: Binding(
+                        get: { store.selectedFilter },
+                        set: { filter in Task { await store.selectFilter(filter) } }
+                    )) {
+                        ForEach(OutfitFilter.allCases) { filter in
+                            Text(filterTitle(filter))
+                                .tag(filter)
+                        }
                     }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
+                .kiioListHeaderRow()
             }
             .listRowBackground(Color.clear)
 
             if store.isLoading {
-                ProgressView(L10n.tr("common.loading", locale: appState.locale))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .listRowBackground(Color.clear)
+                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                    .kiioListCardRow()
             } else if store.outfits.isEmpty {
                 KiioEmptyStateView(
                     systemImage: "tshirt",
                     title: L10n.tr("outfit.empty.title", locale: appState.locale),
                     message: L10n.tr("outfit.empty.message", locale: appState.locale)
                 )
-                .listRowBackground(Color.clear)
+                .kiioListCardRow()
             } else {
                 ForEach(store.outfits) { outfit in
                     NavigationLink {
@@ -59,6 +61,7 @@ private struct OutfitListScene: View {
                             Label(L10n.tr("common.delete", locale: appState.locale), systemImage: "trash")
                         }
                     }
+                    .kiioListCardRow()
                 }
 
                 KiioPaginationFooter(
@@ -69,10 +72,12 @@ private struct OutfitListScene: View {
                 ) {
                     Task { await store.loadMoreOutfits() }
                 }
+                .kiioListCardRow()
             }
         }
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .navigationTitle(L10n.tr("outfit.title", locale: appState.locale))
         .task { await refreshFromBackend() }
         .refreshable { await refreshFromBackend() }
@@ -127,21 +132,23 @@ private struct OutfitDetailView: View {
     var body: some View {
         List {
             if store.isLoading {
-                ProgressView(L10n.tr("common.loading", locale: appState.locale))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .listRowBackground(Color.clear)
+                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                    .kiioListCardRow()
             } else if let outfit = store.detail {
                 Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(outfit.displayTitle)
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundStyle(KiioTheme.text)
-                        Text(outfit.outfitDate ?? outfit.createdAt ?? "--")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(KiioTheme.secondaryText)
+                    KiioCard {
+                        HStack(alignment: .top, spacing: 14) {
+                            KiioIconBadge(systemImage: "tshirt", size: 54, iconSize: 22)
+                            VStack(alignment: .leading, spacing: 9) {
+                                Text(outfit.displayTitle)
+                                    .font(.system(size: 24, weight: .bold))
+                                    .foregroundStyle(KiioTheme.text)
+                                KiioMetaPill(icon: "calendar", text: outfit.outfitDate ?? outfit.createdAt ?? "--")
+                            }
+                        }
                     }
-                    .padding(.vertical, 8)
                 }
+                .kiioListCardRow()
 
                 if let content = outfit.displayContent {
                     Section(L10n.tr("outfit.suggestion", locale: appState.locale)) {
@@ -203,11 +210,12 @@ private struct OutfitDetailView: View {
                     title: L10n.tr("outfit.detail.empty.title", locale: appState.locale),
                     message: L10n.tr("outfit.detail.empty.message", locale: appState.locale)
                 )
-                .listRowBackground(Color.clear)
+                .kiioListCardRow()
             }
         }
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .navigationTitle(L10n.tr("outfit.detailTitle", locale: appState.locale))
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -250,43 +258,49 @@ private struct OutfitRow: View {
     let outfit: ClothOutfitDTO
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(outfit.displayTitle)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(KiioTheme.text)
-                    .lineLimit(2)
-                Spacer()
-                Text(outfit.outfitDate ?? outfit.createdAt ?? "")
-                    .font(.system(size: 12))
-                    .foregroundStyle(KiioTheme.mutedText)
-            }
+        HStack(alignment: .top, spacing: 12) {
+            KiioIconBadge(systemImage: "tshirt", size: 42, iconSize: 17)
 
-            if let content = outfit.displayContent {
-                Text(content)
-                    .font(.system(size: 13))
-                    .foregroundStyle(KiioTheme.secondaryText)
-                    .lineLimit(2)
-            }
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text(outfit.displayTitle)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(KiioTheme.text)
+                        .lineLimit(2)
+                    Spacer()
+                }
 
-            let tags = (outfit.items ?? [])
-                .map { $0.itemName ?? $0.itemType ?? "" }
-                .filter { !$0.isEmpty }
-                .prefix(3)
-            if !tags.isEmpty {
-                HStack(spacing: 6) {
-                    ForEach(Array(tags), id: \.self) { tag in
-                        Text(tag)
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(KiioTheme.accent)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
-                            .background(KiioTheme.accentSoft)
-                            .clipShape(Capsule())
+                if let content = outfit.displayContent {
+                    Text(content)
+                        .font(.system(size: 13))
+                        .foregroundStyle(KiioTheme.secondaryText)
+                        .lineLimit(2)
+                }
+
+                if let date = outfit.outfitDate ?? outfit.createdAt {
+                    KiioMetaPill(icon: "calendar", text: date)
+                }
+
+                let tags = (outfit.items ?? [])
+                    .map { $0.itemName ?? $0.itemType ?? "" }
+                    .filter { !$0.isEmpty }
+                    .prefix(3)
+                if !tags.isEmpty {
+                    HStack(spacing: 6) {
+                        ForEach(Array(tags), id: \.self) { tag in
+                            KiioMetaPill(icon: nil, text: tag, tone: .accent)
+                        }
                     }
                 }
             }
         }
-        .padding(.vertical, 4)
+        .padding(15)
+        .background(KiioTheme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.8), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
     }
 }

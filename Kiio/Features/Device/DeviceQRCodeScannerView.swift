@@ -15,6 +15,7 @@ struct DeviceQRCodeScannerView: View {
     @StateObject private var viewModel = DeviceQRCodeBindingViewModel()
     @State private var permissionState = CameraPermissionState.checking
     @State private var scannerFailure: String?
+    @State private var isRefreshingAgent = false
 
     var body: some View {
         ZStack {
@@ -142,7 +143,15 @@ struct DeviceQRCodeScannerView: View {
     private var bottomPanel: some View {
         VStack(spacing: 14) {
             if permissionState == .authorized {
-                if let scannerFailure {
+                if !agentIsAvailable {
+                    permissionCard(
+                        icon: "sparkles",
+                        title: L10n.tr("device.pairing.agentMissingTitle", locale: appState.locale),
+                        message: L10n.tr("device.pairing.agentMissingMessage", locale: appState.locale),
+                        primaryTitle: L10n.tr("common.refresh", locale: appState.locale),
+                        primaryAction: refreshAgentContext
+                    )
+                } else if let scannerFailure {
                     permissionCard(
                         icon: "camera",
                         title: L10n.tr("device.scan.cameraUnavailable", locale: appState.locale),
@@ -242,10 +251,15 @@ struct DeviceQRCodeScannerView: View {
 
     private var scannerIsActive: Bool {
         permissionState == .authorized
+            && agentIsAvailable
             && scannerFailure == nil
             && !viewModel.isProcessing
             && !viewModel.didBind
             && !viewModel.needsRescan
+    }
+
+    private var agentIsAvailable: Bool {
+        bootstrapStore.agents.first?.id.isEmpty == false
     }
 
     private func updatePermission() async {
@@ -266,6 +280,11 @@ struct DeviceQRCodeScannerView: View {
     }
 
     private func handleScannedValue(_ value: String) async {
+        guard agentIsAvailable else {
+            viewModel.errorMessage = L10n.tr("device.pairing.agentMissingMessage", locale: appState.locale)
+            return
+        }
+
         let success = await viewModel.handleScannedValue(
             value,
             locale: appState.locale,
@@ -279,6 +298,16 @@ struct DeviceQRCodeScannerView: View {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             onBound()
+        }
+    }
+
+    private func refreshAgentContext() {
+        guard !isRefreshingAgent else { return }
+        isRefreshingAgent = true
+        Task {
+            _ = await bootstrapStore.refresh()
+            viewModel.scanAgain()
+            isRefreshingAgent = false
         }
     }
 

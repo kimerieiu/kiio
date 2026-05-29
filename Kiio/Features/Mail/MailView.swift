@@ -22,36 +22,42 @@ private struct MailListScene: View {
     var body: some View {
         List {
             Section {
-                Picker("", selection: Binding(
-                    get: { store.selectedOperationFilter },
-                    set: { filter in Task { await store.selectOperationFilter(filter) } }
-                )) {
-                    ForEach(MailOperationFilter.allCases) { filter in
-                        Text(operationFilterTitle(filter))
-                            .tag(filter)
+                KiioCard(padding: 8, radius: 16) {
+                    Picker("", selection: Binding(
+                        get: { store.selectedOperationFilter },
+                        set: { filter in Task { await store.selectOperationFilter(filter) } }
+                    )) {
+                        ForEach(MailOperationFilter.allCases) { filter in
+                            Text(operationFilterTitle(filter))
+                                .tag(filter)
+                        }
                     }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
+                .kiioListHeaderRow()
             }
             .listRowBackground(Color.clear)
 
             if store.isLoading {
-                ProgressView(L10n.tr("common.loading", locale: appState.locale))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .listRowBackground(Color.clear)
+                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                    .kiioListCardRow()
             } else if store.accounts.isEmpty && store.operations.isEmpty {
                 KiioEmptyStateView(
                     systemImage: "envelope",
                     title: L10n.tr("mail.empty.title", locale: appState.locale),
                     message: L10n.tr("mail.empty.message", locale: appState.locale)
                 )
-                .listRowBackground(Color.clear)
+                .kiioListCardRow()
             } else {
                 Section(L10n.tr("mail.accounts", locale: appState.locale)) {
                     if store.accounts.isEmpty {
-                        Text(L10n.tr("mail.noAccounts", locale: appState.locale))
-                            .foregroundStyle(KiioTheme.secondaryText)
+                        KiioCard {
+                            Text(L10n.tr("mail.noAccounts", locale: appState.locale))
+                                .font(.system(size: 14))
+                                .foregroundStyle(KiioTheme.secondaryText)
+                        }
+                        .kiioListCardRow()
                     } else {
                         ForEach(store.accounts) { account in
                             NavigationLink {
@@ -81,14 +87,19 @@ private struct MailListScene: View {
                                     Label(L10n.tr("common.delete", locale: appState.locale), systemImage: "trash")
                                 }
                             }
+                            .kiioListCardRow()
                         }
                     }
                 }
 
                 Section(L10n.tr("mail.operations", locale: appState.locale)) {
                     if store.operations.isEmpty {
-                        Text(L10n.tr("mail.noOperations", locale: appState.locale))
-                            .foregroundStyle(KiioTheme.secondaryText)
+                        KiioCard {
+                            Text(L10n.tr("mail.noOperations", locale: appState.locale))
+                                .font(.system(size: 14))
+                                .foregroundStyle(KiioTheme.secondaryText)
+                        }
+                        .kiioListCardRow()
                     } else {
                         ForEach(store.operations) { operation in
                             NavigationLink {
@@ -103,6 +114,7 @@ private struct MailListScene: View {
                                     Label(L10n.tr("common.delete", locale: appState.locale), systemImage: "trash")
                                 }
                             }
+                            .kiioListCardRow()
                         }
 
                         KiioPaginationFooter(
@@ -113,12 +125,14 @@ private struct MailListScene: View {
                         ) {
                             Task { await store.loadMoreOperations() }
                         }
+                        .kiioListCardRow()
                     }
                 }
             }
         }
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .navigationTitle(L10n.tr("mail.title", locale: appState.locale))
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -288,6 +302,8 @@ private struct MailAccountFormView: View {
             }
             .navigationTitle(account == nil ? L10n.tr("mail.addAccount", locale: appState.locale) : L10n.tr("mail.editAccount", locale: appState.locale))
             .navigationBarTitleDisplayMode(.inline)
+            .scrollContentBackground(.hidden)
+            .background(KiioTheme.background.ignoresSafeArea())
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(L10n.tr("common.cancel", locale: appState.locale)) {
@@ -410,29 +426,26 @@ private struct MailAccountDetailScene: View {
     var body: some View {
         List {
             if store.isLoading {
-                ProgressView(L10n.tr("common.loading", locale: appState.locale))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .listRowBackground(Color.clear)
+                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                    .kiioListCardRow()
             } else if let account = store.accountDetail {
                 Section {
-                    HStack(spacing: 12) {
-                        Image(systemName: "envelope")
-                            .foregroundStyle(KiioTheme.accent)
-                            .frame(width: 42, height: 42)
-                            .background(KiioTheme.accentSoft)
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(account.displayTitle)
-                                .font(.system(size: 18, weight: .semibold))
-                            if account.isDefault == 1 {
-                                Text(L10n.tr("mail.defaultAccount", locale: appState.locale))
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .foregroundStyle(KiioTheme.accent)
+                    KiioCard {
+                        HStack(spacing: 12) {
+                            KiioIconBadge(systemImage: "envelope", size: 48, iconSize: 20)
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(account.displayTitle)
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundStyle(KiioTheme.text)
+                                if account.isDefault == 1 {
+                                    KiioStatusBadge(text: L10n.tr("mail.defaultAccount", locale: appState.locale), tone: .accent)
+                                }
                             }
+                            Spacer()
                         }
                     }
-                    .padding(.vertical, 6)
                 }
+                .kiioListCardRow()
 
                 Section(L10n.tr("common.detail", locale: appState.locale)) {
                     labeled("IMAP", serverText(account.imapServer, account.imapPort))
@@ -447,11 +460,12 @@ private struct MailAccountDetailScene: View {
                     title: L10n.tr("mail.account.empty.title", locale: appState.locale),
                     message: L10n.tr("mail.account.empty.message", locale: appState.locale)
                 )
-                .listRowBackground(Color.clear)
+                .kiioListCardRow()
             }
         }
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .navigationTitle(L10n.tr("mail.accountDetail", locale: appState.locale))
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -520,6 +534,16 @@ private struct MailAccountDetailScene: View {
                 .multilineTextAlignment(.trailing)
         }
     }
+
+    private func statusTone(_ status: String) -> KiioBadgeTone {
+        if status == "failed" {
+            return .danger
+        }
+        if status == "pending_confirm" {
+            return .warning
+        }
+        return .accent
+    }
 }
 
 private struct MailOperationDetailView: View {
@@ -555,21 +579,30 @@ private struct MailOperationDetailScene: View {
     var body: some View {
         List {
             if store.isLoading {
-                ProgressView(L10n.tr("common.loading", locale: appState.locale))
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .listRowBackground(Color.clear)
+                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                    .kiioListCardRow()
             } else if let operation = store.operationDetail {
                 Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(operation.displayTitle)
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundStyle(KiioTheme.text)
-                        Text(operation.status ?? "--")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(operation.status == "failed" ? KiioTheme.danger : KiioTheme.accent)
+                    KiioCard {
+                        HStack(alignment: .top, spacing: 12) {
+                            KiioIconBadge(
+                                systemImage: "paperplane",
+                                tone: operation.status == "failed" ? .danger : .accent,
+                                size: 48,
+                                iconSize: 20
+                            )
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(operation.displayTitle)
+                                    .font(.system(size: 22, weight: .bold))
+                                    .foregroundStyle(KiioTheme.text)
+                                if let status = operation.status {
+                                    KiioStatusBadge(text: status, tone: statusTone(status))
+                                }
+                            }
+                        }
                     }
-                    .padding(.vertical, 8)
                 }
+                .kiioListCardRow()
 
                 Section(L10n.tr("common.detail", locale: appState.locale)) {
                     labeled(L10n.tr("mail.operationType", locale: appState.locale), operation.operationType)
@@ -606,11 +639,12 @@ private struct MailOperationDetailScene: View {
                     title: L10n.tr("mail.operation.empty.title", locale: appState.locale),
                     message: L10n.tr("mail.operation.empty.message", locale: appState.locale)
                 )
-                .listRowBackground(Color.clear)
+                .kiioListCardRow()
             }
         }
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
+        .listStyle(.plain)
         .navigationTitle(L10n.tr("mail.operationDetail", locale: appState.locale))
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -660,25 +694,55 @@ private struct MailOperationDetailScene: View {
 }
 
 private struct MailAccountRow: View {
+    @EnvironmentObject private var appState: AppState
     let account: MailAccountDTO
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            HStack {
-                Text(account.displayTitle)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(KiioTheme.text)
-                Spacer()
-                if account.isDefault == 1 {
-                    Image(systemName: "star.fill")
-                        .foregroundStyle(KiioTheme.accent)
+        HStack(alignment: .top, spacing: 12) {
+            KiioIconBadge(systemImage: "envelope", size: 42, iconSize: 17)
+
+            VStack(alignment: .leading, spacing: 7) {
+                HStack {
+                    Text(account.displayTitle)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(KiioTheme.text)
+                        .lineLimit(1)
+                    Spacer()
+                    if account.isDefault == 1 {
+                        KiioStatusBadge(text: L10n.tr("mail.defaultAccount", locale: appState.locale), tone: .accent)
+                    }
                 }
+
+                Text(account.imapServer ?? account.smtpServer ?? "--")
+                    .font(.system(size: 12))
+                    .foregroundStyle(KiioTheme.secondaryText)
+                    .lineLimit(1)
+
+                KiioMetaPill(
+                    icon: account.enabled == 1 ? "checkmark.circle" : "pause.circle",
+                    text: statusText,
+                    tone: accountTone
+                )
             }
-            Text(account.imapServer ?? account.smtpServer ?? "--")
-                .font(.system(size: 12))
-                .foregroundStyle(KiioTheme.secondaryText)
         }
-        .padding(.vertical, 4)
+        .padding(15)
+        .background(KiioTheme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.8), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
+    }
+
+    private var statusText: String {
+        account.enabled == 1
+            ? L10n.tr("device.enabled", locale: appState.locale)
+            : L10n.tr("device.disabled", locale: appState.locale)
+    }
+
+    private var accountTone: KiioBadgeTone {
+        account.enabled == 1 ? .success : .muted
     }
 }
 
@@ -686,32 +750,55 @@ private struct MailOperationRow: View {
     let operation: MailOperationDTO
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(operation.displayTitle)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(KiioTheme.text)
-                Spacer()
-                if let status = operation.status {
-                    Text(status)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(status == "failed" ? KiioTheme.danger : KiioTheme.accent)
+        HStack(alignment: .top, spacing: 12) {
+            KiioIconBadge(systemImage: "paperplane", tone: iconTone, size: 42, iconSize: 17)
+
+            VStack(alignment: .leading, spacing: 7) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(operation.displayTitle)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(KiioTheme.text)
+                        .lineLimit(2)
+                    Spacer()
+                    if let status = operation.status {
+                        KiioStatusBadge(text: status, tone: statusTone)
+                    }
+                }
+
+                if let summary = operation.summary {
+                    Text(summary)
+                        .font(.system(size: 13))
+                        .foregroundStyle(KiioTheme.secondaryText)
+                        .lineLimit(2)
+                }
+
+                if let createdAt = operation.createdAt {
+                    KiioMetaPill(icon: "clock", text: createdAt)
                 }
             }
-
-            if let summary = operation.summary {
-                Text(summary)
-                    .font(.system(size: 13))
-                    .foregroundStyle(KiioTheme.secondaryText)
-                    .lineLimit(2)
-            }
-
-            if let createdAt = operation.createdAt {
-                Text(createdAt)
-                    .font(.system(size: 12))
-                    .foregroundStyle(KiioTheme.mutedText)
-            }
         }
-        .padding(.vertical, 4)
+        .padding(15)
+        .background(KiioTheme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.8), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
+    }
+
+    private var statusTone: KiioBadgeTone {
+        switch operation.status {
+        case "failed":
+            return .danger
+        case "pending_confirm":
+            return .warning
+        default:
+            return .accent
+        }
+    }
+
+    private var iconTone: KiioBadgeTone {
+        operation.status == "failed" ? .danger : .accent
     }
 }

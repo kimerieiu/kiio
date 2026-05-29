@@ -21,16 +21,15 @@ struct RootView: View {
                 WelcomeView()
             case .auth:
                 AuthView()
+            case .invite:
+                InviteView()
+                    .task {
+                        await loadAuthenticatedContext()
+                    }
             case .main:
                 MainTabView()
                     .task {
-                        await bootstrapStore.ensureLoaded()
-                        if let language = bootstrapStore.preference?.language {
-                            appState.setLocale(language)
-                        }
-                        authStore.updateUser(bootstrapStore.userInfo)
-                        await dependencies.syncStore.syncVersions(silent: true)
-                        dependencies.notifyWebSocketClient.connect()
+                        await loadAuthenticatedContext()
                     }
             }
         }
@@ -40,11 +39,21 @@ struct RootView: View {
                 dependencies.notifyWebSocketClient.disconnect()
                 dependencies.syncStore.reset()
                 bootstrapStore.reset()
-                if appState.rootRoute == .main {
+                if appState.rootRoute == .main || appState.rootRoute == .invite {
                     appState.showAuth()
                 }
             }
         }
+    }
+
+    private func loadAuthenticatedContext() async {
+        await bootstrapStore.ensureLoaded()
+        if let language = bootstrapStore.preference?.language {
+            appState.setLocale(language)
+        }
+        authStore.updateUser(bootstrapStore.userInfo)
+        await dependencies.syncStore.syncVersions(silent: true)
+        dependencies.notifyWebSocketClient.connect()
     }
 }
 

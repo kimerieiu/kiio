@@ -16,6 +16,14 @@ private enum AuthMode: String, CaseIterable, Identifiable {
         case .forgot: return "auth.mode.forgot"
         }
     }
+
+    var isSignInMode: Bool {
+        self == .password || self == .code
+    }
+
+    var needsEmailCode: Bool {
+        self == .code || self == .register || self == .forgot
+    }
 }
 
 struct AuthView: View {
@@ -32,18 +40,21 @@ struct AuthView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
+                if !mode.isSignInMode {
+                    backToSignInButton
+                }
+
                 header
 
-                if availableModes.count > 1 {
-                    Picker("", selection: $mode) {
-                        ForEach(availableModes) { mode in
-                            Text(L10n.tr(mode.localizationKey, locale: appState.locale)).tag(mode)
-                        }
-                    }
-                    .pickerStyle(.segmented)
+                if mode.isSignInMode && emailVerificationEnabled {
+                    signInMethodPicker
                 }
 
                 formFields
+
+                if mode.needsEmailCode {
+                    sendCodeButton
+                }
 
                 KiioPrimaryButton(
                     title: primaryButtonTitle,
@@ -53,24 +64,7 @@ struct AuthView: View {
                     Task { await submit() }
                 }
 
-                if mode != .password {
-                    KiioSecondaryButton(
-                        title: L10n.tr("auth.sendCode", locale: appState.locale),
-                        isLoading: authStore.isLoading,
-                        isDisabled: !isValidEmail(normalizedEmail)
-                    ) {
-                        Task { await sendCode() }
-                    }
-                }
-
-                if mode == .forgot {
-                    Button(L10n.tr("auth.backToSignIn", locale: appState.locale)) {
-                        mode = .password
-                    }
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(KiioTheme.accent)
-                    .frame(maxWidth: .infinity)
-                }
+                secondaryActions
             }
             .padding(24)
         }
@@ -90,16 +84,30 @@ struct AuthView: View {
             KiioLogoView(size: 56)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(L10n.tr("auth.title", locale: appState.locale))
+                Text(headerTitle)
                     .font(.system(size: 30, weight: .bold))
                     .foregroundStyle(KiioTheme.text)
-                Text(L10n.tr("auth.subtitle", locale: appState.locale))
+                Text(headerSubtitle)
                     .font(.system(size: 15))
                     .lineSpacing(3)
                     .foregroundStyle(KiioTheme.secondaryText)
             }
         }
         .padding(.top, 24)
+    }
+
+    private var signInMethodPicker: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(L10n.tr("auth.signInMethod", locale: appState.locale))
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(KiioTheme.mutedText)
+
+            Picker("", selection: $mode) {
+                Text(L10n.tr("auth.mode.password", locale: appState.locale)).tag(AuthMode.password)
+                Text(L10n.tr("auth.mode.code", locale: appState.locale)).tag(AuthMode.code)
+            }
+            .pickerStyle(.segmented)
+        }
     }
 
     @ViewBuilder
@@ -122,12 +130,109 @@ struct AuthView: View {
         }
     }
 
+    private var sendCodeButton: some View {
+        KiioSecondaryButton(
+            title: L10n.tr("auth.sendCode", locale: appState.locale),
+            isLoading: authStore.isLoading,
+            isDisabled: !isValidEmail(normalizedEmail)
+        ) {
+            Task { await sendCode() }
+        }
+    }
+
+    @ViewBuilder
+    private var secondaryActions: some View {
+        if mode.isSignInMode {
+            VStack(spacing: 14) {
+                if mode == .password && emailVerificationEnabled {
+                    Button {
+                        enterSecondaryMode(.forgot)
+                    } label: {
+                        Text(L10n.tr("auth.forgotPasswordLink", locale: appState.locale))
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(KiioTheme.accent)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+
+                if userRegistrationEnabled {
+                    HStack(spacing: 5) {
+                        Text(L10n.tr("auth.noAccountPrompt", locale: appState.locale))
+                            .foregroundStyle(KiioTheme.secondaryText)
+                        Button {
+                            enterSecondaryMode(.register)
+                        } label: {
+                            Text(L10n.tr("auth.createAccountLink", locale: appState.locale))
+                                .fontWeight(.semibold)
+                                .foregroundStyle(KiioTheme.accent)
+                        }
+                    }
+                    .font(.system(size: 14))
+                    .frame(maxWidth: .infinity)
+                }
+            }
+        } else {
+            HStack(spacing: 5) {
+                Text(L10n.tr("auth.haveAccountPrompt", locale: appState.locale))
+                    .foregroundStyle(KiioTheme.secondaryText)
+                Button {
+                    returnToSignIn()
+                } label: {
+                    Text(L10n.tr("auth.signIn", locale: appState.locale))
+                        .fontWeight(.semibold)
+                        .foregroundStyle(KiioTheme.accent)
+                }
+            }
+            .font(.system(size: 14))
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    private var backToSignInButton: some View {
+        Button {
+            returnToSignIn()
+        } label: {
+            HStack(spacing: 7) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 13, weight: .bold))
+                Text(L10n.tr("auth.backToSignIn", locale: appState.locale))
+                    .font(.system(size: 14, weight: .semibold))
+            }
+            .foregroundStyle(KiioTheme.accent)
+        }
+        .padding(.top, 8)
+    }
+
     private var primaryButtonTitle: String {
         switch mode {
         case .password: return L10n.tr("auth.signIn", locale: appState.locale)
         case .code: return L10n.tr("auth.signInCode", locale: appState.locale)
         case .register: return L10n.tr("auth.createAccount", locale: appState.locale)
         case .forgot: return L10n.tr("auth.resetPassword", locale: appState.locale)
+        }
+    }
+
+    private var headerTitle: String {
+        switch mode {
+        case .password, .code:
+            return L10n.tr("auth.title", locale: appState.locale)
+        case .register:
+            return L10n.tr("auth.registerTitle", locale: appState.locale)
+        case .forgot:
+            return L10n.tr("auth.forgotTitle", locale: appState.locale)
+        }
+    }
+
+    private var headerSubtitle: String {
+        switch mode {
+        case .password:
+            return L10n.tr("auth.subtitle", locale: appState.locale)
+        case .code:
+            return L10n.tr("auth.codeSubtitle", locale: appState.locale)
+        case .register:
+            return L10n.tr("auth.registerSubtitle", locale: appState.locale)
+        case .forgot:
+            return L10n.tr("auth.forgotSubtitle", locale: appState.locale)
         }
     }
 
@@ -198,7 +303,7 @@ struct AuthView: View {
                     code: normalizedCode,
                     language: L10n.backendLocale(appState.locale)
                 )
-                await finishAuthenticatedFlow()
+                await finishAuthenticatedFlow(destination: .invite)
             case .forgot:
                 try await authStore.resetPassword(email: normalizedEmail, code: normalizedCode, password: password)
                 alertMessage = L10n.tr("auth.resetSuccess", locale: appState.locale)
@@ -225,14 +330,19 @@ struct AuthView: View {
         }
     }
 
-    private func finishAuthenticatedFlow() async {
+    private func finishAuthenticatedFlow(destination: AuthSuccessDestination = .main) async {
         await bootstrapStore.refresh()
         guard authStore.isAuthenticated else {
             appState.showAuth()
             return
         }
         authStore.updateUser(bootstrapStore.userInfo)
-        appState.showMain()
+        switch destination {
+        case .main:
+            appState.showMain()
+        case .invite:
+            appState.showInvite()
+        }
     }
 
     private func isValidEmail(_ value: String) -> Bool {
@@ -244,4 +354,22 @@ struct AuthView: View {
             mode = .password
         }
     }
+
+    private func enterSecondaryMode(_ nextMode: AuthMode) {
+        guard availableModes.contains(nextMode) else { return }
+        mode = nextMode
+        password = ""
+        code = ""
+    }
+
+    private func returnToSignIn() {
+        mode = .password
+        password = ""
+        code = ""
+    }
+}
+
+private enum AuthSuccessDestination {
+    case main
+    case invite
 }

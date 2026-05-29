@@ -30,6 +30,9 @@ struct LanguageSelectionView: View {
         }
         .padding(24)
         .background(KiioTheme.background.ignoresSafeArea())
+        .onAppear {
+            selectedLocale = appState.locale
+        }
     }
 
     private func languageRow(title: String, subtitle: String, value: String) -> some View {

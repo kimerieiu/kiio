@@ -13,6 +13,7 @@
 "common.confirm" = "Confirm";
 "common.save" = "Save";
 "common.edit" = "Edit";
+"common.refresh" = "Refresh";
 "common.all" = "All";
 "common.detail" = "Detail";
 "common.content" = "Content";
@@ -52,12 +53,33 @@
 "welcome.slides.s3.title" = "Connect your companion";
 "welcome.slides.s3.sub" = "Bind your Kiio device, browse chat history, and keep the native app in sync.";
 
+"invite.title" = "Set up your Kiio companion";
+"invite.subtitle" = "Your account is ready. Connect a device now, or start exploring the app and add one later.";
+"invite.companionTitle" = "Companion setup";
+"invite.companionPending" = "Kiio is preparing your companion. If binding is not available yet, continue to the app and refresh shortly.";
+"invite.companionSummary" = "%d agent(s) ready, %d device(s) currently bound.";
+"invite.nextSteps" = "Next steps";
+"invite.step.setup.title" = "Connect to device Wi-Fi";
+"invite.step.setup.subtitle" = "Use the setup guide to open the Kiio device portal and finish network setup.";
+"invite.step.bind.title" = "Bind with device code";
+"invite.step.bind.subtitle" = "Scan the QR code or enter the 6-digit code shown on your device.";
+"invite.step.explore.title" = "Explore first";
+"invite.step.explore.subtitle" = "You can return to Device later and add a companion from the plus menu.";
+"invite.addDevice" = "Add Device";
+"invite.browseFirst" = "Browse First";
+
 "auth.mode.password" = "Password";
 "auth.mode.code" = "Code";
 "auth.mode.register" = "Register";
 "auth.mode.forgot" = "Reset";
 "auth.title" = "Sign in to Kiio";
 "auth.subtitle" = "Welcome back. Sign in to manage your Kiio devices and conversations.";
+"auth.codeSubtitle" = "Use a one-time email code when you do not want to enter your password.";
+"auth.registerTitle" = "Create your Kiio account";
+"auth.registerSubtitle" = "Verify your email and set a password. After signup, you can connect your first device.";
+"auth.forgotTitle" = "Reset your password";
+"auth.forgotSubtitle" = "Verify your email, then set a new password for your Kiio account.";
+"auth.signInMethod" = "Sign-in method";
 "auth.email.placeholder" = "Email";
 "auth.password.placeholder" = "Password";
 "auth.newPassword.placeholder" = "New password";
@@ -71,6 +93,10 @@
 "auth.codeSent" = "Email code sent.";
 "auth.invalidEmail" = "Enter a valid email first.";
 "auth.resetSuccess" = "Password reset successfully.";
+"auth.forgotPasswordLink" = "Forgot password?";
+"auth.noAccountPrompt" = "New to Kiio?";
+"auth.createAccountLink" = "Create account";
+"auth.haveAccountPrompt" = "Already have an account?";
 
 "home.companionReady" = "Companion ready";
 "home.morning" = "Good morning";
@@ -263,10 +289,28 @@
 "profile.settingsSubtitle" = "Language, account, and session";
 "profile.signOut" = "Sign Out";
 "profile.signOutSubtitle" = "Clear local token";
+"profile.proTitle" = "Kiio Pro";
+"profile.proDesc" = "Manage subscription benefits and usage.";
+"profile.manageSubscription" = "Manage";
+"profile.orders" = "Orders";
+"profile.ordersSub" = "Review subscription orders and payment status";
+"profile.currentVersion" = "Current version";
 "settings.title" = "Settings";
 "settings.account" = "Account";
 "settings.language" = "Language";
 "settings.about" = "About";
+"settings.notificationsPrivacy" = "Notifications & Privacy";
+"settings.support" = "Support";
+"settings.push" = "Push notifications";
+"settings.pushSub" = "Backend notification preferences are not wired on iOS yet.";
+"settings.privacy" = "Privacy";
+"settings.privacySub" = "Privacy controls are waiting for product confirmation.";
+"settings.security" = "Security";
+"settings.securitySub" = "Account security details currently share the main account flow.";
+"settings.help" = "Help";
+"settings.helpSub" = "Help center content is not connected in this build.";
+"settings.agreement" = "Agreement";
+"settings.agreementSub" = "Legal documents will open here after the iOS route is confirmed.";
 
 "common.loadMore" = "Load more";
 "common.loadingMore" = "Loading more...";
@@ -324,8 +368,14 @@
 "device.provisioning.step3.title" = "Return for binding";
 "device.provisioning.step3.desc" = "When the device displays a 6-digit code, return here and bind it to your companion.";
 "device.provisioning.openSettings" = "Wi-Fi settings";
-"device.provisioning.openSettingsSub" = "Open manually in iOS";
+"device.provisioning.openSettingsSub" = "Open iOS Settings, then choose Wi-Fi manually";
 "device.provisioning.portal" = "Device portal";
+"device.provisioning.copyPortal" = "Copy portal address";
+"device.provisioning.openSettingsHint" = "Settings opened. Choose Wi-Fi and connect to the Kiio hotspot.";
+"device.provisioning.openSettingsFailed" = "Open Settings manually, then choose Wi-Fi.";
+"device.provisioning.portalOpened" = "Opening the device portal in your browser.";
+"device.provisioning.portalOpenFailed" = "If the portal does not open, connect to the device Wi-Fi and visit 192.168.4.1.";
+"device.provisioning.portalCopied" = "Device portal address copied.";
 "device.provisioning.tipsTitle" = "Tips";
 "device.provisioning.tip0" = "Keep the phone and device on the same nearby network during setup.";
 "device.provisioning.tip1" = "If the hotspot is not visible, restart the device and wait for setup mode.";
@@ -338,6 +388,10 @@
 "device.pairing.manualTitle" = "Manual input";
 "device.pairing.manualSub" = "Confirm the code shown on the device screen.";
 "device.pairing.success" = "Device bound";
+"device.pairing.agentMissingTitle" = "Companion is still initializing";
+"device.pairing.agentMissingMessage" = "A default companion is required before binding a device. Refresh after account initialization finishes.";
+"device.pairing.agentStillMissing" = "No companion is available yet. Try again in a moment.";
+"device.pairing.codeInvalid" = "Enter the 6-digit code shown on your device.";
 "device.scan.title" = "Scan Device QR";
 "device.scan.invalidQRCode" = "This QR code is not a supported Kiio device code.";
 "device.scan.bindFailed" = "Device binding failed. Please try again.";
@@ -388,3 +442,11 @@
 "profile.signOutConfirm" = "Sign out and clear the local token on this device?";
 "profile.role.admin" = "Admin";
 "profile.role.user" = "User";
+
+"subscription.title" = "Kiio Pro";
+"subscription.placeholder.message" = "Subscription details will appear here after the iOS payment channel is confirmed.";
+"subscription.placeholder.billing" = "Billing channel";
+"subscription.placeholder.billingSub" = "The current web flow uses backend manual payment. iOS purchase handling will stay separate.";
+"orders.title" = "Orders";
+"orders.empty.title" = "No orders yet";
+"orders.empty.message" = "Subscription orders and payment status will appear here when the iOS order flow is enabled.";
