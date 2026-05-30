@@ -281,7 +281,7 @@ struct DeviceView: View {
     private func toggleAutoUpdate() async {
         guard let mainDevice else { return }
         let nextValue = mainDevice.autoUpdate == 1 ? 0 : 1
-        if !await deviceStore.updateDevice(id: mainDevice.id, autoUpdate: nextValue) {
+        if !(await deviceStore.updateDevice(id: mainDevice.id, autoUpdate: nextValue)) {
             alertMessage = deviceStore.errorMessage
         }
     }

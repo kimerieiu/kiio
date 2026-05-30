@@ -32,7 +32,7 @@ final class MailService {
         if let status, status != "all" {
             queryItems.append(URLQueryItem(name: "status", value: status))
         }
-        try await apiClient.get(
+        return try await apiClient.get(
             "/mail/operations",
             queryItems: queryItems
         )

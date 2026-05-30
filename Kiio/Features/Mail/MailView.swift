@@ -691,6 +691,17 @@ private struct MailOperationDetailScene: View {
                 .multilineTextAlignment(.trailing)
         }
     }
+
+    private func statusTone(_ status: String) -> KiioBadgeTone {
+        switch status {
+        case "failed":
+            return .danger
+        case "pending_confirm":
+            return .warning
+        default:
+            return .accent
+        }
+    }
 }
 
 private struct MailAccountRow: View {
