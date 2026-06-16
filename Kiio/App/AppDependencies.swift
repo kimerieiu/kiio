@@ -17,6 +17,7 @@ final class AppDependencies: ObservableObject {
     let newsService: NewsService
     let outfitService: OutfitService
     let mailService: MailService
+    let subscriptionService: SubscriptionService
     let notifyService: NotifyService
 
     let appState: AppState
@@ -41,6 +42,7 @@ final class AppDependencies: ObservableObject {
         let newsService = NewsService(apiClient: apiClient)
         let outfitService = OutfitService(apiClient: apiClient)
         let mailService = MailService(apiClient: apiClient)
+        let subscriptionService = SubscriptionService(apiClient: apiClient)
         let notifyService = NotifyService(apiClient: apiClient)
 
         let appState = AppState(settings: settingsStore)
@@ -74,6 +76,7 @@ final class AppDependencies: ObservableObject {
         self.newsService = newsService
         self.outfitService = outfitService
         self.mailService = mailService
+        self.subscriptionService = subscriptionService
         self.notifyService = notifyService
         self.appState = appState
         self.authStore = authStore

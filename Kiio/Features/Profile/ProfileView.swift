@@ -117,7 +117,7 @@ struct ProfileView: View {
 
     private var proBanner: some View {
         NavigationLink {
-            SubscriptionPlaceholderView()
+            SubscriptionView()
         } label: {
             HStack(spacing: 14) {
                 Image(systemName: "crown")
@@ -422,61 +422,6 @@ private enum ProfileMenuDestination: Equatable {
     case orders
     case settings
     case about
-}
-
-private struct SubscriptionPlaceholderView: View {
-    @EnvironmentObject private var appState: AppState
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
-                KiioCard {
-                    VStack(alignment: .leading, spacing: 18) {
-                        HStack(alignment: .top, spacing: 14) {
-                            Image(systemName: "crown")
-                                .font(.system(size: 22, weight: .semibold))
-                                .foregroundStyle(.white)
-                                .frame(width: 52, height: 52)
-                                .background(KiioTheme.accent)
-                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-
-                            VStack(alignment: .leading, spacing: 7) {
-                                KiioStatusBadge(text: L10n.tr("common.soon", locale: appState.locale), tone: .accent)
-                                Text(L10n.tr("subscription.title", locale: appState.locale))
-                                    .font(.system(size: 26, weight: .bold))
-                                    .foregroundStyle(KiioTheme.text)
-                                Text(L10n.tr("subscription.placeholder.message", locale: appState.locale))
-                                    .font(.system(size: 14))
-                                    .foregroundStyle(KiioTheme.secondaryText)
-                                    .lineSpacing(4)
-                            }
-                        }
-
-                        ProgressView(value: 0.0)
-                            .tint(KiioTheme.accent)
-                    }
-                }
-
-                KiioCard {
-                    HStack(alignment: .top, spacing: 12) {
-                        KiioIconBadge(systemImage: "creditcard", size: 42, iconSize: 17)
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(L10n.tr("subscription.placeholder.billing", locale: appState.locale))
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(KiioTheme.text)
-                            Text(L10n.tr("subscription.placeholder.billingSub", locale: appState.locale))
-                                .font(.system(size: 13))
-                                .foregroundStyle(KiioTheme.secondaryText)
-                                .lineSpacing(3)
-                        }
-                    }
-                }
-            }
-            .padding(20)
-        }
-        .background(KiioTheme.background.ignoresSafeArea())
-        .navigationTitle(L10n.tr("subscription.title", locale: appState.locale))
-    }
 }
 
 private struct OrdersPlaceholderView: View {
