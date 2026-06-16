@@ -163,7 +163,7 @@ final class APIClient {
         case "zh", "zh_CN", "zh-CN":
             return "zh-CN"
         default:
-            return Locale.preferredLanguages.first ?? "zh-CN"
+            return "en-US"
         }
     }
 }

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct LanguageSelectionView: View {
     @EnvironmentObject private var appState: AppState
-    @State private var selectedLocale = "zh_CN"
+    @State private var selectedLocale = "en_US"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -18,8 +18,8 @@ struct LanguageSelectionView: View {
             }
 
             VStack(spacing: 12) {
-                languageRow(title: L10n.tr("language.zh", locale: appState.locale), subtitle: "zh_CN", value: "zh_CN")
                 languageRow(title: L10n.tr("language.en", locale: appState.locale), subtitle: "en_US", value: "en_US")
+                languageRow(title: L10n.tr("language.zh", locale: appState.locale), subtitle: "zh_CN", value: "zh_CN")
             }
 
             Spacer()

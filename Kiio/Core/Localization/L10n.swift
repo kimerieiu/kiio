@@ -16,8 +16,10 @@ enum L10n {
         switch locale {
         case "en", "en_US", "en-US":
             return "en_US"
-        default:
+        case "zh", "zh_CN", "zh-CN":
             return "zh_CN"
+        default:
+            return "en_US"
         }
     }
 
@@ -29,6 +31,8 @@ enum L10n {
         switch normalized {
         case "zh", "zh_cn", "zh_hans":
             return "zh_CN"
+        case "zh_tw", "zh_hant":
+            return "zh_TW"
         case "zh_hk", "yue", "cantonese":
             return "zh_HK"
         case "en", "en_us":
@@ -70,7 +74,7 @@ enum L10n {
         case "uk", "uk_ua":
             return "uk_UA"
         default:
-            return "zh_CN"
+            return "en_US"
         }
     }
 
@@ -87,8 +91,10 @@ enum L10n {
         switch locale {
         case "en", "en_US", "en-US":
             return "en"
-        default:
+        case "zh", "zh_CN", "zh-CN":
             return "zh-Hans"
+        default:
+            return "en"
         }
     }
 
@@ -96,8 +102,10 @@ enum L10n {
         switch locale {
         case "en", "en_US", "en-US":
             return "en_US"
-        default:
+        case "zh", "zh_CN", "zh-CN":
             return "zh_CN"
+        default:
+            return "en_US"
         }
     }
 }

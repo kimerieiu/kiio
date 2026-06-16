@@ -5,7 +5,7 @@ struct AgentLanguagePreferenceView: View {
     @EnvironmentObject private var bootstrapStore: BootstrapStore
     @Environment(\.dismiss) private var dismiss
 
-    @State private var selected = "zh_CN"
+    @State private var selected = "en_US"
     @State private var isSaving = false
     @State private var alertMessage: String?
 
@@ -62,7 +62,9 @@ struct AgentLanguagePreferenceView: View {
     }
 
     private var currentLanguage: AgentLanguageOption {
-        languages.first(where: { $0.code == selected }) ?? languages[0]
+        languages.first(where: { $0.code == selected })
+            ?? languages.first(where: { $0.code == "en_US" })
+            ?? languages[0]
     }
 
     private var previewCard: some View {

@@ -436,7 +436,7 @@ private struct SubscriptionScene: View {
             return value
         }
         let formatter = DateFormatter()
-        let localeId = ["en", "en_US", "en-US"].contains(appState.locale) ? "en_US" : "zh_CN"
+        let localeId = appState.locale.hasPrefix("zh") ? "zh_CN" : "en_US"
         formatter.locale = Locale(identifier: localeId)
         formatter.dateFormat = "yyyy-MM-dd HH:mm"
         return formatter.string(from: date)

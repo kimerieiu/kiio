@@ -84,14 +84,14 @@ enum DeviceConnectionHelper {
 
     private static func clockFormatter(locale: String) -> DateFormatter {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: locale == "en_US" ? "en_US" : "zh_CN")
+        formatter.locale = Locale(identifier: locale.hasPrefix("zh") ? "zh_CN" : "en_US")
         formatter.dateFormat = "HH:mm"
         return formatter
     }
 
     private static func dateFormatter(locale: String) -> DateFormatter {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: locale == "en_US" ? "en_US" : "zh_CN")
+        formatter.locale = Locale(identifier: locale.hasPrefix("zh") ? "zh_CN" : "en_US")
         formatter.dateFormat = "MM-dd HH:mm"
         return formatter
     }

@@ -14,7 +14,7 @@ final class LocalSettingsStore {
     }
 
     var locale: String {
-        get { defaults.string(forKey: Key.locale) ?? "zh_CN" }
+        get { defaults.string(forKey: Key.locale) ?? "en_US" }
         set { defaults.set(normalizeLocale(newValue), forKey: Key.locale) }
     }
 
@@ -39,8 +39,10 @@ final class LocalSettingsStore {
         switch value {
         case "en", "en_US", "en-US":
             return "en_US"
-        default:
+        case "zh", "zh_CN", "zh-CN":
             return "zh_CN"
+        default:
+            return "en_US"
         }
     }
 }
