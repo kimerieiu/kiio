@@ -19,21 +19,13 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>KIIO_API_BASE_URL</key>
-	<string>http://47.77.215.188:8002/xiaozhi</string>
+	<string>https://api.jbternal.com/xiaozhi</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>47.77.215.188</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
-		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Kiio needs camera access to scan the device QR code for binding.</string>

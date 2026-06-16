@@ -1,8 +1,8 @@
 import Foundation
 
 enum AppConfig {
-    static let debugAPIBaseURL = "http://47.77.215.188:8002/xiaozhi"
-    static let releasePlaceholderAPIBaseURL = "http://47.77.215.188:8002/xiaozhi"
+    static let debugAPIBaseURL = "https://api.jbternal.com/xiaozhi"
+    static let releasePlaceholderAPIBaseURL = "https://api.jbternal.com/xiaozhi"
     static let requestTimeout: TimeInterval = 30
 
     static var apiBaseURL: URL {

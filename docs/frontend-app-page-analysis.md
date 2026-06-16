@@ -482,7 +482,7 @@ App 启动时，`App.vue` 的 `onLaunch` 会先读取安全区，初始化 app s
 
 `api/index.js` 统一处理请求：
 
-- `BASE_URL = VITE_API_BASE_URL || http://127.0.0.1:8002/xiaozhi`
+- `BASE_URL = VITE_API_BASE_URL || https://api.jbternal.com/xiaozhi`
 - 默认 `Content-Type: application/json`
 - 非 `ignoreAuth` 请求会从本地 `token` 取 `Authorization: Bearer ...`
 - HTTP 非 2xx 会 reject。401 会清认证并跳 auth，保留当前 route 作为 redirect。
