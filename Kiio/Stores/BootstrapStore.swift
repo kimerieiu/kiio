@@ -100,7 +100,7 @@ final class BootstrapStore: ObservableObject {
         }
 
         do {
-            preference = try await userService.updateUserPreference(agentLanguage: L10n.backendLocale(locale))
+            preference = try await userService.updateUserPreference(agentLanguage: L10n.backendAgentLocale(locale))
             errorMessage = nil
             return true
         } catch {
