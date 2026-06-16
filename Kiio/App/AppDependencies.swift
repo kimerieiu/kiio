@@ -44,7 +44,7 @@ final class AppDependencies: ObservableObject {
         let notifyService = NotifyService(apiClient: apiClient)
 
         let appState = AppState(settings: settingsStore)
-        let authStore = AuthStore(authService: authService, tokenStore: tokenStore)
+        let authStore = AuthStore(authService: authService, userService: userService, tokenStore: tokenStore)
         let bootstrapStore = BootstrapStore(
             bootstrapService: bootstrapService,
             userService: userService,

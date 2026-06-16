@@ -2,7 +2,20 @@ import SwiftUI
 
 struct SplashView: View {
     @EnvironmentObject private var appState: AppState
+    let errorMessage: String?
+    let isRetrying: Bool
+    let retryAction: () -> Void
     @State private var activeDot = 0
+
+    init(
+        errorMessage: String? = nil,
+        isRetrying: Bool = false,
+        retryAction: @escaping () -> Void = {}
+    ) {
+        self.errorMessage = errorMessage
+        self.isRetrying = isRetrying
+        self.retryAction = retryAction
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -21,8 +34,13 @@ struct SplashView: View {
                 .foregroundStyle(KiioTheme.secondaryText)
                 .padding(.top, 8)
 
-            loadingDots
-                .padding(.top, 56)
+            if let errorMessage {
+                errorContent(errorMessage)
+                    .padding(.top, 44)
+            } else {
+                loadingDots
+                    .padding(.top, 56)
+            }
 
             Spacer()
         }
@@ -35,6 +53,23 @@ struct SplashView: View {
                     activeDot = (activeDot + 1) % 3
                 }
             }
+        }
+    }
+
+    private func errorContent(_ message: String) -> some View {
+        VStack(spacing: 16) {
+            Text(message)
+                .font(.system(size: 14))
+                .foregroundStyle(KiioTheme.secondaryText)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            KiioSecondaryButton(
+                title: L10n.tr("common.refresh", locale: appState.locale),
+                isLoading: isRetrying,
+                action: retryAction
+            )
+            .frame(maxWidth: 220)
         }
     }
 

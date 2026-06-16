@@ -76,8 +76,14 @@ final class APIClient {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue(acceptLanguageHeader(), forHTTPHeaderField: "Accept-Language")
 
-        if authenticated, let token = tokenStore.load()?.token, !token.isEmpty {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        if authenticated {
+            switch tokenStore.loadState() {
+            case .valid(let token) where !token.token.isEmpty:
+                request.setValue("Bearer \(token.token)", forHTTPHeaderField: "Authorization")
+            case .missing, .expired, .valid(_):
+                onUnauthorized?()
+                throw AppError.unauthorized
+            }
         }
 
         if let body {

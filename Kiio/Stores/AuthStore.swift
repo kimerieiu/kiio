@@ -1,6 +1,14 @@
 import Foundation
 import Combine
 
+enum StartupAuthResult {
+    case noLocalSession
+    case localSessionExpired
+    case validated(UserDetail)
+    case unauthorized
+    case recoverableFailure(AppError)
+}
+
 @MainActor
 final class AuthStore: ObservableObject {
     @Published private(set) var token: TokenDTO?
@@ -9,12 +17,16 @@ final class AuthStore: ObservableObject {
     @Published var errorMessage: String?
 
     private let authService: AuthService
+    private let userService: UserService
     private let tokenStore: TokenStore
+    private var expiryTask: Task<Void, Never>?
 
-    init(authService: AuthService, tokenStore: TokenStore) {
+    init(authService: AuthService, userService: UserService, tokenStore: TokenStore) {
         self.authService = authService
+        self.userService = userService
         self.tokenStore = tokenStore
         self.token = tokenStore.load()
+        scheduleExpiryCheck()
     }
 
     var isAuthenticated: Bool {
@@ -58,10 +70,44 @@ final class AuthStore: ObservableObject {
         currentUser = user
     }
 
+    func validateStartupSession() async -> StartupAuthResult {
+        switch tokenStore.loadState() {
+        case .missing:
+            cancelExpiryCheck()
+            clearInMemorySession()
+            return .noLocalSession
+        case .expired:
+            cancelExpiryCheck()
+            clearInMemorySession()
+            errorMessage = AppError.unauthorized.errorDescription
+            return .localSessionExpired
+        case .valid(let localToken):
+            token = localToken
+            scheduleExpiryCheck()
+        }
+
+        do {
+            let user = try await userService.userInfo()
+            currentUser = user
+            errorMessage = nil
+            return .validated(user)
+        } catch {
+            let appError = AppError.from(error)
+            if case .unauthorized = appError {
+                logout()
+                errorMessage = appError.errorDescription
+                return .unauthorized
+            }
+
+            errorMessage = appError.errorDescription
+            return .recoverableFailure(appError)
+        }
+    }
+
     func logout() {
+        cancelExpiryCheck()
         tokenStore.clear()
-        token = nil
-        currentUser = nil
+        clearInMemorySession()
     }
 
     func handleUnauthorized() {
@@ -74,6 +120,38 @@ final class AuthStore: ObservableObject {
         self.token = token
         currentUser = nil
         errorMessage = nil
+        scheduleExpiryCheck()
+    }
+
+    private func clearInMemorySession() {
+        token = nil
+        currentUser = nil
+    }
+
+    private func cancelExpiryCheck() {
+        expiryTask?.cancel()
+        expiryTask = nil
+    }
+
+    private func scheduleExpiryCheck() {
+        cancelExpiryCheck()
+
+        guard let expiresAt = tokenStore.expiresAt() else {
+            return
+        }
+
+        let delay = expiresAt.timeIntervalSinceNow
+        guard delay > 0 else {
+            handleUnauthorized()
+            return
+        }
+
+        expiryTask = Task { [weak self] in
+            let nanoseconds = UInt64(delay * 1_000_000_000)
+            try? await Task.sleep(nanoseconds: nanoseconds)
+            guard !Task.isCancelled else { return }
+            await self?.handleUnauthorized()
+        }
     }
 
     private func runLoading(_ operation: () async throws -> Void) async throws {

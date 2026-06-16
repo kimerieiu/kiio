@@ -1,19 +1,29 @@
 import SwiftUI
 
 struct RootView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var dependencies: AppDependencies
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var authStore: AuthStore
     @EnvironmentObject private var bootstrapStore: BootstrapStore
+    @State private var startupGateError: String?
+    @State private var isRunningStartupGate = false
 
     var body: some View {
         Group {
             switch appState.rootRoute {
             case .splash:
-                SplashView()
+                SplashView(
+                    errorMessage: startupGateError,
+                    isRetrying: isRunningStartupGate,
+                    retryAction: {
+                        Task {
+                            await runStartupGate()
+                        }
+                    }
+                )
                     .task {
-                        try? await Task.sleep(nanoseconds: 1_800_000_000)
-                        appState.finishSplash(isAuthenticated: authStore.isAuthenticated)
+                        await runStartupGate()
                     }
             case .language:
                 LanguageSelectionView()
@@ -39,10 +49,48 @@ struct RootView: View {
                 dependencies.notifyWebSocketClient.disconnect()
                 dependencies.syncStore.reset()
                 bootstrapStore.reset()
-                if appState.rootRoute == .main || appState.rootRoute == .invite {
+                if appState.rootRoute == .main || appState.rootRoute == .invite || appState.rootRoute == .splash {
+                    startupGateError = nil
                     appState.showAuth()
                 }
             }
+        }
+        .onChange(of: scenePhase) { phase in
+            guard phase == .active,
+                  appState.rootRoute == .splash,
+                  startupGateError != nil else {
+                return
+            }
+
+            Task {
+                await runStartupGate()
+            }
+        }
+    }
+
+    private func runStartupGate() async {
+        guard !isRunningStartupGate else {
+            return
+        }
+
+        isRunningStartupGate = true
+        startupGateError = nil
+        defer { isRunningStartupGate = false }
+
+        let result = await authStore.validateStartupSession()
+        guard appState.rootRoute == .splash else {
+            return
+        }
+
+        switch result {
+        case .noLocalSession:
+            appState.finishSplash(isAuthenticated: false)
+        case .localSessionExpired, .unauthorized:
+            appState.showAuth()
+        case .validated(_):
+            appState.showMain()
+        case .recoverableFailure(let error):
+            startupGateError = error.errorDescription ?? AppError.invalidResponse.errorDescription
         }
     }
 
