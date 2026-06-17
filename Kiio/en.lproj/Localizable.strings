@@ -212,11 +212,16 @@
 "mail.saveFailed" = "Unable to save the mail account.";
 "mail.defaultAccount" = "Default account";
 "mail.accountDetail" = "Mail Account";
-"mail.operationDetail" = "Mail Operation";
+"mail.operationDetail" = "Mail Details";
 "mail.lastUsedAt" = "Last used";
 "mail.operationType" = "Operation type";
 "mail.accountId" = "Account ID";
 "mail.rawText" = "Raw text";
+"mail.errorReason" = "Failure reason";
+"mail.operation.search" = "Search mail";
+"mail.operation.send" = "Send mail";
+"mail.operation.download_attachment" = "Download attachment";
+"mail.operation.list_folders" = "List folders";
 "mail.account.empty.title" = "Account not found";
 "mail.account.empty.message" = "The mail account may have been deleted or is no longer available.";
 "mail.operation.empty.title" = "Operation not found";

@@ -582,56 +582,84 @@ private struct MailOperationDetailScene: View {
                 KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
                     .kiioListCardRow()
             } else if let operation = store.operationDetail {
+                let summary = clean(operation.summary)
+                let error = clean(operation.errorMessage)
+                let fallbackBody = summary == nil ? clean(operation.rawText) : nil
+
                 Section {
-                    KiioCard {
+                    VStack(alignment: .leading, spacing: 14) {
                         HStack(alignment: .top, spacing: 12) {
-                            KiioIconBadge(
-                                systemImage: "paperplane",
-                                tone: operation.status == "failed" ? .danger : .accent,
-                                size: 48,
-                                iconSize: 20
-                            )
+                            Image(systemName: operation.status == "failed" ? "exclamationmark.triangle.fill" : "paperplane.fill")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundStyle(statusColor(operation.status))
+                                .frame(width: 48, height: 48)
+                                .background(statusColor(operation.status).opacity(0.14))
+                                .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(operation.displayTitle)
                                     .font(.system(size: 22, weight: .bold))
-                                    .foregroundStyle(KiioTheme.text)
-                                if let status = operation.status {
-                                    KiioStatusBadge(text: status, tone: statusTone(status))
+                                    .foregroundStyle(Color.primary)
+                                    .fixedSize(horizontal: false, vertical: true)
+
+                                if let status = statusText(operation.status) {
+                                    MailOperationStatusBadge(
+                                        text: status,
+                                        color: statusColor(operation.status)
+                                    )
                                 }
                             }
                         }
+
+                        if let operationType = operationText(operation.operationType) {
+                            MailOperationMetaPill(
+                                icon: "tray.full",
+                                text: operationType
+                            )
+                        }
                     }
+                    .mailOperationDetailCard()
                 }
                 .kiioListCardRow()
 
-                Section(L10n.tr("common.detail", locale: appState.locale)) {
-                    labeled(L10n.tr("mail.operationType", locale: appState.locale), operation.operationType)
-                    labeled(L10n.tr("common.status", locale: appState.locale), operation.status)
-                    labeled(L10n.tr("mail.accountId", locale: appState.locale), operation.accountId)
-                    labeled(L10n.tr("common.requestId", locale: appState.locale), operation.requestId)
-                    labeled(L10n.tr("common.createdAt", locale: appState.locale), operation.createdAt)
-                    labeled(L10n.tr("common.updatedAt", locale: appState.locale), operation.updatedAt)
+                Section {
+                    MailOperationDetailRow(
+                        title: L10n.tr("common.time", locale: appState.locale),
+                        value: formattedDateTime(operation.createdAt) ?? "--"
+                    )
+                    .mailOperationDetailCard()
+                }
+                .kiioListCardRow()
+
+                if let summary {
+                    Section {
+                        MailOperationTextCard(
+                            title: L10n.tr("common.summary", locale: appState.locale),
+                            text: summary
+                        )
+                    }
+                    .kiioListCardRow()
                 }
 
-                if let summary = operation.summary, !summary.isEmpty {
-                    Section(L10n.tr("common.summary", locale: appState.locale)) {
-                        Text(summary)
-                            .foregroundStyle(KiioTheme.text)
+                if let error {
+                    Section {
+                        MailOperationTextCard(
+                            title: L10n.tr("mail.errorReason", locale: appState.locale),
+                            text: error,
+                            isError: true
+                        )
                     }
+                    .kiioListCardRow()
                 }
 
-                if let error = operation.errorMessage, !error.isEmpty {
-                    Section(L10n.tr("common.error", locale: appState.locale)) {
-                        Text(error)
-                            .foregroundStyle(KiioTheme.danger)
+                if let fallbackBody {
+                    Section {
+                        MailOperationTextCard(
+                            title: L10n.tr("common.content", locale: appState.locale),
+                            text: fallbackBody
+                        )
                     }
-                }
-
-                if let rawText = operation.rawText, !rawText.isEmpty {
-                    Section(L10n.tr("mail.rawText", locale: appState.locale)) {
-                        Text(rawText)
-                            .foregroundStyle(KiioTheme.text)
-                    }
+                    .kiioListCardRow()
                 }
             } else {
                 KiioEmptyStateView(
@@ -643,7 +671,7 @@ private struct MailOperationDetailScene: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .background(KiioTheme.background.ignoresSafeArea())
+        .background(Color(.systemBackground).ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(L10n.tr("mail.operationDetail", locale: appState.locale))
         .toolbar {
@@ -682,26 +710,191 @@ private struct MailOperationDetailScene: View {
         dismiss()
     }
 
-    private func labeled(_ title: String, _ value: String?) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Text(title)
-            Spacer()
-            Text(value?.isEmpty == false ? value! : "--")
-                .foregroundStyle(KiioTheme.secondaryText)
-                .multilineTextAlignment(.trailing)
+    private func clean(_ value: String?) -> String? {
+        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed?.isEmpty == false ? trimmed : nil
+    }
+
+    private func statusText(_ status: String?) -> String? {
+        guard let status = clean(status) else { return nil }
+        switch status {
+        case "success":
+            return L10n.tr("mail.filter.success", locale: appState.locale)
+        case "failed":
+            return L10n.tr("mail.filter.failed", locale: appState.locale)
+        case "pending_confirm":
+            return L10n.tr("mail.filter.pending", locale: appState.locale)
+        default:
+            return status
         }
     }
 
-    private func statusTone(_ status: String) -> KiioBadgeTone {
+    private func operationText(_ type: String?) -> String? {
+        guard let type = clean(type) else { return nil }
+        let key = "mail.operation.\(type)"
+        let text = L10n.tr(key, locale: appState.locale)
+        return text == key ? type : text
+    }
+
+    private func formattedDateTime(_ value: String?) -> String? {
+        MailOperationDateFormatter.string(from: value, locale: appState.locale)
+    }
+
+    private func statusColor(_ status: String?) -> Color {
         switch status {
         case "failed":
-            return .danger
+            return Color(.systemRed)
         case "pending_confirm":
-            return .warning
+            return Color(.systemOrange)
         default:
-            return .accent
+            return Color(.systemGreen)
         }
     }
+}
+
+private struct MailOperationStatusBadge: View {
+    let text: String
+    let color: Color
+
+    var body: some View {
+        Text(text)
+            .font(.system(size: 11, weight: .bold))
+            .foregroundStyle(color)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 5)
+            .background(color.opacity(0.13))
+            .clipShape(Capsule())
+            .lineLimit(1)
+    }
+}
+
+private struct MailOperationMetaPill: View {
+    let icon: String
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .semibold))
+            Text(text)
+                .font(.system(size: 12, weight: .medium))
+                .lineLimit(1)
+        }
+        .foregroundStyle(Color.secondary)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color.primary.opacity(0.06))
+        .clipShape(Capsule())
+    }
+}
+
+private struct MailOperationDetailRow: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Text(title)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(Color.secondary)
+            Spacer()
+            Text(value)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(Color.primary)
+                .multilineTextAlignment(.trailing)
+        }
+    }
+}
+
+private struct MailOperationTextCard: View {
+    let title: String
+    let text: String
+    var isError = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(isError ? Color(.systemRed) : Color.secondary)
+            Text(text)
+                .font(.system(size: 15))
+                .lineSpacing(4)
+                .foregroundStyle(isError ? Color(.systemRed) : Color.primary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .mailOperationDetailCard()
+    }
+}
+
+private struct MailOperationDetailCardModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+            )
+    }
+}
+
+private extension View {
+    func mailOperationDetailCard() -> some View {
+        modifier(MailOperationDetailCardModifier())
+    }
+}
+
+private enum MailOperationDateFormatter {
+    static func string(from value: String?, locale: String) -> String? {
+        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !value.isEmpty else { return nil }
+        guard let date = date(from: value) else { return value }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: locale.hasPrefix("zh") ? "zh_CN" : "en_US")
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        return formatter.string(from: date)
+    }
+
+    private static func date(from value: String) -> Date? {
+        if let date = backendSecondFormatter.date(from: value) {
+            return date
+        }
+        if let date = backendMinuteFormatter.date(from: value) {
+            return date
+        }
+        let normalized = value.replacingOccurrences(of: " ", with: "T")
+        return isoFormatter.date(from: normalized) ?? fallbackISOFormatter.date(from: normalized)
+    }
+
+    private static let backendSecondFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone.current
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter
+    }()
+
+    private static let backendMinuteFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone.current
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        return formatter
+    }()
+
+    private static let isoFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+
+    private static let fallbackISOFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
 }
 
 private struct MailAccountRow: View {

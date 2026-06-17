@@ -212,11 +212,16 @@
 "mail.saveFailed" = "无法保存邮件账号。";
 "mail.defaultAccount" = "默认账号";
 "mail.accountDetail" = "邮件账号";
-"mail.operationDetail" = "邮件操作";
+"mail.operationDetail" = "邮件详情";
 "mail.lastUsedAt" = "上次使用";
 "mail.operationType" = "操作类型";
 "mail.accountId" = "账号 ID";
 "mail.rawText" = "原始内容";
+"mail.errorReason" = "失败原因";
+"mail.operation.search" = "搜索邮件";
+"mail.operation.send" = "发送邮件";
+"mail.operation.download_attachment" = "下载附件";
+"mail.operation.list_folders" = "列出文件夹";
 "mail.account.empty.title" = "未找到邮件账号";
 "mail.account.empty.message" = "该邮件账号可能已被删除或暂不可用。";
 "mail.operation.empty.title" = "未找到邮件操作";
