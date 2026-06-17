@@ -71,6 +71,10 @@ struct ProfileView: View {
                     .frame(width: 40, height: 40)
                     .background(KiioTheme.surface)
                     .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            .stroke(KiioTheme.border, lineWidth: 1)
+                    )
             }
         }
     }
@@ -113,6 +117,10 @@ struct ProfileView: View {
         .padding(18)
         .background(KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(KiioTheme.border, lineWidth: 1)
+        )
     }
 
     private var proBanner: some View {
@@ -154,6 +162,10 @@ struct ProfileView: View {
             .padding(16)
             .background(KiioTheme.surface)
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(KiioTheme.border, lineWidth: 1)
+            )
         }
         .buttonStyle(.plain)
     }
@@ -182,6 +194,10 @@ struct ProfileView: View {
         .padding(16)
         .background(KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(KiioTheme.border, lineWidth: 1)
+        )
     }
 
     private var assetsCard: some View {
@@ -213,6 +229,10 @@ struct ProfileView: View {
         .padding(.vertical, 18)
         .background(KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(KiioTheme.border, lineWidth: 1)
+        )
     }
 
     private var assetRows: [ProfileMenuRowData] {
@@ -403,6 +423,10 @@ private struct ProfileMenuRow: View {
         .padding(15)
         .background(KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(KiioTheme.border, lineWidth: 1)
+        )
     }
 }
 

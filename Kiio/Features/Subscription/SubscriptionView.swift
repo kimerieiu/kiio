@@ -180,6 +180,12 @@ private struct SubscriptionScene: View {
                     .frame(height: 50)
                     .background(KiioTheme.background)
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(KiioTheme.border, lineWidth: 1)
+                    )
+                    .foregroundStyle(KiioTheme.text)
+                    .tint(KiioTheme.accent)
 
                 Button {
                     Task { await previewCode() }
@@ -193,10 +199,10 @@ private struct SubscriptionScene: View {
                         Text(actionTitle)
                             .font(.system(size: 15, weight: .bold))
                     }
-                    .foregroundStyle(.white)
+                    .foregroundStyle(actionDisabled ? KiioTheme.secondaryText : .white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .background(actionDisabled ? KiioTheme.mutedText : KiioTheme.accent)
+                    .background(actionDisabled ? KiioTheme.disabledFill : KiioTheme.accent)
                     .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
                 }
                 .disabled(actionDisabled)

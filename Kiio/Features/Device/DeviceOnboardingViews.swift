@@ -442,6 +442,10 @@ private struct DeviceGuideAction: View {
             .frame(maxWidth: .infinity, minHeight: 118, alignment: .leading)
             .background(KiioTheme.surface)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(KiioTheme.border, lineWidth: 1)
+            )
         }
         .buttonStyle(.plain)
     }

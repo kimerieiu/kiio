@@ -15,7 +15,7 @@ struct KiioCard<Content: View>: View {
         .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: radius, style: .continuous)
-                .stroke(.white.opacity(0.8), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.04), radius: 16, y: 8)
     }
@@ -74,6 +74,7 @@ struct KiioStatusBadge: View {
             .padding(.vertical, 5)
             .background(tone.color.opacity(0.12))
             .clipShape(Capsule())
+            .overlay(Capsule().stroke(tone.color.opacity(0.24), lineWidth: 1))
             .lineLimit(1)
     }
 }
@@ -91,6 +92,10 @@ struct KiioIconBadge: View {
             .frame(width: size, height: size)
             .background(tone.color.opacity(0.13))
             .clipShape(RoundedRectangle(cornerRadius: size * 0.31, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: size * 0.31, style: .continuous)
+                    .stroke(tone.color.opacity(0.22), lineWidth: 1)
+            )
     }
 }
 
@@ -112,8 +117,9 @@ struct KiioMetaPill: View {
         .foregroundStyle(tone.color)
         .padding(.horizontal, 8)
         .padding(.vertical, 5)
-        .background(tone.color.opacity(tone == .muted ? 0.08 : 0.12))
+        .background(tone.color.opacity(tone == .muted ? 0.1 : 0.12))
         .clipShape(Capsule())
+        .overlay(Capsule().stroke(tone.color.opacity(0.2), lineWidth: 1))
     }
 }
 

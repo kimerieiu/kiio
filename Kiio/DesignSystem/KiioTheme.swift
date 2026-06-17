@@ -8,6 +8,8 @@ enum KiioTheme {
     static let mutedText = KiioColors.mutedText
     static let accent = KiioColors.accent
     static let accentSoft = KiioColors.accentSoft
+    static let border = KiioColors.border
+    static let disabledFill = KiioColors.disabledFill
     static let success = KiioColors.success
     static let warning = KiioColors.warning
     static let info = KiioColors.info

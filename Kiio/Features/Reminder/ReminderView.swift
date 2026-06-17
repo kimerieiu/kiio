@@ -67,7 +67,7 @@ private struct ReminderListScene: View {
                             } label: {
                                 Label(L10n.tr("common.cancel", locale: appState.locale), systemImage: "xmark.circle")
                             }
-                            .tint(.orange)
+                            .tint(KiioTheme.warning)
                         }
                     }
                     .swipeActions(edge: .leading, allowsFullSwipe: true) {
@@ -387,7 +387,7 @@ private struct ReminderTaskRow: View {
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.8), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
     }

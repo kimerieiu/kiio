@@ -56,7 +56,7 @@ private struct ChatScene: View {
             .clipShape(Capsule())
             .overlay(
                 Capsule()
-                    .stroke(.white.opacity(0.85), lineWidth: 1)
+                    .stroke(KiioTheme.border, lineWidth: 1)
             )
 
             Spacer()
@@ -140,7 +140,7 @@ private struct ChatScene: View {
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(.white.opacity(0.85), lineWidth: 1)
+                    .stroke(KiioTheme.border, lineWidth: 1)
             )
             .shadow(color: .black.opacity(0.04), radius: 14, y: 6)
         }
@@ -272,7 +272,7 @@ struct ChatMessageRow: View {
                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                     .overlay(
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .stroke(message.isAgentMessage ? .white.opacity(0.85) : .clear, lineWidth: 1)
+                            .stroke(message.isAgentMessage ? KiioTheme.border : .clear, lineWidth: 1)
                     )
                     .shadow(color: .black.opacity(message.isAgentMessage ? 0.035 : 0), radius: 10, y: 5)
 
@@ -417,7 +417,7 @@ private struct ChatSessionRow: View {
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(.white.opacity(0.85), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
     }
 }

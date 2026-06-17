@@ -10,10 +10,10 @@ struct HomeView: View {
 
     private let tools: [HomeToolItem] = [
         HomeToolItem(icon: "bell", categoryKey: "home.category.productivity", titleKey: "home.tool.reminders.title", subtitleKey: "home.tool.reminders.subtitle", destination: .reminder, accent: KiioTheme.accent, softTint: Color(red: 237 / 255, green: 232 / 255, blue: 225 / 255)),
-        HomeToolItem(icon: "wallet.pass", categoryKey: "home.category.finance", titleKey: "home.tool.accounting.title", subtitleKey: "home.tool.accounting.subtitle", destination: .accounting, accent: Color(red: 139 / 255, green: 122 / 255, blue: 101 / 255), softTint: Color(red: 221 / 255, green: 213 / 255, blue: 200 / 255)),
-        HomeToolItem(icon: "tshirt", categoryKey: "home.category.life", titleKey: "home.tool.outfit.title", subtitleKey: "home.tool.outfit.subtitle", destination: .outfit, accent: Color(red: 120 / 255, green: 109 / 255, blue: 96 / 255), softTint: Color(red: 230 / 255, green: 224 / 255, blue: 215 / 255)),
+        HomeToolItem(icon: "wallet.pass", categoryKey: "home.category.finance", titleKey: "home.tool.accounting.title", subtitleKey: "home.tool.accounting.subtitle", destination: .accounting, accent: Color(red: 106 / 255, green: 90 / 255, blue: 73 / 255), softTint: Color(red: 221 / 255, green: 213 / 255, blue: 200 / 255)),
+        HomeToolItem(icon: "tshirt", categoryKey: "home.category.life", titleKey: "home.tool.outfit.title", subtitleKey: "home.tool.outfit.subtitle", destination: .outfit, accent: Color(red: 103 / 255, green: 92 / 255, blue: 80 / 255), softTint: Color(red: 230 / 255, green: 224 / 255, blue: 215 / 255)),
         HomeToolItem(icon: "newspaper", categoryKey: "home.category.info", titleKey: "home.tool.news.title", subtitleKey: "home.tool.news.subtitle", destination: .news, accent: Color(red: 107 / 255, green: 90 / 255, blue: 77 / 255), softTint: Color(red: 224 / 255, green: 218 / 255, blue: 209 / 255)),
-        HomeToolItem(icon: "envelope", categoryKey: "home.category.communication", titleKey: "home.tool.mail.title", subtitleKey: "home.tool.mail.subtitle", destination: .mail, accent: Color(red: 184 / 255, green: 92 / 255, blue: 110 / 255), softTint: Color(red: 239 / 255, green: 220 / 255, blue: 222 / 255))
+        HomeToolItem(icon: "envelope", categoryKey: "home.category.communication", titleKey: "home.tool.mail.title", subtitleKey: "home.tool.mail.subtitle", destination: .mail, accent: Color(red: 150 / 255, green: 64 / 255, blue: 84 / 255), softTint: Color(red: 239 / 255, green: 220 / 255, blue: 222 / 255))
     ]
 
     var body: some View {
@@ -57,7 +57,7 @@ struct HomeView: View {
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(.white.opacity(0.8), lineWidth: 1)
+                    .stroke(KiioTheme.border, lineWidth: 1)
             )
         }
     }
@@ -102,7 +102,7 @@ struct HomeView: View {
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.8), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.035), radius: 14, y: 6)
     }
@@ -358,8 +358,9 @@ private struct HomeFeatureCard: View {
                         .font(.system(size: 13, weight: .bold))
                         .foregroundStyle(tool.accent)
                         .frame(width: 34, height: 34)
-                        .background(Color.white.opacity(0.7))
+                        .background(KiioTheme.surface)
                         .clipShape(Circle())
+                        .overlay(Circle().stroke(KiioTheme.border, lineWidth: 1))
                 }
             }
             .padding(22)
@@ -369,7 +370,7 @@ private struct HomeFeatureCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(.white.opacity(0.84), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.05), radius: 18, y: 8)
     }
@@ -424,7 +425,7 @@ private struct HomeListCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.8), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
     }

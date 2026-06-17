@@ -62,10 +62,10 @@ struct WelcomeView: View {
                 .font(.system(size: 44, weight: .regular))
                 .foregroundStyle(KiioTheme.accent)
                 .frame(width: 120, height: 120)
-                .background(Color.black.opacity(0.04))
+                .background(KiioTheme.accentSoft)
                 .overlay(
                     RoundedRectangle(cornerRadius: 30, style: .continuous)
-                        .stroke(Color.black.opacity(0.08), lineWidth: 1)
+                        .stroke(KiioTheme.border, lineWidth: 1)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
 

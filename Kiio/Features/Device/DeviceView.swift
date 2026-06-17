@@ -417,7 +417,7 @@ private struct DeviceHeroCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(.white.opacity(0.8), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.05), radius: 18, y: 8)
     }
@@ -454,7 +454,7 @@ private struct DeviceEmptyHeroCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(.white.opacity(0.8), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.05), radius: 18, y: 8)
     }
@@ -475,8 +475,9 @@ private struct DeviceStatusPill: View {
         .foregroundStyle(KiioTheme.secondaryText)
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(.white.opacity(0.65))
+        .background(KiioTheme.background)
         .clipShape(Capsule())
+        .overlay(Capsule().stroke(KiioTheme.border, lineWidth: 1))
     }
 }
 
@@ -505,6 +506,10 @@ private struct DeviceMetricCard: View {
         .frame(maxWidth: .infinity, minHeight: 92, alignment: .leading)
         .background(KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(KiioTheme.border, lineWidth: 1)
+        )
     }
 }
 
@@ -546,6 +551,10 @@ private struct DeviceMenuRow: View {
         .frame(maxWidth: .infinity)
         .background(KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(KiioTheme.border, lineWidth: 1)
+        )
     }
 
     @ViewBuilder
@@ -637,7 +646,7 @@ private struct DeviceDetailHeroCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(.white.opacity(0.85), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.05), radius: 18, y: 8)
     }
@@ -670,7 +679,7 @@ private struct DeviceDetailMetricCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(.white.opacity(0.8), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
     }
 }

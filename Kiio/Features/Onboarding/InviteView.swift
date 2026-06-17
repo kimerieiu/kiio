@@ -150,6 +150,10 @@ struct InviteView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(KiioTheme.border, lineWidth: 1)
+        )
     }
 
     private var companionSummary: String {

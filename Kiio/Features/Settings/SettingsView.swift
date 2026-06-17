@@ -169,7 +169,7 @@ struct SettingsView: View {
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(.white.opacity(0.8), lineWidth: 1)
+                    .stroke(KiioTheme.border, lineWidth: 1)
             )
         }
         .buttonStyle(.plain)

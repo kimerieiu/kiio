@@ -5,13 +5,15 @@ struct KiioTextFieldModifier: ViewModifier {
         content
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
+            .foregroundStyle(KiioTheme.text)
+            .tint(KiioTheme.accent)
             .padding(.horizontal, 14)
             .frame(height: 50)
-            .background(.white.opacity(0.84))
+            .background(KiioTheme.surface)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(Color.black.opacity(0.06), lineWidth: 1)
+                    .stroke(KiioTheme.border, lineWidth: 1)
             )
     }
 }

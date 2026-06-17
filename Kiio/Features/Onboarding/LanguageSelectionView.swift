@@ -54,8 +54,12 @@ struct LanguageSelectionView: View {
                     .foregroundStyle(selectedLocale == value ? KiioTheme.accent : KiioTheme.mutedText)
             }
             .padding(16)
-            .background(.white.opacity(0.8))
+            .background(KiioTheme.surface)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(KiioTheme.border, lineWidth: 1)
+            )
         }
     }
 }

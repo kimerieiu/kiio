@@ -18,8 +18,8 @@ struct KiioPrimaryButton: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 52)
-            .foregroundStyle(.white)
-            .background(isDisabled ? KiioTheme.mutedText.opacity(0.35) : KiioTheme.accent)
+            .foregroundStyle(isDisabled ? KiioTheme.secondaryText : .white)
+            .background(isDisabled ? KiioTheme.disabledFill : KiioTheme.accent)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
         .disabled(isDisabled || isLoading)
@@ -43,8 +43,8 @@ struct KiioSecondaryButton: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 48)
-            .foregroundStyle(KiioTheme.text)
-            .background(isDisabled ? KiioTheme.mutedText.opacity(0.12) : KiioTheme.accentSoft)
+            .foregroundStyle(isDisabled ? KiioTheme.secondaryText : KiioTheme.text)
+            .background(isDisabled ? KiioTheme.disabledFill : KiioTheme.accentSoft)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
         .disabled(isDisabled || isLoading)

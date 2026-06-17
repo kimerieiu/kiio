@@ -321,7 +321,7 @@ private struct NewsRecordRow: View {
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.8), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
     }

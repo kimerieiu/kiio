@@ -599,7 +599,7 @@ private struct MailOperationDetailScene: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(operation.displayTitle)
                                     .font(.system(size: 22, weight: .bold))
-                                    .foregroundStyle(Color.primary)
+                                    .foregroundStyle(KiioTheme.text)
                                     .fixedSize(horizontal: false, vertical: true)
 
                                 if let status = statusText(operation.status) {
@@ -671,7 +671,7 @@ private struct MailOperationDetailScene: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .background(Color(.systemBackground).ignoresSafeArea())
+        .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(L10n.tr("mail.operationDetail", locale: appState.locale))
         .toolbar {
@@ -743,11 +743,11 @@ private struct MailOperationDetailScene: View {
     private func statusColor(_ status: String?) -> Color {
         switch status {
         case "failed":
-            return Color(.systemRed)
+            return KiioTheme.danger
         case "pending_confirm":
-            return Color(.systemOrange)
+            return KiioTheme.warning
         default:
-            return Color(.systemGreen)
+            return KiioTheme.success
         }
     }
 }
@@ -780,11 +780,12 @@ private struct MailOperationMetaPill: View {
                 .font(.system(size: 12, weight: .medium))
                 .lineLimit(1)
         }
-        .foregroundStyle(Color.secondary)
+        .foregroundStyle(KiioTheme.secondaryText)
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(Color.primary.opacity(0.06))
+        .background(KiioTheme.mutedText.opacity(0.1))
         .clipShape(Capsule())
+        .overlay(Capsule().stroke(KiioTheme.mutedText.opacity(0.2), lineWidth: 1))
     }
 }
 
@@ -796,11 +797,11 @@ private struct MailOperationDetailRow: View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Text(title)
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(Color.secondary)
+                .foregroundStyle(KiioTheme.secondaryText)
             Spacer()
             Text(value)
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(Color.primary)
+                .foregroundStyle(KiioTheme.text)
                 .multilineTextAlignment(.trailing)
         }
     }
@@ -815,11 +816,11 @@ private struct MailOperationTextCard: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(isError ? Color(.systemRed) : Color.secondary)
+                .foregroundStyle(isError ? KiioTheme.danger : KiioTheme.secondaryText)
             Text(text)
                 .font(.system(size: 15))
                 .lineSpacing(4)
-                .foregroundStyle(isError ? Color(.systemRed) : Color.primary)
+                .foregroundStyle(isError ? KiioTheme.danger : KiioTheme.text)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .mailOperationDetailCard()
@@ -831,11 +832,11 @@ private struct MailOperationDetailCardModifier: ViewModifier {
         content
             .padding(18)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.secondarySystemBackground))
+            .background(KiioTheme.surface)
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                    .stroke(KiioTheme.border, lineWidth: 1)
             )
     }
 }
@@ -934,7 +935,7 @@ private struct MailAccountRow: View {
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.8), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
     }
@@ -986,7 +987,7 @@ private struct MailOperationRow: View {
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(.white.opacity(0.8), lineWidth: 1)
+                .stroke(KiioTheme.border, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
     }

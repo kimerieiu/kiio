@@ -212,7 +212,7 @@ private struct DeviceListCard: View {
                     Circle()
                         .fill(isOnline ? KiioTheme.success : KiioTheme.mutedText)
                         .frame(width: 12, height: 12)
-                        .overlay(Circle().stroke(.white, lineWidth: 2))
+                        .overlay(Circle().stroke(KiioTheme.surface, lineWidth: 2))
                 }
 
                 VStack(alignment: .leading, spacing: 5) {
@@ -267,7 +267,7 @@ private struct DeviceListCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(isPrimary ? KiioTheme.accent.opacity(0.35) : .white.opacity(0.8), lineWidth: 1)
+                .stroke(isPrimary ? KiioTheme.accent.opacity(0.5) : KiioTheme.border, lineWidth: 1)
         )
     }
 
@@ -287,7 +287,8 @@ private struct DeviceListCard: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.white.opacity(0.6))
+        .background(KiioTheme.background)
         .clipShape(Capsule())
+        .overlay(Capsule().stroke(KiioTheme.border, lineWidth: 1))
     }
 }

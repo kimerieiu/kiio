@@ -86,8 +86,12 @@ struct AgentLanguagePreferenceView: View {
                     .foregroundStyle(KiioTheme.text)
                     .lineSpacing(3)
                     .padding(12)
-                    .background(.white.opacity(0.75))
+                    .background(KiioTheme.background)
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(KiioTheme.border, lineWidth: 1)
+                    )
             }
         }
     }
@@ -115,6 +119,10 @@ struct AgentLanguagePreferenceView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(KiioTheme.surface)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(KiioTheme.border, lineWidth: 1)
+            )
     }
 
     private var languageCard: some View {
@@ -144,7 +152,7 @@ struct AgentLanguagePreferenceView: View {
 
                         Image(systemName: selected == language.code ? "checkmark.circle.fill" : "circle")
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(selected == language.code ? KiioTheme.accent : KiioTheme.mutedText.opacity(0.45))
+                            .foregroundStyle(selected == language.code ? KiioTheme.accent : KiioTheme.mutedText)
                     }
                     .padding(16)
                     .contentShape(Rectangle())
@@ -159,6 +167,10 @@ struct AgentLanguagePreferenceView: View {
         }
         .background(KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(KiioTheme.border, lineWidth: 1)
+        )
     }
 
     private func saveLanguage() async {
