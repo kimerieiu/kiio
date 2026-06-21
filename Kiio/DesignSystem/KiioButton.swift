@@ -18,7 +18,7 @@ struct KiioPrimaryButton: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 52)
-            .foregroundStyle(isDisabled ? KiioTheme.secondaryText : .white)
+            .foregroundStyle(isDisabled ? KiioTheme.text : .white)
             .background(isDisabled ? KiioTheme.disabledFill : KiioTheme.accent)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
@@ -43,7 +43,7 @@ struct KiioSecondaryButton: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 48)
-            .foregroundStyle(isDisabled ? KiioTheme.secondaryText : KiioTheme.text)
+            .foregroundStyle(KiioTheme.text)
             .background(isDisabled ? KiioTheme.disabledFill : KiioTheme.accentSoft)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }

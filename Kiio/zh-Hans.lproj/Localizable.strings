@@ -102,7 +102,6 @@
 "home.morning" = "上午好";
 "home.afternoon" = "下午好";
 "home.evening" = "晚上好";
-"home.summary" = "当前账号已连接 %d 个智能体和 %d 台设备。";
 "home.tools" = "常用工具";
 "home.tool.reminders.title" = "提醒";
 "home.tool.reminders.subtitle" = "创建并查看 Kiio 助手提醒。";
@@ -231,7 +230,6 @@
 "mail.filter.pending" = "待确认";
 
 "device.title" = "设备";
-"device.agents" = "智能体";
 "device.devices" = "设备";
 "device.noAgents" = "暂无智能体。";
 "device.noDevices.title" = "暂无绑定设备";
@@ -288,7 +286,6 @@
 "profile.title" = "我的";
 "profile.defaultUser" = "Kiio 用户";
 "profile.id" = "ID: %@";
-"profile.agents" = "智能体";
 "profile.devices" = "设备";
 "profile.settings" = "设置";
 "profile.settingsSubtitle" = "语言、账号与登录状态";
@@ -348,7 +345,6 @@
 "device.network" = "网络连接";
 "device.needsCheck" = "需检查";
 "device.noConnection" = "暂无连接";
-"device.agentDeviceCount" = "%d 台关联设备";
 "device.addCompanion" = "添加设备";
 "device.addCompanionSub" = "先查看配网引导，再输入设备码绑定";
 "device.neverConnected" = "尚未连接";
@@ -481,9 +477,6 @@
 
 "profile.groups.assets" = "资产";
 "profile.groups.system" = "系统";
-"profile.companionTitle" = "Kiio 智能伙伴";
-"profile.digitalCloset" = "数字衣橱";
-"profile.digitalClosetSub" = "查看 Kiio 生成的穿搭建议";
 "profile.accountSecurity" = "账号与安全";
 "profile.about" = "关于";
 "profile.signOutConfirm" = "退出登录并清除此设备上的本地令牌？";
@@ -515,7 +508,7 @@
 "subscription.redeemEmpty" = "请先输入兑换码。";
 "subscription.confirmTitle" = "确认激活";
 "subscription.confirmAction" = "激活";
-"subscription.confirmMessage" = "%@ · %@\n兑换码有效期至：%@";
+"subscription.confirmMessage" = "%@\n兑换码有效期至：%@";
 "subscription.redeemUnavailable" = "该兑换码不可兑换。状态：%@";
 "subscription.redeemSuccess" = "订阅已激活";
 "subscription.status.active" = "已生效";

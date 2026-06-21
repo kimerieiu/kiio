@@ -148,8 +148,6 @@ struct DeviceView: View {
             }
 
             menuList
-
-            agentsSummary
         }
     }
 
@@ -205,38 +203,6 @@ struct DeviceView: View {
             }
             .buttonStyle(.plain)
             .disabled(mainDevice == nil || deviceStore.isUpdating)
-        }
-    }
-
-    private var agentsSummary: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(L10n.tr("device.agents", locale: appState.locale))
-                .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(KiioTheme.text)
-
-            KiioCard {
-                ForEach(bootstrapStore.agents) { agent in
-                    HStack(spacing: 12) {
-                        Image(systemName: "sparkles")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(KiioTheme.accent)
-                            .frame(width: 32, height: 32)
-                            .background(KiioTheme.accentSoft)
-                            .clipShape(Circle())
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(agent.displayName)
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(KiioTheme.text)
-                            Text(L10n.tr("device.agentDeviceCount", locale: appState.locale, agent.deviceCount ?? 0))
-                                .font(.system(size: 12))
-                                .foregroundStyle(KiioTheme.secondaryText)
-                        }
-
-                        Spacer()
-                    }
-                }
-            }
         }
     }
 

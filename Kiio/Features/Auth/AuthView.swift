@@ -90,7 +90,7 @@ struct AuthView: View {
                 Text(headerSubtitle)
                     .font(.system(size: 15))
                     .lineSpacing(3)
-                    .foregroundStyle(KiioTheme.secondaryText)
+                    .foregroundStyle(KiioTheme.text)
             }
         }
         .padding(.top, 24)
@@ -100,7 +100,7 @@ struct AuthView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(L10n.tr("auth.signInMethod", locale: appState.locale))
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(KiioTheme.mutedText)
+                .foregroundStyle(KiioTheme.text)
 
             Picker("", selection: $mode) {
                 Text(L10n.tr("auth.mode.password", locale: appState.locale)).tag(AuthMode.password)
@@ -113,17 +113,17 @@ struct AuthView: View {
     @ViewBuilder
     private var formFields: some View {
         VStack(spacing: 12) {
-            TextField(L10n.tr("auth.email.placeholder", locale: appState.locale), text: $email)
+            TextField("", text: $email, prompt: fieldPrompt("auth.email.placeholder"))
                 .keyboardType(.emailAddress)
                 .kiioTextField()
 
             if mode != .code {
-                SecureField(passwordPlaceholder, text: $password)
+                SecureField("", text: $password, prompt: Text(passwordPlaceholder).foregroundColor(authFieldPlaceholderColor))
                     .kiioTextField()
             }
 
             if mode != .password {
-                TextField(L10n.tr("auth.code.placeholder", locale: appState.locale), text: $code)
+                TextField("", text: $code, prompt: fieldPrompt("auth.code.placeholder"))
                     .keyboardType(.numberPad)
                     .kiioTextField()
             }
@@ -150,7 +150,7 @@ struct AuthView: View {
                     } label: {
                         Text(L10n.tr("auth.forgotPasswordLink", locale: appState.locale))
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(KiioTheme.accent)
+                            .foregroundStyle(KiioTheme.text)
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -158,13 +158,13 @@ struct AuthView: View {
                 if userRegistrationEnabled {
                     HStack(spacing: 5) {
                         Text(L10n.tr("auth.noAccountPrompt", locale: appState.locale))
-                            .foregroundStyle(KiioTheme.secondaryText)
+                            .foregroundStyle(KiioTheme.text)
                         Button {
                             enterSecondaryMode(.register)
                         } label: {
                             Text(L10n.tr("auth.createAccountLink", locale: appState.locale))
                                 .fontWeight(.semibold)
-                                .foregroundStyle(KiioTheme.accent)
+                                .foregroundStyle(KiioTheme.text)
                         }
                     }
                     .font(.system(size: 14))
@@ -174,13 +174,13 @@ struct AuthView: View {
         } else {
             HStack(spacing: 5) {
                 Text(L10n.tr("auth.haveAccountPrompt", locale: appState.locale))
-                    .foregroundStyle(KiioTheme.secondaryText)
+                    .foregroundStyle(KiioTheme.text)
                 Button {
                     returnToSignIn()
                 } label: {
                     Text(L10n.tr("auth.signIn", locale: appState.locale))
                         .fontWeight(.semibold)
-                        .foregroundStyle(KiioTheme.accent)
+                        .foregroundStyle(KiioTheme.text)
                 }
             }
             .font(.system(size: 14))
@@ -198,7 +198,7 @@ struct AuthView: View {
                 Text(L10n.tr("auth.backToSignIn", locale: appState.locale))
                     .font(.system(size: 14, weight: .semibold))
             }
-            .foregroundStyle(KiioTheme.accent)
+            .foregroundStyle(KiioTheme.text)
         }
         .padding(.top, 8)
     }
@@ -264,6 +264,10 @@ struct AuthView: View {
             : L10n.tr("auth.password.placeholder", locale: appState.locale)
     }
 
+    private var authFieldPlaceholderColor: Color {
+        KiioTheme.text.opacity(0.58)
+    }
+
     private var canSubmit: Bool {
         guard availableModes.contains(mode), isValidEmail(normalizedEmail) else {
             return false
@@ -285,6 +289,11 @@ struct AuthView: View {
 
     private var normalizedCode: String {
         code.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func fieldPrompt(_ key: String) -> Text {
+        Text(L10n.tr(key, locale: appState.locale))
+            .foregroundColor(authFieldPlaceholderColor)
     }
 
     private func submit() async {

@@ -75,14 +75,6 @@ private struct SubscriptionScene: View {
                     }
 
                     KiioDetailField(
-                        title: L10n.tr("subscription.billingCycle", locale: appState.locale),
-                        value: billingText(store.subscription?.billingCycle)
-                    )
-                    KiioDetailField(
-                        title: L10n.tr("subscription.channel", locale: appState.locale),
-                        value: channelText(store.subscription?.channel)
-                    )
-                    KiioDetailField(
                         title: L10n.tr("subscription.expireTime", locale: appState.locale),
                         value: formatDateTime(store.subscription?.expireTime)
                     )
@@ -99,17 +91,6 @@ private struct SubscriptionScene: View {
             )
 
             VStack(spacing: 12) {
-                voiceUsageView
-                entitlementRow(
-                    icon: "cpu",
-                    title: L10n.tr("subscription.modelLevel", locale: appState.locale),
-                    value: modelLevel
-                )
-                entitlementRow(
-                    icon: "dot.radiowaves.left.and.right",
-                    title: L10n.tr("subscription.maxDevices", locale: appState.locale),
-                    value: "\(entitlementInt("max_devices", defaultValue: 1))"
-                )
                 entitlementRow(
                     icon: "wand.and.stars",
                     title: L10n.tr("subscription.enabledFeatures", locale: appState.locale),
@@ -117,26 +98,6 @@ private struct SubscriptionScene: View {
                 )
             }
         }
-    }
-
-    private var voiceUsageView: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Label(L10n.tr("subscription.voiceUsage", locale: appState.locale), systemImage: "mic")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(KiioTheme.text)
-                Spacer()
-                Text(voiceUsageText)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(KiioTheme.secondaryText)
-            }
-
-            ProgressView(value: voiceProgress)
-                .tint(KiioTheme.accent)
-        }
-        .padding(12)
-        .background(KiioTheme.accentSoft.opacity(0.55))
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private func entitlementRow(icon: String, title: String, value: String) -> some View {
@@ -227,7 +188,6 @@ private struct SubscriptionScene: View {
             "subscription.confirmMessage",
             locale: appState.locale,
             preview.planName ?? preview.planCode ?? "--",
-            billingText(preview.billingCycle),
             formatDateTime(preview.codeExpireTime) ?? "--"
         )
     }
@@ -277,38 +237,11 @@ private struct SubscriptionScene: View {
         }
     }
 
-    private var modelLevel: String {
-        entitlementString("llm_model_level", defaultValue: "basic").uppercased()
-    }
-
     private var enabledServicesText: String {
         let services = enabledServices()
         return services.isEmpty
             ? L10n.tr("subscription.noPremiumFeatures", locale: appState.locale)
             : services.joined(separator: " / ")
-    }
-
-    private var voiceUsage: SubscriptionUsageQuotaDTO? {
-        store.subscription?.usage?["voice_seconds"]
-    }
-
-    private var voiceProgress: Double {
-        guard let voiceUsage else { return 0 }
-        let total = max(voiceUsage.total.value, 0)
-        guard total > 0 else { return 0 }
-        return min(Double(voiceUsage.used.value) / Double(total), 1)
-    }
-
-    private var voiceUsageText: String {
-        guard let voiceUsage else {
-            return L10n.tr("subscription.noQuota", locale: appState.locale)
-        }
-        let used = max(voiceUsage.used.value, 0) / 60
-        let total = max(voiceUsage.total.value, 0) / 60
-        guard total > 0 else {
-            return L10n.tr("subscription.noQuota", locale: appState.locale)
-        }
-        return L10n.tr("subscription.voiceUsageText", locale: appState.locale, used, total)
     }
 
     private func loadCurrent(showError: Bool) async {
@@ -358,18 +291,6 @@ private struct SubscriptionScene: View {
         }
     }
 
-    private func entitlementString(_ key: String, defaultValue: String) -> String {
-        guard let value = store.subscription?.entitlements?[key]?.stringValue,
-              !value.isEmpty else {
-            return defaultValue
-        }
-        return value
-    }
-
-    private func entitlementInt(_ key: String, defaultValue: Int) -> Int {
-        store.subscription?.entitlements?[key]?.intValue ?? defaultValue
-    }
-
     private func enabledServices() -> [String] {
         let statuses = store.subscription?.featureSubscriptions ?? [:]
         let ordered: [(String, String)] = [
@@ -403,36 +324,6 @@ private struct SubscriptionScene: View {
             return L10n.tr("subscription.redeemStatus.invalidated", locale: appState.locale)
         default:
             return status ?? "--"
-        }
-    }
-
-    private func billingText(_ cycle: String?) -> String {
-        switch cycle {
-        case "month":
-            return L10n.tr("subscription.billing.month", locale: appState.locale)
-        case "year":
-            return L10n.tr("subscription.billing.year", locale: appState.locale)
-        case "lifetime":
-            return L10n.tr("subscription.billing.lifetime", locale: appState.locale)
-        case "trial":
-            return L10n.tr("subscription.billing.trial", locale: appState.locale)
-        case "manual":
-            return L10n.tr("subscription.billing.manual", locale: appState.locale)
-        default:
-            return cycle?.isEmpty == false ? cycle! : "--"
-        }
-    }
-
-    private func channelText(_ channel: String?) -> String {
-        switch channel {
-        case "shopify_redeem":
-            return L10n.tr("subscription.channel.shopifyRedeem", locale: appState.locale)
-        case "manual":
-            return L10n.tr("subscription.channel.manual", locale: appState.locale)
-        case "apple":
-            return "Apple"
-        default:
-            return channel?.isEmpty == false ? channel! : "--"
         }
     }
 

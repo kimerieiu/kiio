@@ -14,7 +14,6 @@ struct ProfileView: View {
                 topBar
                 profileHeader
                 proBanner
-                companionBanner
                 assetsCard
                 menuGroup(
                     title: L10n.tr("profile.groups.assets", locale: appState.locale),
@@ -170,52 +169,8 @@ struct ProfileView: View {
         .buttonStyle(.plain)
     }
 
-    private var companionBanner: some View {
-        HStack(spacing: 14) {
-            Image(systemName: "sparkles")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(KiioTheme.accent)
-                .frame(width: 46, height: 46)
-                .background(KiioTheme.accentSoft)
-                .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(L10n.tr("profile.companionTitle", locale: appState.locale))
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(KiioTheme.text)
-                Text(L10n.tr("home.summary", locale: appState.locale, bootstrapStore.agents.count, bootstrapStore.devices.count))
-                    .font(.system(size: 12))
-                    .foregroundStyle(KiioTheme.secondaryText)
-                    .lineLimit(2)
-            }
-
-            Spacer()
-        }
-        .padding(16)
-        .background(KiioTheme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(KiioTheme.border, lineWidth: 1)
-        )
-    }
-
     private var assetsCard: some View {
-        HStack(spacing: 0) {
-            NavigationLink {
-                DeviceListView()
-            } label: {
-                assetMetric(
-                    value: "\(bootstrapStore.agents.count)",
-                    label: L10n.tr("profile.agents", locale: appState.locale)
-                )
-            }
-            .buttonStyle(.plain)
-
-            Rectangle()
-                .fill(KiioTheme.mutedText.opacity(0.18))
-                .frame(width: 1, height: 44)
-
+        HStack {
             NavigationLink {
                 DeviceListView()
             } label: {
@@ -242,12 +197,6 @@ struct ProfileView: View {
                 title: L10n.tr("device.allCompanions", locale: appState.locale),
                 subtitle: L10n.tr("device.manageCompanions", locale: appState.locale, bootstrapStore.devices.count),
                 destination: .devices
-            ),
-            ProfileMenuRowData(
-                icon: "hanger",
-                title: L10n.tr("profile.digitalCloset", locale: appState.locale),
-                subtitle: L10n.tr("profile.digitalClosetSub", locale: appState.locale),
-                destination: .outfit
             ),
             ProfileMenuRowData(
                 icon: "receipt",
@@ -288,9 +237,6 @@ struct ProfileView: View {
                     switch row.destination {
                     case .devices:
                         NavigationLink { DeviceListView() } label: { ProfileMenuRow(row: row) }
-                            .buttonStyle(.plain)
-                    case .outfit:
-                        NavigationLink { OutfitView() } label: { ProfileMenuRow(row: row) }
                             .buttonStyle(.plain)
                     case .orders:
                         NavigationLink { OrdersPlaceholderView() } label: { ProfileMenuRow(row: row) }
@@ -442,7 +388,6 @@ private struct ProfileMenuRowData: Identifiable {
 
 private enum ProfileMenuDestination: Equatable {
     case devices
-    case outfit
     case orders
     case settings
     case about

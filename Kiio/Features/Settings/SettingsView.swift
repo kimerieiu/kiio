@@ -27,7 +27,6 @@ struct SettingsView: View {
                         SettingsPendingRow(icon: "doc.text", titleKey: "settings.agreement", subtitleKey: "settings.agreementSub")
                     ]
                 )
-                aboutCard
                 signOutButton
             }
             .padding(20)
@@ -141,17 +140,6 @@ struct SettingsView: View {
         }
     }
 
-    private var aboutCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            KiioSectionTitle(title: L10n.tr("settings.about", locale: appState.locale), icon: "info.circle")
-
-            KiioCard {
-                KiioDetailField(title: L10n.tr("common.version", locale: appState.locale), value: versionText)
-                KiioDetailField(title: L10n.tr("common.api", locale: appState.locale), value: AppConfig.apiBaseURL.absoluteString)
-            }
-        }
-    }
-
     private var signOutButton: some View {
         Button {
             isConfirmingSignOut = true
@@ -210,12 +198,6 @@ struct SettingsView: View {
 
     private var userId: String {
         user?.id ?? "--"
-    }
-
-    private var versionText: String {
-        bootstrapStore.publicConfig?.version?.isEmpty == false
-            ? bootstrapStore.publicConfig!.version!
-            : "1.0.0"
     }
 
     private func signOut() {

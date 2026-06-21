@@ -9,11 +9,51 @@ struct HomeView: View {
     @GestureState private var cardDragOffset: CGFloat = 0
 
     private let tools: [HomeToolItem] = [
-        HomeToolItem(icon: "bell", categoryKey: "home.category.productivity", titleKey: "home.tool.reminders.title", subtitleKey: "home.tool.reminders.subtitle", destination: .reminder, accent: KiioTheme.accent, softTint: Color(red: 237 / 255, green: 232 / 255, blue: 225 / 255)),
-        HomeToolItem(icon: "wallet.pass", categoryKey: "home.category.finance", titleKey: "home.tool.accounting.title", subtitleKey: "home.tool.accounting.subtitle", destination: .accounting, accent: Color(red: 106 / 255, green: 90 / 255, blue: 73 / 255), softTint: Color(red: 221 / 255, green: 213 / 255, blue: 200 / 255)),
-        HomeToolItem(icon: "tshirt", categoryKey: "home.category.life", titleKey: "home.tool.outfit.title", subtitleKey: "home.tool.outfit.subtitle", destination: .outfit, accent: Color(red: 103 / 255, green: 92 / 255, blue: 80 / 255), softTint: Color(red: 230 / 255, green: 224 / 255, blue: 215 / 255)),
-        HomeToolItem(icon: "newspaper", categoryKey: "home.category.info", titleKey: "home.tool.news.title", subtitleKey: "home.tool.news.subtitle", destination: .news, accent: Color(red: 107 / 255, green: 90 / 255, blue: 77 / 255), softTint: Color(red: 224 / 255, green: 218 / 255, blue: 209 / 255)),
-        HomeToolItem(icon: "envelope", categoryKey: "home.category.communication", titleKey: "home.tool.mail.title", subtitleKey: "home.tool.mail.subtitle", destination: .mail, accent: Color(red: 150 / 255, green: 64 / 255, blue: 84 / 255), softTint: Color(red: 239 / 255, green: 220 / 255, blue: 222 / 255))
+        HomeToolItem(
+            icon: "bell",
+            categoryKey: "home.category.productivity",
+            titleKey: "home.tool.reminders.title",
+            subtitleKey: "home.tool.reminders.subtitle",
+            destination: .reminder,
+            accent: Color(red: 53 / 255, green: 122 / 255, blue: 105 / 255),
+            softTint: Color(red: 220 / 255, green: 235 / 255, blue: 229 / 255)
+        ),
+        HomeToolItem(
+            icon: "wallet.pass",
+            categoryKey: "home.category.finance",
+            titleKey: "home.tool.accounting.title",
+            subtitleKey: "home.tool.accounting.subtitle",
+            destination: .accounting,
+            accent: Color(red: 55 / 255, green: 103 / 255, blue: 154 / 255),
+            softTint: Color(red: 220 / 255, green: 232 / 255, blue: 244 / 255)
+        ),
+        HomeToolItem(
+            icon: "tshirt",
+            categoryKey: "home.category.life",
+            titleKey: "home.tool.outfit.title",
+            subtitleKey: "home.tool.outfit.subtitle",
+            destination: .outfit,
+            accent: Color(red: 138 / 255, green: 92 / 255, blue: 143 / 255),
+            softTint: Color(red: 237 / 255, green: 225 / 255, blue: 238 / 255)
+        ),
+        HomeToolItem(
+            icon: "newspaper",
+            categoryKey: "home.category.info",
+            titleKey: "home.tool.news.title",
+            subtitleKey: "home.tool.news.subtitle",
+            destination: .news,
+            accent: Color(red: 182 / 255, green: 111 / 255, blue: 52 / 255),
+            softTint: Color(red: 244 / 255, green: 229 / 255, blue: 213 / 255)
+        ),
+        HomeToolItem(
+            icon: "envelope",
+            categoryKey: "home.category.communication",
+            titleKey: "home.tool.mail.title",
+            subtitleKey: "home.tool.mail.subtitle",
+            destination: .mail,
+            accent: Color(red: 150 / 255, green: 64 / 255, blue: 84 / 255),
+            softTint: Color(red: 239 / 255, green: 220 / 255, blue: 222 / 255)
+        )
     ]
 
     var body: some View {
@@ -148,7 +188,7 @@ struct HomeView: View {
                         }
                     } label: {
                         Capsule()
-                            .fill(index == currentCard ? KiioTheme.accent : KiioTheme.accent.opacity(0.24))
+                            .fill(index == currentCard ? currentToolAccent : currentToolAccent.opacity(0.24))
                             .frame(width: index == currentCard ? 18 : 6, height: 6)
                     }
                     .buttonStyle(.plain)
@@ -173,6 +213,13 @@ struct HomeView: View {
                     moveCard(by: -1)
                 }
             }
+    }
+
+    private var currentToolAccent: Color {
+        guard tools.indices.contains(currentCard) else {
+            return KiioTheme.accent
+        }
+        return tools[currentCard].accent
     }
 
     private func moveCard(by step: Int) {
