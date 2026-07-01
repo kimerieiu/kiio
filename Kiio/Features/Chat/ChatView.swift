@@ -61,13 +61,18 @@ private struct ChatScene: View {
 
             Spacer()
 
-            Image(systemName: "list.bullet")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(KiioTheme.text)
-                .frame(width: 38, height: 38)
-                .background(KiioTheme.surface)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .accessibilityLabel(Text(L10n.tr("chat.sessions", locale: appState.locale)))
+            NavigationLink {
+                ChatSessionsView()
+            } label: {
+                Image(systemName: "list.bullet")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(KiioTheme.text)
+                    .frame(width: 38, height: 38)
+                    .background(KiioTheme.surface)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(L10n.tr("chat.sessions", locale: appState.locale)))
         }
     }
 
@@ -91,7 +96,6 @@ private struct ChatScene: View {
         } else if let latestSession = store.sessions.first {
             latestSessionSummary(latestSession)
             latestConversation
-            sessionsList
         } else {
             KiioEmptyStateView(
                 systemImage: "bubble.left.and.bubble.right",
@@ -164,7 +168,7 @@ private struct ChatScene: View {
                 }
             } else {
                 VStack(spacing: 14) {
-                    ForEach(store.latestMessages.prefix(8)) { message in
+                    ForEach(store.latestMessages) { message in
                         ChatMessageRow(message: message)
                     }
                 }
@@ -172,50 +176,99 @@ private struct ChatScene: View {
         }
     }
 
+    private func load() async {
+        await bootstrapStore.ensureLoaded()
+        await store.loadLatestConversation(agent: bootstrapStore.agents.first)
+    }
+}
+
+struct ChatSessionsView: View {
+    @EnvironmentObject private var dependencies: AppDependencies
+
+    var body: some View {
+        ChatSessionsScene(store: ChatStore(service: dependencies.chatService))
+    }
+}
+
+private struct ChatSessionsScene: View {
+    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var bootstrapStore: BootstrapStore
+
+    @StateObject private var store: ChatStore
+
+    init(store: ChatStore) {
+        _store = StateObject(wrappedValue: store)
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                content
+            }
+            .padding(20)
+        }
+        .background(KiioTheme.background.ignoresSafeArea())
+        .navigationTitle(L10n.tr("chat.sessions", locale: appState.locale))
+        .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await load()
+        }
+        .refreshable {
+            await load()
+        }
+        .kiioErrorAlert(message: $store.errorMessage, locale: appState.locale)
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if store.isLoading && store.sessions.isEmpty {
+            KiioLoadingCard(message: L10n.tr("chat.loadingConversations", locale: appState.locale))
+        } else if store.agent == nil {
+            KiioEmptyStateView(
+                systemImage: "bubble.left.and.bubble.right",
+                title: L10n.tr("chat.noAgent.title", locale: appState.locale),
+                message: L10n.tr("chat.noAgent.message", locale: appState.locale)
+            )
+        } else if store.sessions.isEmpty {
+            KiioEmptyStateView(
+                systemImage: "bubble.left.and.bubble.right",
+                title: L10n.tr("chat.empty.title", locale: appState.locale),
+                message: L10n.tr("chat.empty.message", locale: appState.locale)
+            )
+        } else {
+            sessionsList
+        }
+    }
+
     private var sessionsList: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(L10n.tr("chat.sessions", locale: appState.locale))
-                .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(KiioTheme.mutedText)
-                .padding(.horizontal, 4)
-
-            if store.sessions.isEmpty {
-                KiioCard {
-                    Text(L10n.tr("chat.noSessions", locale: appState.locale))
-                        .font(.system(size: 14))
+            ForEach(groupedSessions) { group in
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(group.title)
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(KiioTheme.secondaryText)
-                }
-            } else {
-                VStack(spacing: 10) {
-                    ForEach(groupedSessions) { group in
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(group.title)
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(KiioTheme.secondaryText)
-                                .padding(.horizontal, 4)
+                        .padding(.horizontal, 4)
 
-                            ForEach(group.sessions) { session in
-                                NavigationLink {
-                                    ChatSessionDetailView(agent: store.agent, session: session)
-                                } label: {
-                                    ChatSessionRow(session: session)
-                                }
-                                .buttonStyle(.plain)
-                            }
+                    ForEach(group.sessions) { session in
+                        NavigationLink {
+                            ChatSessionDetailView(agent: store.agent, session: session)
+                        } label: {
+                            ChatSessionRow(session: session)
                         }
+                        .buttonStyle(.plain)
                     }
-
-                    KiioPaginationFooter(
-                        isLoading: store.isLoadingMore,
-                        hasMore: store.hasMoreSessions,
-                        isEmpty: store.sessions.isEmpty,
-                        locale: appState.locale
-                    ) {
-                        Task { await store.loadMoreSessions() }
-                    }
-                    .padding(.top, 2)
                 }
             }
+
+            KiioPaginationFooter(
+                isLoading: store.isLoadingMore,
+                hasMore: store.hasMoreSessions,
+                isEmpty: store.sessions.isEmpty,
+                locale: appState.locale
+            ) {
+                Task { await store.loadMoreSessions() }
+            }
+            .padding(.top, 2)
         }
     }
 

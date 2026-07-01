@@ -22,6 +22,46 @@ final class ChatStore: ObservableObject {
         self.service = service
     }
 
+    func loadLatestConversation(agent: AgentDTO?) async {
+        self.agent = agent
+
+        guard let agent else {
+            sessions = []
+            latestMessages = []
+            totalSessions = 0
+            nextPage = 1
+            hasMoreSessions = false
+            errorMessage = nil
+            return
+        }
+
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let page = try await service.sessions(agentId: agent.id, page: 1, limit: 1)
+            sessions = page.list
+            totalSessions = page.total
+            nextPage = 1
+            hasMoreSessions = false
+
+            if let firstSession = page.list.first {
+                let history = try await service.history(agentId: agent.id, sessionId: firstSession.sessionId)
+                latestMessages = history.filter(\.isVisibleConversationMessage)
+            } else {
+                latestMessages = []
+            }
+            errorMessage = nil
+        } catch {
+            sessions = []
+            latestMessages = []
+            totalSessions = 0
+            nextPage = 1
+            hasMoreSessions = false
+            errorMessage = AppError.from(error).errorDescription
+        }
+    }
+
     func load(agent: AgentDTO?) async {
         self.agent = agent
 

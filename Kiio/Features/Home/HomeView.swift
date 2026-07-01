@@ -64,6 +64,7 @@ struct HomeView: View {
 
                 if viewMode == .card {
                     toolCarousel
+                        .padding(.top, HomeFeatureCardMetrics.moduleSpacing)
                 } else {
                     toolList
                 }
@@ -150,7 +151,11 @@ struct HomeView: View {
     private var toolCarousel: some View {
         VStack(spacing: 14) {
             GeometryReader { proxy in
-                let cardWidth = min(max(proxy.size.width * 0.72, 232), 274)
+                let cardWidth = min(
+                    max(proxy.size.width * HomeFeatureCardMetrics.widthRatio, HomeFeatureCardMetrics.minWidth),
+                    HomeFeatureCardMetrics.maxWidth
+                )
+                let cardHeight = cardWidth / HomeFeatureCardMetrics.aspectRatio
 
                 ZStack {
                     ForEach(Array(tools.enumerated()), id: \.element.id) { index, tool in
@@ -160,7 +165,7 @@ struct HomeView: View {
                             toolDestination(tool.destination)
                         } label: {
                             HomeFeatureCard(tool: tool)
-                                .frame(width: cardWidth)
+                                .frame(width: cardWidth, height: cardHeight)
                         }
                         .buttonStyle(.plain)
                         .rotation3DEffect(.degrees(style.rotation), axis: (x: 0, y: 1, z: 0), perspective: 0.74)
@@ -172,10 +177,10 @@ struct HomeView: View {
                         .accessibilityHidden(index != currentCard)
                     }
                 }
-                .frame(width: proxy.size.width, height: 286)
+                .frame(width: proxy.size.width, height: HomeFeatureCardMetrics.maxHeight)
                 .contentShape(Rectangle())
             }
-            .frame(height: 286)
+            .frame(height: HomeFeatureCardMetrics.maxHeight)
             .simultaneousGesture(cardDragGesture)
             .animation(.spring(response: 0.42, dampingFraction: 0.86), value: currentCard)
             .animation(.interactiveSpring(response: 0.26, dampingFraction: 0.88), value: cardDragOffset)
@@ -336,6 +341,18 @@ private struct HomeFlowCardStyle {
     let zIndex: Double
 }
 
+private enum HomeFeatureCardMetrics {
+    static let widthRatio: CGFloat = 0.72
+    static let minWidth: CGFloat = 232
+    static let maxWidth: CGFloat = 272
+    static let aspectRatio: CGFloat = 3.0 / 4.0
+    static let moduleSpacing: CGFloat = 12
+
+    static var maxHeight: CGFloat {
+        maxWidth / aspectRatio
+    }
+}
+
 private struct HomeFeatureCard: View {
     @EnvironmentObject private var appState: AppState
     let tool: HomeToolItem
@@ -344,16 +361,16 @@ private struct HomeFeatureCard: View {
         ZStack(alignment: .bottomLeading) {
             LinearGradient(
                 colors: [
-                    KiioTheme.surface,
-                    tool.softTint.opacity(0.42),
-                    KiioTheme.surface.opacity(0.96)
+                    tool.softTint.opacity(0.78),
+                    tool.softTint.opacity(0.58),
+                    KiioTheme.surface.opacity(0.98)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
 
             Circle()
-                .fill(tool.softTint.opacity(0.5))
+                .fill(tool.softTint.opacity(0.64))
                 .frame(width: 184, height: 184)
                 .offset(x: 178, y: 106)
 
@@ -401,19 +418,11 @@ private struct HomeFeatureCard: View {
                         .fill(tool.accent)
                         .frame(width: 34, height: 4)
                     Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(tool.accent)
-                        .frame(width: 34, height: 34)
-                        .background(KiioTheme.surface)
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(KiioTheme.border, lineWidth: 1))
                 }
             }
             .padding(22)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 278)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
