@@ -54,7 +54,12 @@ struct DeviceQRCodeScannerView: View {
                     Task { await handleScannedValue(value) }
                 },
                 onFailure: { failure in
-                    scannerFailure = scannerFailureMessage(failure)
+                    if failure == .cameraAccessDenied {
+                        scannerFailure = nil
+                        permissionState = .denied
+                    } else {
+                        scannerFailure = scannerFailureMessage(failure)
+                    }
                 }
             )
             .ignoresSafeArea()
@@ -313,6 +318,8 @@ struct DeviceQRCodeScannerView: View {
 
     private func scannerFailureMessage(_ failure: QRCodeScannerFailure) -> String {
         switch failure {
+        case .cameraAccessDenied:
+            return L10n.tr("device.scan.permissionDeniedMessage", locale: appState.locale)
         case .cameraUnavailable:
             return L10n.tr("device.scan.cameraUnavailableMessage", locale: appState.locale)
         case .sessionConfigurationFailed:

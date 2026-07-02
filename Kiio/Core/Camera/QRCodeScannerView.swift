@@ -4,6 +4,7 @@ import UIKit
 
 enum QRCodeScannerFailure: Error, Equatable {
     case cameraUnavailable
+    case cameraAccessDenied
     case sessionConfigurationFailed
 }
 
@@ -50,6 +51,8 @@ final class QRCodeScannerViewController: UIViewController, AVCaptureMetadataOutp
         fatalError("init(coder:) has not been implemented")
     }
 
+    override var prefersStatusBarHidden: Bool { true }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
@@ -59,6 +62,21 @@ final class QRCodeScannerViewController: UIViewController, AVCaptureMetadataOutp
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         previewLayer?.frame = view.bounds
+        updateVideoOrientation()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        stopSession()
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: { [weak self] _ in
+            guard let self else { return }
+            self.previewLayer?.frame = CGRect(origin: .zero, size: size)
+            self.updateVideoOrientation()
+        })
     }
 
     func setActive(_ isActive: Bool) {
@@ -87,34 +105,122 @@ final class QRCodeScannerViewController: UIViewController, AVCaptureMetadataOutp
             return
         }
 
-        guard let device = AVCaptureDevice.default(for: .video),
-              let input = try? AVCaptureDeviceInput(device: device) else {
-            onFailure(.cameraUnavailable)
-            return
+        requestCameraAccessIfNeeded { [weak self] granted in
+            guard let self else { return }
+            if granted {
+                self.configureSession()
+            } else {
+                DispatchQueue.main.async {
+                    self.onFailure(.cameraAccessDenied)
+                }
+            }
         }
+    }
 
-        let output = AVCaptureMetadataOutput()
-        session.beginConfiguration()
-
-        guard session.canAddInput(input), session.canAddOutput(output) else {
-            session.commitConfiguration()
-            onFailure(.sessionConfigurationFailed)
-            return
+    private func requestCameraAccessIfNeeded(completion: @escaping (Bool) -> Void) {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            completion(true)
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video, completionHandler: completion)
+        case .denied, .restricted:
+            completion(false)
+        @unknown default:
+            completion(false)
         }
+    }
 
-        session.addInput(input)
-        session.addOutput(output)
-        output.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
-        output.metadataObjectTypes = [.qr]
-        session.commitConfiguration()
+    private func configureSession() {
+        sessionQueue.async { [weak self] in
+            guard let self else { return }
 
-        let previewLayer = AVCaptureVideoPreviewLayer(session: session)
-        previewLayer.videoGravity = .resizeAspectFill
-        previewLayer.frame = view.bounds
-        view.layer.insertSublayer(previewLayer, at: 0)
-        self.previewLayer = previewLayer
-        isConfigured = true
-        setActive(shouldRunWhenConfigured)
+            guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+                  let input = try? AVCaptureDeviceInput(device: device) else {
+                DispatchQueue.main.async {
+                    self.onFailure(.cameraUnavailable)
+                }
+                return
+            }
+
+            let output = AVCaptureMetadataOutput()
+            self.session.beginConfiguration()
+
+            if self.session.canSetSessionPreset(.hd1920x1080) {
+                self.session.sessionPreset = .hd1920x1080
+            }
+
+            guard self.session.canAddInput(input), self.session.canAddOutput(output) else {
+                self.session.commitConfiguration()
+                DispatchQueue.main.async {
+                    self.onFailure(.sessionConfigurationFailed)
+                }
+                return
+            }
+
+            self.session.addInput(input)
+            self.session.addOutput(output)
+            output.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+            output.metadataObjectTypes = [.qr]
+            self.session.commitConfiguration()
+
+            self.tuneDeviceForFastAccurateScanning(device)
+
+            DispatchQueue.main.async {
+                let previewLayer = AVCaptureVideoPreviewLayer(session: self.session)
+                previewLayer.videoGravity = .resizeAspectFill
+                previewLayer.frame = self.view.bounds
+                self.view.layer.insertSublayer(previewLayer, at: 0)
+                self.previewLayer = previewLayer
+                self.isConfigured = true
+                self.updateVideoOrientation()
+                self.setActive(self.shouldRunWhenConfigured)
+            }
+        }
+    }
+
+    private func tuneDeviceForFastAccurateScanning(_ device: AVCaptureDevice) {
+        guard (try? device.lockForConfiguration()) != nil else { return }
+        defer { device.unlockForConfiguration() }
+
+        if device.isFocusModeSupported(.continuousAutoFocus) {
+            device.focusMode = .continuousAutoFocus
+        }
+        if device.isAutoFocusRangeRestrictionSupported {
+            device.autoFocusRangeRestriction = .near
+        }
+        if device.isSmoothAutoFocusSupported {
+            device.isSmoothAutoFocusEnabled = false
+        }
+        if device.isExposureModeSupported(.continuousAutoExposure) {
+            device.exposureMode = .continuousAutoExposure
+        }
+        if device.isLowLightBoostSupported {
+            device.automaticallyEnablesLowLightBoostWhenAvailable = true
+        }
+    }
+
+    private func updateVideoOrientation() {
+        guard let connection = previewLayer?.connection, connection.isVideoOrientationSupported else { return }
+
+        let orientation: AVCaptureVideoOrientation
+        switch view.window?.windowScene?.interfaceOrientation {
+        case .landscapeLeft:
+            orientation = .landscapeLeft
+        case .landscapeRight:
+            orientation = .landscapeRight
+        case .portraitUpsideDown:
+            orientation = .portraitUpsideDown
+        default:
+            orientation = .portrait
+        }
+        connection.videoOrientation = orientation
+    }
+
+    private func stopSession() {
+        sessionQueue.async { [weak self] in
+            guard let self, self.session.isRunning else { return }
+            self.session.stopRunning()
+        }
     }
 
     func metadataOutput(
@@ -131,10 +237,7 @@ final class QRCodeScannerViewController: UIViewController, AVCaptureMetadataOutp
         }
 
         hasReportedCode = true
-        sessionQueue.async { [weak self] in
-            guard let self, self.session.isRunning else { return }
-            self.session.stopRunning()
-        }
+        stopSession()
         onCode(value)
     }
 }
