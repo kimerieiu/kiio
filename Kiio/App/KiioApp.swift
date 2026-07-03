@@ -25,7 +25,7 @@ struct KiioApp: App {
     private func configureNavigationAppearance() {
         let backImage = UIImage(
             systemName: "chevron.left",
-            withConfiguration: UIImage.SymbolConfiguration(pointSize: 12, weight: .semibold)
+            withConfiguration: UIImage.SymbolConfiguration(pointSize: 15, weight: .bold)
         )
         UINavigationBar.appearance().backIndicatorImage = backImage
         UINavigationBar.appearance().backIndicatorTransitionMaskImage = backImage

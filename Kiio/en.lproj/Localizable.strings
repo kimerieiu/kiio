@@ -421,6 +421,7 @@
 "device.list.emptyTitle" = "No bound devices";
 "device.list.emptyDesc" = "Add a Kiio device to start syncing conversations and tools.";
 "device.list.primary" = "Primary";
+"device.list.actions" = "Device actions";
 "device.list.sortByName" = "Sort by name";
 "device.list.sortByRecent" = "Sort by recent";
 "device.list.autoOta" = "Auto OTA";

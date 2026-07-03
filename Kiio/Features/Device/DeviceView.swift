@@ -310,7 +310,7 @@ private struct DeviceAddActionSheet: View {
         .padding(.horizontal, 20)
         .padding(.top, 8)
         .padding(.bottom, 12)
-        .background(KiioTheme.background.ignoresSafeArea())
+        .background(KiioTheme.disabledFill.opacity(0.45).ignoresSafeArea())
     }
 
     private func sheetRow(icon: String, title: String, subtitle: String) -> some View {
@@ -339,6 +339,11 @@ private struct DeviceAddActionSheet: View {
         .padding(14)
         .background(KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(KiioTheme.border, lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.06), radius: 12, y: 6)
     }
 }
 

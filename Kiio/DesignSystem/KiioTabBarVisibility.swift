@@ -61,17 +61,85 @@ struct KiioTabSwitchAnimator: UIViewControllerRepresentable {
     }
 
     final class Coordinator: NSObject, UITabBarControllerDelegate {
-        func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-            guard tabBarController.selectedViewController !== viewController else {
-                return true
+        func tabBarController(
+            _ tabBarController: UITabBarController,
+            animationControllerForTransitionFrom fromVC: UIViewController,
+            to toVC: UIViewController
+        ) -> UIViewControllerAnimatedTransitioning? {
+            guard
+                let viewControllers = tabBarController.viewControllers,
+                let fromIndex = viewControllers.firstIndex(where: { $0 === fromVC }),
+                let toIndex = viewControllers.firstIndex(where: { $0 === toVC }),
+                fromIndex != toIndex
+            else {
+                return nil
             }
 
-            let transition = CATransition()
-            transition.duration = 0.12
-            transition.type = .fade
-            transition.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            tabBarController.view.layer.add(transition, forKey: "kiio-tab-switch")
-            return true
+            return ContentTransitionAnimator(direction: toIndex > fromIndex ? .forward : .backward)
+        }
+    }
+
+    private final class ContentTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+        enum Direction: Equatable {
+            case forward
+            case backward
+        }
+
+        let direction: Direction
+
+        init(direction: Direction) {
+            self.direction = direction
+        }
+
+        func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+            0.24
+        }
+
+        func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+            guard
+                let fromView = transitionContext.view(forKey: .from),
+                let toView = transitionContext.view(forKey: .to),
+                let toViewController = transitionContext.viewController(forKey: .to)
+            else {
+                transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+                return
+            }
+
+            let container = transitionContext.containerView
+            let distance = min(container.bounds.width * 0.14, 52)
+            let incomingOffset = direction == .forward ? distance : -distance
+            let outgoingOffset = -incomingOffset * 0.45
+
+            toView.frame = transitionContext.finalFrame(for: toViewController)
+            toView.alpha = 0
+            toView.transform = CGAffineTransform(translationX: incomingOffset, y: 0)
+            container.addSubview(toView)
+
+            UIView.animate(
+                withDuration: transitionDuration(using: transitionContext),
+                delay: 0,
+                usingSpringWithDamping: 0.92,
+                initialSpringVelocity: 0.2,
+                options: [.allowUserInteraction, .beginFromCurrentState]
+            ) {
+                fromView.alpha = 0.84
+                fromView.transform = CGAffineTransform(translationX: outgoingOffset, y: 0)
+                toView.alpha = 1
+                toView.transform = .identity
+            } completion: { _ in
+                let wasCancelled = transitionContext.transitionWasCancelled
+
+                fromView.alpha = 1
+                fromView.transform = .identity
+                toView.alpha = 1
+                toView.transform = .identity
+
+                if wasCancelled {
+                    toView.removeFromSuperview()
+                }
+
+                transitionContext.completeTransition(!wasCancelled)
+            }
         }
     }
 }

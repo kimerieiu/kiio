@@ -421,6 +421,7 @@
 "device.list.emptyTitle" = "暂无绑定设备";
 "device.list.emptyDesc" = "添加 Kiio 设备后即可同步对话和工具数据。";
 "device.list.primary" = "主设备";
+"device.list.actions" = "设备操作";
 "device.list.sortByName" = "按名称排序";
 "device.list.sortByRecent" = "按最近连接排序";
 "device.list.autoOta" = "自动 OTA";

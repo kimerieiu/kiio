@@ -74,15 +74,8 @@ struct DeviceQRCodeScannerView: View {
 
     private var topBar: some View {
         HStack {
-            Button {
+            KiioBackButton(style: .onDark) {
                 dismiss()
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
-                    .background(.black.opacity(0.32))
-                    .clipShape(Circle())
             }
 
             Spacer()

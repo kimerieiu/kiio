@@ -6,59 +6,84 @@ struct DeviceListView: View {
     @EnvironmentObject private var syncStore: SyncStore
 
     @State private var sortMode: DeviceListSortMode = .recent
+    @State private var isShowingActionMenu = false
     @State private var activeRoute: DeviceRoute?
     @State private var alertMessage: String?
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
-                subtitle
+        ZStack(alignment: .topTrailing) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    subtitle
 
-                if bootstrapStore.isLoading && bootstrapStore.devices.isEmpty {
-                    loadingState
-                } else if bootstrapStore.agents.isEmpty {
-                    noAgentState
-                } else if sortedDevices.isEmpty {
-                    emptyState
-                } else {
-                    if !onlineDevices.isEmpty {
-                        deviceSection(
-                            title: L10n.tr("device.list.online", locale: appState.locale),
-                            devices: onlineDevices
-                        )
-                    }
-                    if !offlineDevices.isEmpty {
-                        deviceSection(
-                            title: onlineDevices.isEmpty
-                            ? L10n.tr("device.bound", locale: appState.locale)
-                            : L10n.tr("device.list.offline", locale: appState.locale),
-                            devices: offlineDevices
-                        )
+                    if bootstrapStore.isLoading && bootstrapStore.devices.isEmpty {
+                        loadingState
+                    } else if bootstrapStore.agents.isEmpty {
+                        noAgentState
+                    } else if sortedDevices.isEmpty {
+                        emptyState
+                    } else {
+                        if !onlineDevices.isEmpty {
+                            deviceSection(
+                                title: L10n.tr("device.list.online", locale: appState.locale),
+                                devices: onlineDevices
+                            )
+                        }
+                        if !offlineDevices.isEmpty {
+                            deviceSection(
+                                title: onlineDevices.isEmpty
+                                ? L10n.tr("device.bound", locale: appState.locale)
+                                : L10n.tr("device.list.offline", locale: appState.locale),
+                                devices: offlineDevices
+                            )
+                        }
                     }
                 }
+                .padding(20)
             }
-            .padding(20)
+
+            if isShowingActionMenu {
+                Color.black.opacity(0.001)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        closeActionMenu()
+                    }
+                    .zIndex(1)
+
+                DeviceListActionMenu(
+                    addTitle: L10n.tr("device.addCompanion", locale: appState.locale),
+                    sortTitle: sortActionTitle,
+                    onAdd: {
+                        closeActionMenu()
+                        activeRoute = .provisioning
+                    },
+                    onSort: {
+                        closeActionMenu()
+                        sortMode = sortMode == .recent ? .name : .recent
+                    }
+                )
+                .padding(.top, 8)
+                .padding(.trailing, 16)
+                .transition(.scale(scale: 0.96, anchor: .topTrailing).combined(with: .opacity))
+                .zIndex(2)
+            }
         }
         .background(KiioTheme.background.ignoresSafeArea())
         .navigationTitle(L10n.tr("device.list.title", locale: appState.locale))
         .kiioHidesTabBar()
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Menu {
-                    Button {
-                        activeRoute = .provisioning
-                    } label: {
-                        Label(L10n.tr("device.addCompanion", locale: appState.locale), systemImage: "plus")
-                    }
-
-                    Button {
-                        sortMode = sortMode == .recent ? .name : .recent
-                    } label: {
-                        Label(sortActionTitle, systemImage: "arrow.up.arrow.down")
-                    }
+                Button {
+                    toggleActionMenu()
                 } label: {
-                    Image(systemName: "ellipsis.circle")
+                    Image(systemName: isShowingActionMenu ? "xmark.circle.fill" : "ellipsis.circle")
+                        .font(.system(size: 19, weight: .semibold))
+                        .foregroundStyle(KiioTheme.text)
+                        .frame(width: 36, height: 36)
+                        .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel(L10n.tr("device.list.actions", locale: appState.locale))
             }
         }
         .refreshable {
@@ -183,6 +208,20 @@ struct DeviceListView: View {
         )
     }
 
+    private func toggleActionMenu() {
+        withAnimation(.spring(response: 0.22, dampingFraction: 0.86)) {
+            isShowingActionMenu.toggle()
+        }
+    }
+
+    private func closeActionMenu() {
+        guard isShowingActionMenu else { return }
+
+        withAnimation(.spring(response: 0.22, dampingFraction: 0.86)) {
+            isShowingActionMenu = false
+        }
+    }
+
     private func refreshDevicesFromBackend(version: Int? = nil) async {
         let targetVersion = syncStore.targetVersion(.device, incomingVersion: version)
         guard await bootstrapStore.refresh() else {
@@ -195,6 +234,56 @@ struct DeviceListView: View {
         if syncStore.hasRemoteVersion(.device, after: targetVersion) {
             await refreshDevicesFromBackend()
         }
+    }
+}
+
+private struct DeviceListActionMenu: View {
+    let addTitle: String
+    let sortTitle: String
+    let onAdd: () -> Void
+    let onSort: () -> Void
+
+    var body: some View {
+        VStack(spacing: 6) {
+            actionButton(icon: "plus", title: addTitle, action: onAdd)
+            actionButton(icon: "arrow.up.arrow.down", title: sortTitle, action: onSort)
+        }
+        .padding(8)
+        .frame(width: 232)
+        .background(KiioTheme.text)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.18), radius: 18, y: 10)
+    }
+
+    private func actionButton(icon: String, title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 34, height: 34)
+                    .background(Color.white.opacity(0.12))
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.82)
+
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.white.opacity(0.08))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+        .buttonStyle(.plain)
     }
 }
 

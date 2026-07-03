@@ -37,7 +37,7 @@ struct SettingsView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                SettingsBackButton {
+                KiioBackButton {
                     dismiss()
                 }
             }
@@ -230,7 +230,7 @@ private struct AppLanguagePreferenceView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                SettingsBackButton {
+                KiioBackButton {
                     dismiss()
                 }
             }
@@ -283,23 +283,6 @@ private struct AppLanguageOption: Identifiable {
     let nameKey: String
 
     var id: String { code }
-}
-
-private struct SettingsBackButton: View {
-    @EnvironmentObject private var appState: AppState
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: "chevron.left")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(KiioTheme.text)
-                .frame(width: 24, height: 24)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(L10n.tr("common.back", locale: appState.locale))
-    }
 }
 
 private struct SettingsPendingRow {
