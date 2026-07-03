@@ -78,9 +78,9 @@ struct DeviceQRCodeScannerView: View {
                 dismiss()
             } label: {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 42, height: 42)
+                    .frame(width: 36, height: 36)
                     .background(.black.opacity(0.32))
                     .clipShape(Circle())
             }
@@ -94,7 +94,7 @@ struct DeviceQRCodeScannerView: View {
             Spacer()
 
             Color.clear
-                .frame(width: 42, height: 42)
+                .frame(width: 36, height: 36)
         }
         .padding(.horizontal, 20)
         .padding(.top, 12)
