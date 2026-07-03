@@ -45,6 +45,7 @@ struct AgentLanguagePreferenceView: View {
         }
         .background(KiioTheme.background.ignoresSafeArea())
         .navigationTitle(L10n.tr("settingsLanguage.title", locale: appState.locale))
+        .kiioHidesTabBar()
         .safeAreaInset(edge: .bottom) {
             KiioPrimaryButton(
                 title: L10n.tr("common.save", locale: appState.locale),

@@ -167,6 +167,7 @@ struct HomeView: View {
 
                         NavigationLink {
                             toolDestination(tool.destination)
+                                .kiioHidesTabBar()
                         } label: {
                             HomeFeatureCard(tool: tool)
                                 .frame(width: cardWidth, height: cardHeight)
@@ -292,6 +293,7 @@ struct HomeView: View {
             ForEach(tools) { tool in
                 NavigationLink {
                     toolDestination(tool.destination)
+                        .kiioHidesTabBar()
                 } label: {
                     HomeListCard(tool: tool)
                 }

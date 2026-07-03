@@ -62,6 +62,7 @@ private struct MailListScene: View {
                         ForEach(store.accounts) { account in
                             NavigationLink {
                                 MailAccountDetailView(accountId: account.id, store: store)
+                                    .kiioHidesTabBar()
                             } label: {
                                 MailAccountRow(account: account)
                             }
@@ -104,6 +105,7 @@ private struct MailListScene: View {
                         ForEach(store.operations) { operation in
                             NavigationLink {
                                 MailOperationDetailView(operationId: operation.id, store: store)
+                                    .kiioHidesTabBar()
                             } label: {
                                 MailOperationRow(operation: operation)
                             }
@@ -134,6 +136,7 @@ private struct MailListScene: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(L10n.tr("mail.title", locale: appState.locale))
+        .kiioHidesTabBar()
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
@@ -304,6 +307,7 @@ private struct MailAccountFormView: View {
             .navigationBarTitleDisplayMode(.inline)
             .scrollContentBackground(.hidden)
             .background(KiioTheme.background.ignoresSafeArea())
+            .kiioHidesTabBar()
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(L10n.tr("common.cancel", locale: appState.locale)) {
@@ -467,6 +471,7 @@ private struct MailAccountDetailScene: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(L10n.tr("mail.accountDetail", locale: appState.locale))
+        .kiioHidesTabBar()
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
@@ -674,6 +679,7 @@ private struct MailOperationDetailScene: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(L10n.tr("mail.operationDetail", locale: appState.locale))
+        .kiioHidesTabBar()
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(role: .destructive) {

@@ -33,6 +33,7 @@ private struct NewsListScene: View {
                 ForEach(store.records) { record in
                     NavigationLink {
                         NewsDetailView(recordId: record.id, store: store)
+                            .kiioHidesTabBar()
                     } label: {
                         NewsRecordRow(record: record)
                     }
@@ -61,6 +62,7 @@ private struct NewsListScene: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(navigationTitle)
+        .kiioHidesTabBar()
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
@@ -235,6 +237,7 @@ private struct NewsDetailScene: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(L10n.tr("common.detail", locale: appState.locale))
+        .kiioHidesTabBar()
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(role: .destructive) {

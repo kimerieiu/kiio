@@ -62,6 +62,7 @@ struct ProfileView: View {
             Spacer()
             NavigationLink {
                 SettingsView()
+                    .kiioHidesTabBar()
             } label: {
                 Image(systemName: "gearshape")
                     .font(.system(size: 16, weight: .semibold))
@@ -124,6 +125,7 @@ struct ProfileView: View {
     private var proBanner: some View {
         NavigationLink {
             SubscriptionView()
+                .kiioHidesTabBar()
         } label: {
             HStack(spacing: 14) {
                 Image(systemName: "crown")
@@ -208,10 +210,10 @@ struct ProfileView: View {
                 ForEach(rows) { row in
                     switch row.destination {
                     case .orders:
-                        NavigationLink { OrdersPlaceholderView() } label: { ProfileMenuRow(row: row) }
+                        NavigationLink { OrdersPlaceholderView().kiioHidesTabBar() } label: { ProfileMenuRow(row: row) }
                             .buttonStyle(.plain)
                     case .settings:
-                        NavigationLink { SettingsView() } label: { ProfileMenuRow(row: row) }
+                        NavigationLink { SettingsView().kiioHidesTabBar() } label: { ProfileMenuRow(row: row) }
                             .buttonStyle(.plain)
                     case .about:
                         Button {
@@ -375,5 +377,6 @@ private struct OrdersPlaceholderView: View {
         }
         .background(KiioTheme.background.ignoresSafeArea())
         .navigationTitle(L10n.tr("orders.title", locale: appState.locale))
+        .kiioHidesTabBar()
     }
 }

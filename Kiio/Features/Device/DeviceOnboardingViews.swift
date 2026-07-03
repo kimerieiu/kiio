@@ -22,6 +22,7 @@ struct DeviceProvisioningGuideView: View {
         }
         .background(KiioTheme.background.ignoresSafeArea())
         .navigationTitle(L10n.tr("device.provisioning.title", locale: appState.locale))
+        .kiioHidesTabBar()
         .safeAreaInset(edge: .bottom) {
             KiioPrimaryButton(title: L10n.tr("device.provisioning.next", locale: appState.locale)) {
                 onContinue()
@@ -190,6 +191,7 @@ struct DevicePairingGuideView: View {
         }
         .background(KiioTheme.background.ignoresSafeArea())
         .navigationTitle(L10n.tr("device.pairing.title", locale: appState.locale))
+        .kiioHidesTabBar()
         .task {
             await bootstrapStore.ensureLoaded()
         }
@@ -254,6 +256,7 @@ struct DevicePairingGuideView: View {
                 didBind = true
                 onBound()
             }
+            .kiioHidesTabBar()
         } label: {
             KiioCard {
                 VStack(spacing: 14) {

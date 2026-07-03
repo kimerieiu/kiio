@@ -30,6 +30,7 @@ struct DeviceQRCodeScannerView: View {
             }
         }
         .background(Color.black.ignoresSafeArea())
+        .kiioHidesTabBar()
         .navigationBarBackButtonHidden(true)
         .task {
             await updatePermission()

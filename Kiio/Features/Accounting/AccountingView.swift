@@ -87,6 +87,7 @@ private struct AccountingListScene: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(L10n.tr("accounting.title", locale: appState.locale))
+        .kiioHidesTabBar()
         .task { await refreshFromBackend() }
         .refreshable { await refreshFromBackend() }
         .onReceive(syncStore.$latestEvent) { event in
@@ -121,6 +122,7 @@ private struct AccountingListScene: View {
     private func billLink(_ bill: AccountingBillDTO) -> some View {
         NavigationLink {
             AccountingDetailView(billId: bill.id, store: store)
+                .kiioHidesTabBar()
         } label: {
             AccountingBillRow(bill: bill)
         }
@@ -241,6 +243,7 @@ private struct AccountingDetailScene: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(L10n.tr("common.detail", locale: appState.locale))
+        .kiioHidesTabBar()
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {

@@ -36,6 +36,7 @@ private struct SubscriptionScene: View {
         }
         .background(KiioTheme.background.ignoresSafeArea())
         .navigationTitle(L10n.tr("subscription.title", locale: appState.locale))
+        .kiioHidesTabBar()
         .task {
             await loadCurrent(showError: true)
         }

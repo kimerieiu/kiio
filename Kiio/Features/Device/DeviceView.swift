@@ -50,12 +50,15 @@ struct DeviceView: View {
                 DeviceProvisioningGuideView {
                     activeRoute = .pairing
                 }
+                .kiioHidesTabBar()
             case .some(.pairing):
                 DevicePairingGuideView {
                     activeRoute = nil
                 }
+                .kiioHidesTabBar()
             case .some(.agentLanguage):
                 AgentLanguagePreferenceView()
+                    .kiioHidesTabBar()
             case .none:
                 EmptyView()
             }
@@ -121,6 +124,7 @@ struct DeviceView: View {
             if let mainDevice {
                 NavigationLink {
                     DeviceDetailView(device: mainDevice)
+                        .kiioHidesTabBar()
                 } label: {
                     DeviceHeroCard(device: mainDevice)
                 }
@@ -155,6 +159,7 @@ struct DeviceView: View {
         VStack(spacing: 10) {
             NavigationLink {
                 DeviceListView()
+                    .kiioHidesTabBar()
             } label: {
                 DeviceMenuRow(
                     icon: "list.bullet",
@@ -168,6 +173,7 @@ struct DeviceView: View {
             if let mainDevice {
                 NavigationLink {
                     DeviceDetailView(device: mainDevice)
+                        .kiioHidesTabBar()
                 } label: {
                     DeviceMenuRow(
                         icon: "wifi",
@@ -795,6 +801,7 @@ struct DeviceDetailView: View {
             }
         }
         .navigationTitle(currentDevice.displayName)
+        .kiioHidesTabBar()
         .scrollContentBackground(.hidden)
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
@@ -815,12 +822,15 @@ struct DeviceDetailView: View {
                 DeviceProvisioningGuideView {
                     activeRoute = .pairing
                 }
+                .kiioHidesTabBar()
             case .some(.pairing):
                 DevicePairingGuideView {
                     activeRoute = nil
                 }
+                .kiioHidesTabBar()
             case .some(.agentLanguage):
                 AgentLanguagePreferenceView()
+                    .kiioHidesTabBar()
             case .none:
                 EmptyView()
             }

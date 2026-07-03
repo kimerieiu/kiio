@@ -63,6 +63,7 @@ private struct ChatScene: View {
 
             NavigationLink {
                 ChatSessionsView()
+                    .kiioHidesTabBar()
             } label: {
                 Image(systemName: "list.bullet")
                     .font(.system(size: 16, weight: .semibold))
@@ -108,6 +109,7 @@ private struct ChatScene: View {
     private func latestSessionSummary(_ session: ChatSessionDTO) -> some View {
         NavigationLink {
             ChatSessionDetailView(agent: store.agent, session: session)
+                .kiioHidesTabBar()
         } label: {
             HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 5) {
@@ -209,6 +211,7 @@ private struct ChatSessionsScene: View {
         }
         .background(KiioTheme.background.ignoresSafeArea())
         .navigationTitle(L10n.tr("chat.sessions", locale: appState.locale))
+        .kiioHidesTabBar()
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await load()
@@ -252,6 +255,7 @@ private struct ChatSessionsScene: View {
                     ForEach(group.sessions) { session in
                         NavigationLink {
                             ChatSessionDetailView(agent: store.agent, session: session)
+                                .kiioHidesTabBar()
                         } label: {
                             ChatSessionRow(session: session)
                         }
@@ -412,6 +416,7 @@ private struct ChatSessionDetailScene: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle("#\(session.sessionId.prefix(8))")
+        .kiioHidesTabBar()
         .task {
             await store.loadHistory(agent: agent, session: session)
         }

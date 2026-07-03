@@ -51,6 +51,7 @@ private struct OutfitListScene: View {
                 ForEach(store.outfits) { outfit in
                     NavigationLink {
                         OutfitDetailView(outfitId: outfit.id, store: store)
+                            .kiioHidesTabBar()
                     } label: {
                         OutfitRow(outfit: outfit)
                     }
@@ -79,6 +80,7 @@ private struct OutfitListScene: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(L10n.tr("outfit.title", locale: appState.locale))
+        .kiioHidesTabBar()
         .task { await refreshFromBackend() }
         .refreshable { await refreshFromBackend() }
         .onReceive(syncStore.$latestEvent) { event in
@@ -217,6 +219,7 @@ private struct OutfitDetailView: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(L10n.tr("outfit.detailTitle", locale: appState.locale))
+        .kiioHidesTabBar()
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(role: .destructive) {

@@ -51,6 +51,7 @@ private struct ReminderListScene: View {
                 ForEach(store.tasks) { task in
                     NavigationLink {
                         ReminderDetailView(taskId: task.id, store: store)
+                            .kiioHidesTabBar()
                     } label: {
                         ReminderTaskRow(task: task)
                     }
@@ -98,6 +99,7 @@ private struct ReminderListScene: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(L10n.tr("reminder.title", locale: appState.locale))
+        .kiioHidesTabBar()
         .task { await refreshFromBackend() }
         .refreshable { await refreshFromBackend() }
         .onReceive(syncStore.$latestEvent) { event in
@@ -263,6 +265,7 @@ private struct ReminderDetailScene: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .listStyle(.plain)
         .navigationTitle(L10n.tr("common.detail", locale: appState.locale))
+        .kiioHidesTabBar()
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 if store.detail?.status == "active" {

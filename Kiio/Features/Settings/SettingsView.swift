@@ -33,6 +33,7 @@ struct SettingsView: View {
             .padding(20)
         }
         .navigationTitle(L10n.tr("settings.title", locale: appState.locale))
+        .kiioHidesTabBar()
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -97,6 +98,7 @@ struct SettingsView: View {
             KiioCard(padding: 0) {
                 NavigationLink {
                     AppLanguagePreferenceView()
+                        .kiioHidesTabBar()
                 } label: {
                     SettingsMenuRow(
                         icon: "globe",
@@ -224,6 +226,7 @@ private struct AppLanguagePreferenceView: View {
             .padding(20)
         }
         .navigationTitle(L10n.tr("settings.appLanguage", locale: appState.locale))
+        .kiioHidesTabBar()
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {

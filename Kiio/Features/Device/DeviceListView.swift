@@ -41,6 +41,7 @@ struct DeviceListView: View {
         }
         .background(KiioTheme.background.ignoresSafeArea())
         .navigationTitle(L10n.tr("device.list.title", locale: appState.locale))
+        .kiioHidesTabBar()
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
@@ -73,12 +74,15 @@ struct DeviceListView: View {
                 DeviceProvisioningGuideView {
                     activeRoute = .pairing
                 }
+                .kiioHidesTabBar()
             case .some(.pairing):
                 DevicePairingGuideView {
                     activeRoute = nil
                 }
+                .kiioHidesTabBar()
             case .some(.agentLanguage):
                 AgentLanguagePreferenceView()
+                    .kiioHidesTabBar()
             case .none:
                 EmptyView()
             }
@@ -133,6 +137,7 @@ struct DeviceListView: View {
                 ForEach(devices) { device in
                     NavigationLink {
                         DeviceDetailView(device: device)
+                            .kiioHidesTabBar()
                     } label: {
                         DeviceListCard(
                             device: device,
