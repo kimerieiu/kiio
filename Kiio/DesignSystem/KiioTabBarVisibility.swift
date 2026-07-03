@@ -4,7 +4,6 @@ import UIKit
 extension View {
     func kiioHidesTabBar() -> some View {
         toolbar(.hidden, for: .tabBar)
-            .navigationBarBackButtonDisplayMode(.minimal)
             .background(KiioTabBarVisibilityHost(isHidden: true).frame(width: 0, height: 0))
     }
 

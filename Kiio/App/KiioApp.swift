@@ -29,5 +29,9 @@ struct KiioApp: App {
         )
         UINavigationBar.appearance().backIndicatorImage = backImage
         UINavigationBar.appearance().backIndicatorTransitionMaskImage = backImage
+        UIBarButtonItem.appearance().setBackButtonTitlePositionAdjustment(
+            UIOffset(horizontal: -1_000, vertical: 0),
+            for: .default
+        )
     }
 }
