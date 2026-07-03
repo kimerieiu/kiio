@@ -14,7 +14,6 @@ struct ProfileView: View {
                 topBar
                 profileHeader
                 proBanner
-                assetsCard
                 menuGroup(
                     title: L10n.tr("profile.groups.assets", locale: appState.locale),
                     rows: assetRows
@@ -169,35 +168,8 @@ struct ProfileView: View {
         .buttonStyle(.plain)
     }
 
-    private var assetsCard: some View {
-        HStack {
-            NavigationLink {
-                DeviceListView()
-            } label: {
-                assetMetric(
-                    value: "\(bootstrapStore.devices.count)",
-                    label: L10n.tr("profile.devices", locale: appState.locale)
-                )
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.vertical, 18)
-        .background(KiioTheme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(KiioTheme.border, lineWidth: 1)
-        )
-    }
-
     private var assetRows: [ProfileMenuRowData] {
         [
-            ProfileMenuRowData(
-                icon: "dot.radiowaves.left.and.right",
-                title: L10n.tr("device.allCompanions", locale: appState.locale),
-                subtitle: L10n.tr("device.manageCompanions", locale: appState.locale, bootstrapStore.devices.count),
-                destination: .devices
-            ),
             ProfileMenuRowData(
                 icon: "receipt",
                 title: L10n.tr("profile.orders", locale: appState.locale),
@@ -235,9 +207,6 @@ struct ProfileView: View {
             VStack(spacing: 10) {
                 ForEach(rows) { row in
                     switch row.destination {
-                    case .devices:
-                        NavigationLink { DeviceListView() } label: { ProfileMenuRow(row: row) }
-                            .buttonStyle(.plain)
                     case .orders:
                         NavigationLink { OrdersPlaceholderView() } label: { ProfileMenuRow(row: row) }
                             .buttonStyle(.plain)
@@ -269,18 +238,6 @@ struct ProfileView: View {
                 .background(KiioTheme.surface)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
-    }
-
-    private func assetMetric(value: String, label: String) -> some View {
-        VStack(spacing: 5) {
-            Text(value)
-                .font(.system(size: 26, weight: .bold))
-                .foregroundStyle(KiioTheme.text)
-            Text(label)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(KiioTheme.secondaryText)
-        }
-        .frame(maxWidth: .infinity)
     }
 
     private var user: UserDetail? {
@@ -387,7 +344,6 @@ private struct ProfileMenuRowData: Identifiable {
 }
 
 private enum ProfileMenuDestination: Equatable {
-    case devices
     case orders
     case settings
     case about

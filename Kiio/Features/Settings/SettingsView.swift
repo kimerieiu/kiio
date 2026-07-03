@@ -9,7 +9,7 @@ struct SettingsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 14) {
                 accountCard
                 languageSection
                 pendingSection(
@@ -52,7 +52,7 @@ struct SettingsView: View {
     }
 
     private var accountCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             KiioSectionTitle(title: L10n.tr("settings.account", locale: appState.locale), icon: "person")
 
             KiioCard {
@@ -82,35 +82,17 @@ struct SettingsView: View {
     }
 
     private var languageSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             KiioSectionTitle(title: L10n.tr("settings.language", locale: appState.locale), icon: "globe")
 
             KiioCard(padding: 0) {
-                languageButton(
-                    title: L10n.tr("language.zh", locale: appState.locale),
-                    subtitle: "zh-CN",
-                    locale: "zh_CN"
-                )
-
-                Divider()
-                    .padding(.leading, 64)
-
-                languageButton(
-                    title: L10n.tr("language.en", locale: appState.locale),
-                    subtitle: "en-US",
-                    locale: "en_US"
-                )
-
-                Divider()
-                    .padding(.leading, 64)
-
                 NavigationLink {
-                    AgentLanguagePreferenceView()
+                    AppLanguagePreferenceView()
                 } label: {
                     SettingsMenuRow(
-                        icon: "sparkles",
-                        title: L10n.tr("settings.agentLanguage", locale: appState.locale),
-                        subtitle: L10n.tr("settings.agentLanguageSub", locale: appState.locale),
+                        icon: "globe",
+                        title: L10n.tr("settings.appLanguage", locale: appState.locale),
+                        subtitle: currentAppLanguageSubtitle,
                         accessory: .chevron
                     )
                 }
@@ -120,20 +102,22 @@ struct SettingsView: View {
     }
 
     private func pendingSection(title: String, rows: [SettingsPendingRow]) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             KiioSectionTitle(title: title)
             KiioCard(padding: 0) {
-                ForEach(rows.indices, id: \.self) { index in
-                    SettingsMenuRow(
-                        icon: rows[index].icon,
-                        title: L10n.tr(rows[index].titleKey, locale: appState.locale),
-                        subtitle: L10n.tr(rows[index].subtitleKey, locale: appState.locale),
-                        accessory: .badge(L10n.tr("common.soon", locale: appState.locale))
-                    )
+                VStack(spacing: 0) {
+                    ForEach(rows.indices, id: \.self) { index in
+                        SettingsMenuRow(
+                            icon: rows[index].icon,
+                            title: L10n.tr(rows[index].titleKey, locale: appState.locale),
+                            subtitle: L10n.tr(rows[index].subtitleKey, locale: appState.locale),
+                            accessory: .badge(L10n.tr("common.soon", locale: appState.locale))
+                        )
 
-                    if index != rows.count - 1 {
-                        Divider()
-                            .padding(.leading, 64)
+                        if index != rows.count - 1 {
+                            Divider()
+                                .padding(.leading, 60)
+                        }
                     }
                 }
             }
@@ -163,29 +147,21 @@ struct SettingsView: View {
         .buttonStyle(.plain)
     }
 
-    private func languageButton(title: String, subtitle: String, locale: String) -> some View {
-        Button {
-            updateLocale(locale)
-        } label: {
-            SettingsMenuRow(
-                icon: "globe",
-                title: title,
-                subtitle: subtitle,
-                accessory: appState.locale == locale ? .checkmark : .none
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func updateLocale(_ locale: String) {
-        appState.setLocale(locale)
-        Task {
-            await bootstrapStore.updateLanguagePreference(locale)
-        }
-    }
-
     private var user: UserDetail? {
         bootstrapStore.userInfo ?? authStore.currentUser
+    }
+
+    private var currentAppLanguageSubtitle: String {
+        L10n.tr("settings.appLanguageSub", locale: appState.locale, appLanguageName(for: appState.locale))
+    }
+
+    private func appLanguageName(for locale: String) -> String {
+        switch L10n.backendLocale(locale) {
+        case "zh_CN":
+            return L10n.tr("language.zh", locale: appState.locale)
+        default:
+            return L10n.tr("language.en", locale: appState.locale)
+        }
     }
 
     private var displayName: String {
@@ -205,6 +181,87 @@ struct SettingsView: View {
         bootstrapStore.reset()
         appState.showAuth()
     }
+}
+
+private struct AppLanguagePreferenceView: View {
+    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var bootstrapStore: BootstrapStore
+    @State private var alertMessage: String?
+
+    private let languages: [AppLanguageOption] = [
+        AppLanguageOption(code: "zh_CN", displayCode: "zh-CN", nameKey: "language.zh"),
+        AppLanguageOption(code: "en_US", displayCode: "en-US", nameKey: "language.en")
+    ]
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                Text(L10n.tr("settings.appLanguageHint", locale: appState.locale))
+                    .font(.system(size: 14))
+                    .foregroundStyle(KiioTheme.secondaryText)
+                    .lineSpacing(3)
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(KiioTheme.surface)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(KiioTheme.border, lineWidth: 1)
+                    )
+
+                languageCard
+            }
+            .padding(20)
+        }
+        .navigationTitle(L10n.tr("settings.appLanguage", locale: appState.locale))
+        .background(KiioTheme.background.ignoresSafeArea())
+        .kiioErrorAlert(message: $alertMessage, locale: appState.locale)
+    }
+
+    private var languageCard: some View {
+        KiioCard(padding: 0) {
+            VStack(spacing: 0) {
+                ForEach(languages) { language in
+                    Button {
+                        updateLocale(language.code)
+                    } label: {
+                        SettingsMenuRow(
+                            icon: "globe",
+                            title: L10n.tr(language.nameKey, locale: appState.locale),
+                            subtitle: language.displayCode,
+                            accessory: L10n.backendLocale(appState.locale) == language.code ? .checkmark : .none
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    if language.id != languages.last?.id {
+                        Divider()
+                            .padding(.leading, 60)
+                    }
+                }
+            }
+        }
+    }
+
+    private func updateLocale(_ locale: String) {
+        guard L10n.backendLocale(appState.locale) != locale else { return }
+
+        appState.setLocale(locale)
+        Task {
+            await bootstrapStore.updateLanguagePreference(locale)
+            if let errorMessage = bootstrapStore.errorMessage {
+                alertMessage = errorMessage
+            }
+        }
+    }
+}
+
+private struct AppLanguageOption: Identifiable {
+    let code: String
+    let displayCode: String
+    let nameKey: String
+
+    var id: String { code }
 }
 
 private struct SettingsPendingRow {
@@ -228,7 +285,7 @@ private struct SettingsMenuRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            KiioIconBadge(systemImage: icon, size: 40, iconSize: 15)
+            KiioIconBadge(systemImage: icon, size: 36, iconSize: 14)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
@@ -245,7 +302,8 @@ private struct SettingsMenuRow: View {
 
             accessoryView
         }
-        .padding(16)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 11)
         .contentShape(Rectangle())
     }
 

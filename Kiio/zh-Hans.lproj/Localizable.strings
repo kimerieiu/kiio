@@ -300,6 +300,9 @@
 "settings.title" = "设置";
 "settings.account" = "账号";
 "settings.language" = "语言";
+"settings.appLanguage" = "App 显示语言";
+"settings.appLanguageSub" = "当前：%@";
+"settings.appLanguageHint" = "选择此 App 界面的显示语言。修改后会立即应用，并同步到账号偏好。";
 "settings.about" = "关于";
 "settings.notificationsPrivacy" = "通知与隐私";
 "settings.support" = "支持";

@@ -8,27 +8,36 @@ struct MainTabView: View {
             NavigationStack {
                 HomeView()
             }
-            .tabItem { Label(L10n.tr(MainTab.home.localizationKey, locale: appState.locale), systemImage: MainTab.home.systemImage) }
+            .tabItem { tabLabel(.home) }
             .tag(MainTab.home)
 
             NavigationStack {
                 ChatView()
             }
-            .tabItem { Label(L10n.tr(MainTab.chat.localizationKey, locale: appState.locale), systemImage: MainTab.chat.systemImage) }
+            .tabItem { tabLabel(.chat) }
             .tag(MainTab.chat)
 
             NavigationStack {
                 DeviceView()
             }
-            .tabItem { Label(L10n.tr(MainTab.device.localizationKey, locale: appState.locale), systemImage: MainTab.device.systemImage) }
+            .tabItem { tabLabel(.device) }
             .tag(MainTab.device)
 
             NavigationStack {
                 ProfileView()
             }
-            .tabItem { Label(L10n.tr(MainTab.profile.localizationKey, locale: appState.locale), systemImage: MainTab.profile.systemImage) }
+            .tabItem { tabLabel(.profile) }
             .tag(MainTab.profile)
         }
         .background(KiioTheme.background)
+    }
+
+    private func tabLabel(_ tab: MainTab) -> some View {
+        Label {
+            Text(L10n.tr(tab.localizationKey, locale: appState.locale))
+        } icon: {
+            Image(tab.assetName)
+                .renderingMode(.original)
+        }
     }
 }

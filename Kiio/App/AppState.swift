@@ -25,12 +25,12 @@ enum MainTab: Hashable {
         }
     }
 
-    var systemImage: String {
+    var assetName: String {
         switch self {
-        case .home: return "house"
-        case .chat: return "bubble.left.and.bubble.right"
-        case .device: return "dot.radiowaves.left.and.right"
-        case .profile: return "person"
+        case .home: return "TabHome"
+        case .chat: return "TabChat"
+        case .device: return "TabDevice"
+        case .profile: return "TabProfile"
         }
     }
 }

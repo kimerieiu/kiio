@@ -275,11 +275,6 @@ private struct DeviceAddActionSheet: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Capsule()
-                .fill(KiioTheme.mutedText.opacity(0.25))
-                .frame(width: 42, height: 4)
-                .padding(.top, 8)
-
             Button(action: onProvisioning) {
                 sheetRow(
                     icon: "plus",
@@ -307,6 +302,7 @@ private struct DeviceAddActionSheet: View {
             }
         }
         .padding(.horizontal, 20)
+        .padding(.top, 8)
         .padding(.bottom, 12)
         .background(KiioTheme.background.ignoresSafeArea())
     }

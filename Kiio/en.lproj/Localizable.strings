@@ -300,6 +300,9 @@
 "settings.title" = "Settings";
 "settings.account" = "Account";
 "settings.language" = "Language";
+"settings.appLanguage" = "App Display Language";
+"settings.appLanguageSub" = "Current: %@";
+"settings.appLanguageHint" = "Choose the display language for this app. Changes apply immediately and sync to your account preference.";
 "settings.about" = "About";
 "settings.notificationsPrivacy" = "Notifications & Privacy";
 "settings.support" = "Support";

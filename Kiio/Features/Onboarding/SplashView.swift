@@ -6,6 +6,7 @@ struct SplashView: View {
     let isRetrying: Bool
     let retryAction: () -> Void
     @State private var activeDot = 0
+    @State private var artworkVisible = false
 
     init(
         errorMessage: String? = nil,
@@ -21,13 +22,19 @@ struct SplashView: View {
         VStack(spacing: 0) {
             Spacer()
 
-            KiioLogoView(size: 72)
+            Image("SplashGreeting")
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: 286)
+                .opacity(artworkVisible ? 1 : 0)
+                .scaleEffect(artworkVisible ? 1 : 0.96)
+                .accessibilityHidden(true)
 
             Text(L10n.tr("app.name", locale: appState.locale))
                 .font(.system(size: 30, weight: .regular, design: .serif))
                 .italic()
                 .foregroundStyle(KiioTheme.text)
-                .padding(.top, 12)
+                .padding(.top, 18)
 
             Text(L10n.tr("splash.tagline", locale: appState.locale))
                 .font(.system(size: 14))
@@ -47,6 +54,10 @@ struct SplashView: View {
         .padding(.horizontal, 28)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .task {
+            withAnimation(.spring(response: 0.65, dampingFraction: 0.84)) {
+                artworkVisible = true
+            }
+
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: 320_000_000)
                 withAnimation(.easeInOut(duration: 0.22)) {
