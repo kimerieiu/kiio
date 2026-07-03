@@ -131,12 +131,16 @@ struct HomeView: View {
                     .font(.system(size: 10, weight: .semibold))
                 Text(L10n.tr("home.mood.today", locale: appState.locale))
                     .font(.system(size: 11, weight: .semibold))
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
             }
             .foregroundStyle(KiioTheme.accent)
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
             .background(KiioTheme.accentSoft)
             .clipShape(Capsule())
+            .fixedSize(horizontal: true, vertical: false)
+            .layoutPriority(2)
         }
         .padding(16)
         .background(KiioTheme.surface)
@@ -346,7 +350,7 @@ private enum HomeFeatureCardMetrics {
     static let minWidth: CGFloat = 232
     static let maxWidth: CGFloat = 272
     static let aspectRatio: CGFloat = 3.0 / 4.0
-    static let moduleSpacing: CGFloat = 12
+    static let moduleSpacing: CGFloat = 24
 
     static var maxHeight: CGFloat {
         maxWidth / aspectRatio

@@ -1,5 +1,6 @@
 "app.name" = "Kiio";
 "common.ok" = "确定";
+"common.back" = "返回";
 "common.cancel" = "取消";
 "common.continue" = "继续";
 "common.skip" = "跳过";

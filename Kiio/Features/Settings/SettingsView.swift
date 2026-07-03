@@ -4,6 +4,7 @@ struct SettingsView: View {
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var authStore: AuthStore
     @EnvironmentObject private var bootstrapStore: BootstrapStore
+    @Environment(\.dismiss) private var dismiss
 
     @State private var isConfirmingSignOut = false
 
@@ -32,6 +33,14 @@ struct SettingsView: View {
             .padding(20)
         }
         .navigationTitle(L10n.tr("settings.title", locale: appState.locale))
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                SettingsBackButton {
+                    dismiss()
+                }
+            }
+        }
         .background(KiioTheme.background.ignoresSafeArea())
         .refreshable {
             await bootstrapStore.refresh()
@@ -186,6 +195,7 @@ struct SettingsView: View {
 private struct AppLanguagePreferenceView: View {
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var bootstrapStore: BootstrapStore
+    @Environment(\.dismiss) private var dismiss
     @State private var alertMessage: String?
 
     private let languages: [AppLanguageOption] = [
@@ -214,6 +224,14 @@ private struct AppLanguagePreferenceView: View {
             .padding(20)
         }
         .navigationTitle(L10n.tr("settings.appLanguage", locale: appState.locale))
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                SettingsBackButton {
+                    dismiss()
+                }
+            }
+        }
         .background(KiioTheme.background.ignoresSafeArea())
         .kiioErrorAlert(message: $alertMessage, locale: appState.locale)
     }
@@ -262,6 +280,23 @@ private struct AppLanguageOption: Identifiable {
     let nameKey: String
 
     var id: String { code }
+}
+
+private struct SettingsBackButton: View {
+    @EnvironmentObject private var appState: AppState
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "chevron.left")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(KiioTheme.text)
+                .frame(width: 28, height: 28)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(L10n.tr("common.back", locale: appState.locale))
+    }
 }
 
 private struct SettingsPendingRow {

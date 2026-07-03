@@ -341,8 +341,8 @@ private struct DeviceHeroCard: View {
     let device: DeviceDTO
 
     var body: some View {
-        HStack(alignment: .center, spacing: 16) {
-            VStack(alignment: .leading, spacing: 12) {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
                 DeviceStatusPill(
                     text: DeviceConnectionHelper.isRecentlyConnected(device)
                     ? L10n.tr("device.recentlyOnline", locale: appState.locale)
@@ -351,15 +351,17 @@ private struct DeviceHeroCard: View {
                 )
 
                 Text(device.displayName)
-                    .font(.system(size: 26, weight: .bold))
+                    .font(.system(size: 21, weight: .bold))
                     .foregroundStyle(KiioTheme.text)
-                    .lineLimit(2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
 
                 HStack(spacing: 6) {
                     Image(systemName: "wifi")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 12, weight: .semibold))
                     Text(DeviceConnectionHelper.formatLastConnected(device.lastConnectedAt, locale: appState.locale))
-                        .font(.system(size: 13))
+                        .font(.system(size: 12))
+                        .lineLimit(1)
                 }
                 .foregroundStyle(KiioTheme.secondaryText)
             }
@@ -367,21 +369,21 @@ private struct DeviceHeroCard: View {
             Spacer()
 
             Image(systemName: "dot.radiowaves.left.and.right")
-                .font(.system(size: 42, weight: .semibold))
+                .font(.system(size: 30, weight: .semibold))
                 .foregroundStyle(KiioTheme.accent)
-                .frame(width: 86, height: 86)
+                .frame(width: 62, height: 62)
                 .background(KiioTheme.accentSoft)
-                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
-        .padding(20)
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(KiioTheme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(KiioTheme.border, lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.05), radius: 18, y: 8)
+        .shadow(color: .black.opacity(0.04), radius: 12, y: 6)
     }
 }
 
@@ -389,36 +391,39 @@ private struct DeviceEmptyHeroCard: View {
     @EnvironmentObject private var appState: AppState
 
     var body: some View {
-        HStack(alignment: .center, spacing: 16) {
-            VStack(alignment: .leading, spacing: 10) {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
                 DeviceStatusPill(text: L10n.tr("device.unbound", locale: appState.locale), isOnline: false)
                 Text(L10n.tr("device.addFirstCompanion", locale: appState.locale))
-                    .font(.system(size: 24, weight: .bold))
+                    .font(.system(size: 21, weight: .bold))
                     .foregroundStyle(KiioTheme.text)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.82)
                 Text(L10n.tr("device.addFirstDesc", locale: appState.locale))
-                    .font(.system(size: 13))
+                    .font(.system(size: 12))
                     .foregroundStyle(KiioTheme.secondaryText)
-                    .lineSpacing(3)
+                    .lineSpacing(2)
+                    .lineLimit(2)
             }
 
             Spacer()
 
             Image(systemName: "plus")
-                .font(.system(size: 34, weight: .bold))
+                .font(.system(size: 27, weight: .bold))
                 .foregroundStyle(KiioTheme.accent)
-                .frame(width: 82, height: 82)
+                .frame(width: 62, height: 62)
                 .background(KiioTheme.accentSoft)
-                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
-        .padding(20)
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(KiioTheme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(KiioTheme.border, lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.05), radius: 18, y: 8)
+        .shadow(color: .black.opacity(0.04), radius: 12, y: 6)
     }
 }
 
