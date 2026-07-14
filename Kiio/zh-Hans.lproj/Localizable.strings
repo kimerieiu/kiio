@@ -163,6 +163,16 @@
 "news.title" = "新闻";
 "news.empty.title" = "暂无新闻";
 "news.empty.message" = "每日简报和保存的新闻会显示在这里。";
+"news.detail.title" = "新闻详情";
+"news.publishedAt" = "发布时间";
+"news.originalLinks" = "原文链接";
+"news.viewOriginal" = "查看原文";
+"news.external.confirmTitle" = "打开外部网页？";
+"news.external.confirmMessage" = "即将在 App 内打开 %@。";
+"news.external.open" = "继续打开";
+"news.external.missing" = "该新闻未提供可用的原文链接。";
+"news.external.invalid" = "链接格式无效，无法打开。";
+"news.external.unavailable" = "当前无法打开该链接，请稍后重试。";
 "news.keyword" = "关键词";
 "news.tagType" = "标签";
 "news.links" = "链接";

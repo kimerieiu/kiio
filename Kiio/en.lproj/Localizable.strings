@@ -163,6 +163,16 @@
 "news.title" = "News";
 "news.empty.title" = "No news yet";
 "news.empty.message" = "Daily briefings and saved news will appear here.";
+"news.detail.title" = "News Details";
+"news.publishedAt" = "Published";
+"news.originalLinks" = "Original article";
+"news.viewOriginal" = "View original";
+"news.external.confirmTitle" = "Open external webpage?";
+"news.external.confirmMessage" = "You are about to open %@ inside the app.";
+"news.external.open" = "Continue";
+"news.external.missing" = "No usable original article link is available.";
+"news.external.invalid" = "This link is invalid and cannot be opened.";
+"news.external.unavailable" = "This link cannot be opened right now. Please try again later.";
 "news.keyword" = "Keyword";
 "news.tagType" = "Tag";
 "news.links" = "Links";
