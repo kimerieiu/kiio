@@ -449,7 +449,7 @@ private struct NewsDetailScene: View {
     private func linkified(_ value: String) -> AttributedString {
         let attributed = NSMutableAttributedString(string: value)
         guard let detector = try? NSDataDetector(
-            checkingTypes: NSTextCheckingResult.CheckingType.link.rawValue
+            types: NSTextCheckingResult.CheckingType.link.rawValue
         ) else {
             return AttributedString(value)
         }
