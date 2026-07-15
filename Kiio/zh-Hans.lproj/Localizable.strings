@@ -501,6 +501,13 @@
 "profile.accountSecurity" = "账号与安全";
 "profile.about" = "关于";
 "profile.signOutConfirm" = "退出登录并清除此设备上的本地令牌？";
+"settings.dangerZone" = "危险操作";
+"settings.deleteAccount" = "注销账号";
+"settings.deleteAccountSub" = "永久删除账号及与 Kiio 关联的数据。";
+"settings.deleteAccountConfirmTitle" = "确定注销账号？";
+"settings.deleteAccountConfirmMessage" = "此操作无法撤销。你的账号、设备绑定、智能体、对话记录和 Kiio 服务数据将从所有设备永久删除。";
+"settings.deleteAccountAction" = "永久注销账号";
+"settings.deletingAccount" = "正在注销账号…";
 "profile.role.admin" = "管理员";
 "profile.role.user" = "用户";
 

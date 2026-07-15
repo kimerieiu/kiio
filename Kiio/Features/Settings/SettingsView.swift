@@ -7,6 +7,8 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var isConfirmingSignOut = false
+    @State private var isConfirmingAccountDeletion = false
+    @State private var accountDeletionError: String?
 
     var body: some View {
         ScrollView {
@@ -28,6 +30,7 @@ struct SettingsView: View {
                     ]
                 )
                 signOutButton
+                accountDeletionSection
             }
             .padding(20)
         }
@@ -58,6 +61,21 @@ struct SettingsView: View {
         } message: {
             Text(L10n.tr("profile.signOutConfirm", locale: appState.locale))
         }
+        .confirmationDialog(
+            L10n.tr("settings.deleteAccountConfirmTitle", locale: appState.locale),
+            isPresented: $isConfirmingAccountDeletion,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.tr("settings.deleteAccountAction", locale: appState.locale), role: .destructive) {
+                Task {
+                    await deleteAccount()
+                }
+            }
+            Button(L10n.tr("common.cancel", locale: appState.locale), role: .cancel) {}
+        } message: {
+            Text(L10n.tr("settings.deleteAccountConfirmMessage", locale: appState.locale))
+        }
+        .kiioErrorAlert(message: $accountDeletionError, locale: appState.locale)
     }
 
     private var accountCard: some View {
@@ -178,6 +196,65 @@ struct SettingsView: View {
             )
         }
         .buttonStyle(.plain)
+        .disabled(authStore.isLoading)
+    }
+
+    private var accountDeletionSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            KiioSectionTitle(
+                title: L10n.tr("settings.dangerZone", locale: appState.locale),
+                icon: "exclamationmark.triangle"
+            )
+
+            Button {
+                isConfirmingAccountDeletion = true
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "person.crop.circle.badge.minus")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(KiioTheme.danger)
+                        .frame(width: 40, height: 40)
+                        .background(KiioTheme.danger.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(
+                            authStore.isLoading
+                                ? L10n.tr("settings.deletingAccount", locale: appState.locale)
+                                : L10n.tr("settings.deleteAccount", locale: appState.locale)
+                        )
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(KiioTheme.danger)
+
+                        Text(L10n.tr("settings.deleteAccountSub", locale: appState.locale))
+                            .font(.system(size: 12))
+                            .foregroundStyle(KiioTheme.secondaryText)
+                            .multilineTextAlignment(.leading)
+                    }
+
+                    Spacer(minLength: 8)
+
+                    if authStore.isLoading {
+                        ProgressView()
+                            .tint(KiioTheme.danger)
+                    } else {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(KiioTheme.mutedText)
+                    }
+                }
+                .padding(15)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(KiioTheme.surface)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(KiioTheme.danger.opacity(0.24), lineWidth: 1)
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(authStore.isLoading)
+        }
     }
 
     private var user: UserDetail? {
@@ -213,6 +290,16 @@ struct SettingsView: View {
         authStore.logout()
         bootstrapStore.reset()
         appState.showAuth()
+    }
+
+    private func deleteAccount() async {
+        do {
+            try await authStore.deleteAccount()
+            bootstrapStore.reset()
+            appState.showAuth()
+        } catch {
+            accountDeletionError = AppError.from(error).errorDescription
+        }
     }
 }
 

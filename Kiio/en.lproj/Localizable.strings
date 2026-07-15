@@ -501,6 +501,13 @@
 "profile.accountSecurity" = "Account & Security";
 "profile.about" = "About";
 "profile.signOutConfirm" = "Sign out and clear the local token on this device?";
+"settings.dangerZone" = "Danger Zone";
+"settings.deleteAccount" = "Delete Account";
+"settings.deleteAccountSub" = "Permanently delete your account and associated Kiio data.";
+"settings.deleteAccountConfirmTitle" = "Delete your account?";
+"settings.deleteAccountConfirmMessage" = "This cannot be undone. Your account, devices, companions, conversations, and Kiio service data will be permanently deleted on all devices.";
+"settings.deleteAccountAction" = "Delete Account Permanently";
+"settings.deletingAccount" = "Deleting Account…";
 "profile.role.admin" = "Admin";
 "profile.role.user" = "User";
 

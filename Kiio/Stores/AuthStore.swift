@@ -66,6 +66,13 @@ final class AuthStore: ObservableObject {
         }
     }
 
+    func deleteAccount() async throws {
+        try await runLoading {
+            try await authService.deleteAccount()
+            logout()
+        }
+    }
+
     func updateUser(_ user: UserDetail?) {
         currentUser = user
     }

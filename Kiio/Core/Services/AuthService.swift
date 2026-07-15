@@ -51,4 +51,8 @@ final class AuthService {
             authenticated: false
         )
     }
+
+    func deleteAccount() async throws {
+        let _: EmptyResponse = try await apiClient.delete("/user/account")
+    }
 }
