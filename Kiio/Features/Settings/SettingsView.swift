@@ -14,18 +14,17 @@ struct SettingsView: View {
                 accountCard
                 languageSection
                 pendingSection(
-                    title: L10n.tr("settings.notificationsPrivacy", locale: appState.locale),
+                    title: L10n.tr("settings.notificationsSecurity", locale: appState.locale),
                     rows: [
                         SettingsPendingRow(icon: "bell.badge", titleKey: "settings.push", subtitleKey: "settings.pushSub"),
-                        SettingsPendingRow(icon: "hand.raised", titleKey: "settings.privacy", subtitleKey: "settings.privacySub"),
                         SettingsPendingRow(icon: "lock.shield", titleKey: "settings.security", subtitleKey: "settings.securitySub")
                     ]
                 )
+                legalSection
                 pendingSection(
                     title: L10n.tr("settings.support", locale: appState.locale),
                     rows: [
-                        SettingsPendingRow(icon: "questionmark.circle", titleKey: "settings.help", subtitleKey: "settings.helpSub"),
-                        SettingsPendingRow(icon: "doc.text", titleKey: "settings.agreement", subtitleKey: "settings.agreementSub")
+                        SettingsPendingRow(icon: "questionmark.circle", titleKey: "settings.help", subtitleKey: "settings.helpSub")
                     ]
                 )
                 signOutButton
@@ -104,6 +103,29 @@ struct SettingsView: View {
                         icon: "globe",
                         title: L10n.tr("settings.appLanguage", locale: appState.locale),
                         subtitle: currentAppLanguageSubtitle,
+                        accessory: .chevron
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private var legalSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            KiioSectionTitle(
+                title: L10n.tr("settings.legal", locale: appState.locale),
+                icon: "checkmark.shield"
+            )
+
+            KiioCard(padding: 0) {
+                NavigationLink {
+                    LegalCenterView()
+                } label: {
+                    SettingsMenuRow(
+                        icon: "checkmark.shield",
+                        title: L10n.tr("legal.center.title", locale: appState.locale),
+                        subtitle: L10n.tr("legal.center.subtitle", locale: appState.locale),
                         accessory: .chevron
                     )
                 }

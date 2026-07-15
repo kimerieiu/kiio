@@ -2,6 +2,7 @@
 "common.ok" = "OK";
 "common.back" = "Back";
 "common.cancel" = "Cancel";
+"common.done" = "Done";
 "common.continue" = "Continue";
 "common.skip" = "Skip";
 "common.next" = "Next";
@@ -98,6 +99,9 @@
 "auth.noAccountPrompt" = "New to Kiio?";
 "auth.createAccountLink" = "Create account";
 "auth.haveAccountPrompt" = "Already have an account?";
+"auth.legal.consentPrefix" = "I have read and agree to";
+"auth.legal.and" = "and";
+"auth.legal.consentAccessibility" = "Agree to the Terms of Service and Privacy Policy";
 
 "home.companionReady" = "Companion ready";
 "home.morning" = "Good morning";
@@ -316,6 +320,8 @@
 "settings.appLanguageHint" = "Choose the display language for this app. Changes apply immediately and sync to your account preference.";
 "settings.about" = "About";
 "settings.notificationsPrivacy" = "Notifications & Privacy";
+"settings.notificationsSecurity" = "Notifications & Security";
+"settings.legal" = "Legal & Privacy";
 "settings.support" = "Support";
 "settings.push" = "Push notifications";
 "settings.pushSub" = "Backend notification preferences are not wired on iOS yet.";
@@ -542,6 +548,43 @@
 "subscription.services.news" = "News";
 "subscription.services.outfit" = "Outfit";
 "subscription.services.mail" = "Mail";
+
+"subscription.legalSection" = "Membership Terms";
+"mail.authorizationSection" = "Authorization & Privacy";
+"mail.authorizationHint" = "Review mail access and credential protection before saving.";
+
+"legal.center.title" = "Terms & Privacy";
+"legal.center.subtitle" = "Terms, privacy notices, and feature authorizations";
+"legal.center.heading" = "Kiio Legal Center";
+"legal.center.description" = "Review documents covering Kiio services, personal data processing, and feature authorizations. Version and effective-date details will appear here after publication.";
+"legal.section.core" = "Core Documents";
+"legal.section.privacy" = "Privacy & Data";
+"legal.section.features" = "Feature Terms";
+"legal.status.draft" = "Draft";
+"legal.document.draftNotice" = "This entry is ready, but the legal text is still being prepared. Until publication, this page confirms information architecture only and is not the final legal document.";
+"legal.document.information" = "Document Information";
+"legal.document.status" = "Status";
+"legal.document.version" = "Version";
+"legal.document.unpublished" = "Not published";
+
+"legal.document.terms.title" = "Kiio Terms of Service";
+"legal.document.terms.summary" = "Covers accounts, AI services, device use, intellectual property, and each party's rights and obligations.";
+"legal.document.privacy.title" = "Kiio Privacy Policy";
+"legal.document.privacy.summary" = "Explains how personal data is collected, used, retained, shared, and controlled.";
+"legal.document.collection.title" = "Personal Data Collection List";
+"legal.document.collection.summary" = "Lists data types, purposes, usage scenarios, and retention periods by feature.";
+"legal.document.thirdParty.title" = "Third-Party Sharing & SDK List";
+"legal.document.thirdParty.summary" = "Lists recipients, SDKs, shared data, purposes, and third-party privacy policies.";
+"legal.document.sensitive.title" = "Sensitive Data Processing Consent";
+"legal.document.sensitive.summary" = "Explains the need, impact, and safeguards for mail credentials, accounting data, and other sensitive information.";
+"legal.document.ai.title" = "Third-Party AI Data Authorization";
+"legal.document.ai.summary" = "Explains data sent to AI providers, processing purposes, training practices, and withdrawal options.";
+"legal.document.deletion.title" = "Account & Data Deletion Notice";
+"legal.document.deletion.summary" = "Explains the deletion entry point, process, scope, and legally required retention.";
+"legal.document.membership.title" = "Kiio Pro Membership Terms";
+"legal.document.membership.summary" = "Covers membership benefits, validity, redemption, service changes, and refunds.";
+"legal.document.mail.title" = "Mail Account Authorization & Security Notice";
+"legal.document.mail.summary" = "Covers IMAP/SMTP access, app-password protection, and authorization withdrawal.";
 "orders.title" = "Orders";
 "orders.empty.title" = "No orders yet";
 "orders.empty.message" = "Subscription orders and payment status will appear here when the iOS order flow is enabled.";

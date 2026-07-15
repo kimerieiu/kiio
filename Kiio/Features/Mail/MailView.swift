@@ -280,6 +280,29 @@ private struct MailAccountFormView: View {
                         .keyboardType(.numberPad)
                 }
 
+                Section(L10n.tr("mail.authorizationSection", locale: appState.locale)) {
+                    NavigationLink {
+                        LegalDocumentView(document: .mailAccountAuthorization)
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "envelope.badge")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundStyle(KiioTheme.accent)
+
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(L10n.tr("legal.document.mail.title", locale: appState.locale))
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundStyle(KiioTheme.text)
+                                Text(L10n.tr("mail.authorizationHint", locale: appState.locale))
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(KiioTheme.secondaryText)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+
                 Section(L10n.tr("device.settings", locale: appState.locale)) {
                     Toggle(L10n.tr("mail.enabled", locale: appState.locale), isOn: $isEnabled)
                         .onChange(of: isEnabled) { enabled in

@@ -31,6 +31,7 @@ private struct SubscriptionScene: View {
 
                 entitlementCard
                 redeemCard
+                membershipAgreementCard
             }
             .padding(20)
         }
@@ -168,6 +169,24 @@ private struct SubscriptionScene: View {
                     .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
                 }
                 .disabled(actionDisabled)
+            }
+        }
+    }
+
+    private var membershipAgreementCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            KiioSectionTitle(
+                title: L10n.tr("subscription.legalSection", locale: appState.locale),
+                icon: "doc.text"
+            )
+
+            KiioCard(padding: 0) {
+                NavigationLink {
+                    LegalDocumentView(document: .membershipTerms)
+                } label: {
+                    LegalDocumentRow(document: .membershipTerms, showsStatus: false)
+                }
+                .buttonStyle(.plain)
             }
         }
     }

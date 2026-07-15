@@ -36,6 +36,8 @@ struct AuthView: View {
     @State private var password = ""
     @State private var code = ""
     @State private var alertMessage: String?
+    @State private var hasAcceptedRegistrationTerms = false
+    @State private var presentedLegalDocument: LegalDocument?
 
     var body: some View {
         ScrollView {
@@ -56,6 +58,10 @@ struct AuthView: View {
                     sendCodeButton
                 }
 
+                if mode == .register {
+                    registrationLegalConsent
+                }
+
                 KiioPrimaryButton(
                     title: primaryButtonTitle,
                     isLoading: authStore.isLoading,
@@ -65,6 +71,10 @@ struct AuthView: View {
                 }
 
                 secondaryActions
+
+                if mode != .register {
+                    legalFooter
+                }
             }
             .padding(24)
         }
@@ -76,6 +86,9 @@ struct AuthView: View {
         }
         .onChange(of: bootstrapStore.publicConfig) { _ in
             normalizeModeAvailability()
+        }
+        .sheet(item: $presentedLegalDocument) { document in
+            LegalDocumentSheet(document: document)
         }
     }
 
@@ -138,6 +151,65 @@ struct AuthView: View {
         ) {
             Task { await sendCode() }
         }
+    }
+
+    private var registrationLegalConsent: some View {
+        HStack(alignment: .top, spacing: 11) {
+            Button {
+                hasAcceptedRegistrationTerms.toggle()
+            } label: {
+                Image(systemName: hasAcceptedRegistrationTerms ? "checkmark.square.fill" : "square")
+                    .font(.system(size: 21, weight: .semibold))
+                    .foregroundStyle(hasAcceptedRegistrationTerms ? KiioTheme.accent : KiioTheme.mutedText)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(L10n.tr("auth.legal.consentAccessibility", locale: appState.locale))
+
+            VStack(alignment: .leading, spacing: 7) {
+                Text(L10n.tr("auth.legal.consentPrefix", locale: appState.locale))
+                    .font(.system(size: 13))
+                    .foregroundStyle(KiioTheme.secondaryText)
+
+                HStack(spacing: 6) {
+                    legalButton(.termsOfService)
+                    Text(L10n.tr("auth.legal.and", locale: appState.locale))
+                        .font(.system(size: 13))
+                        .foregroundStyle(KiioTheme.secondaryText)
+                    legalButton(.privacyPolicy)
+                }
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(KiioTheme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(KiioTheme.border, lineWidth: 1)
+        )
+    }
+
+    private var legalFooter: some View {
+        HStack(spacing: 14) {
+            legalButton(.termsOfService)
+            Divider()
+                .frame(height: 14)
+            legalButton(.privacyPolicy)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 2)
+    }
+
+    private func legalButton(_ document: LegalDocument) -> some View {
+        Button {
+            presentedLegalDocument = document
+        } label: {
+            Text(L10n.tr(document.titleKey, locale: appState.locale))
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(KiioTheme.accent)
+                .underline()
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder
@@ -278,7 +350,9 @@ struct AuthView: View {
             return !password.isEmpty
         case .code:
             return normalizedCode.count >= 4
-        case .register, .forgot:
+        case .register:
+            return normalizedCode.count >= 4 && password.count >= 6 && hasAcceptedRegistrationTerms
+        case .forgot:
             return normalizedCode.count >= 4 && password.count >= 6
         }
     }
@@ -369,12 +443,16 @@ struct AuthView: View {
         mode = nextMode
         password = ""
         code = ""
+        if nextMode == .register {
+            hasAcceptedRegistrationTerms = false
+        }
     }
 
     private func returnToSignIn() {
         mode = .password
         password = ""
         code = ""
+        hasAcceptedRegistrationTerms = false
     }
 }
 
