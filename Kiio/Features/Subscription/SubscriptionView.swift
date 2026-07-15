@@ -184,7 +184,7 @@ private struct SubscriptionScene: View {
                 NavigationLink {
                     LegalDocumentView(document: .membershipTerms)
                 } label: {
-                    LegalDocumentRow(document: .membershipTerms, showsStatus: false)
+                    LegalDocumentRow(document: .membershipTerms)
                 }
                 .buttonStyle(.plain)
             }

@@ -36,29 +36,6 @@ enum LegalDocument: String, CaseIterable, Identifiable {
         }
     }
 
-    var summaryKey: String {
-        switch self {
-        case .termsOfService:
-            return "legal.document.terms.summary"
-        case .privacyPolicy:
-            return "legal.document.privacy.summary"
-        case .personalInformationCollection:
-            return "legal.document.collection.summary"
-        case .thirdPartySharing:
-            return "legal.document.thirdParty.summary"
-        case .sensitivePersonalInformationConsent:
-            return "legal.document.sensitive.summary"
-        case .aiDataAuthorization:
-            return "legal.document.ai.summary"
-        case .accountDeletion:
-            return "legal.document.deletion.summary"
-        case .membershipTerms:
-            return "legal.document.membership.summary"
-        case .mailAccountAuthorization:
-            return "legal.document.mail.summary"
-        }
-    }
-
     var icon: String {
         switch self {
         case .termsOfService:
@@ -109,7 +86,6 @@ struct LegalCenterView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                introductionCard
                 documentSection(
                     title: L10n.tr("legal.section.core", locale: appState.locale),
                     documents: coreDocuments
@@ -129,25 +105,6 @@ struct LegalCenterView: View {
         .navigationBarTitleDisplayMode(.inline)
         .kiioHidesTabBar()
         .background(KiioTheme.background.ignoresSafeArea())
-    }
-
-    private var introductionCard: some View {
-        KiioCard {
-            HStack(alignment: .top, spacing: 14) {
-                KiioIconBadge(systemImage: "checkmark.shield", size: 48, iconSize: 20)
-
-                VStack(alignment: .leading, spacing: 7) {
-                    Text(L10n.tr("legal.center.heading", locale: appState.locale))
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(KiioTheme.text)
-                    Text(L10n.tr("legal.center.description", locale: appState.locale))
-                        .font(.system(size: 13))
-                        .foregroundStyle(KiioTheme.secondaryText)
-                        .lineSpacing(3)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-        }
     }
 
     private func documentSection(title: String, documents: [LegalDocument]) -> some View {
@@ -189,7 +146,6 @@ struct LegalDocumentView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                headerCard
                 draftNotice
                 informationCard
             }
@@ -199,25 +155,6 @@ struct LegalDocumentView: View {
         .navigationBarTitleDisplayMode(.inline)
         .kiioHidesTabBar()
         .background(KiioTheme.background.ignoresSafeArea())
-    }
-
-    private var headerCard: some View {
-        KiioCard {
-            HStack(alignment: .top, spacing: 14) {
-                KiioIconBadge(systemImage: document.icon, size: 50, iconSize: 20)
-
-                VStack(alignment: .leading, spacing: 7) {
-                    Text(L10n.tr(document.titleKey, locale: appState.locale))
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundStyle(KiioTheme.text)
-                    Text(L10n.tr(document.summaryKey, locale: appState.locale))
-                        .font(.system(size: 14))
-                        .foregroundStyle(KiioTheme.secondaryText)
-                        .lineSpacing(4)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-        }
     }
 
     private var draftNotice: some View {
@@ -290,36 +227,22 @@ struct LegalDocumentRow: View {
     @EnvironmentObject private var appState: AppState
 
     let document: LegalDocument
-    var showsStatus = true
 
-    init(document: LegalDocument, showsStatus: Bool = true) {
+    init(document: LegalDocument) {
         self.document = document
-        self.showsStatus = showsStatus
     }
 
     var body: some View {
         HStack(spacing: 12) {
             KiioIconBadge(systemImage: document.icon, size: 38, iconSize: 15)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(L10n.tr(document.titleKey, locale: appState.locale))
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(KiioTheme.text)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text(L10n.tr(document.summaryKey, locale: appState.locale))
-                    .font(.system(size: 12))
-                    .foregroundStyle(KiioTheme.secondaryText)
-                    .lineLimit(2)
-            }
+            Text(L10n.tr(document.titleKey, locale: appState.locale))
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(KiioTheme.text)
+                .lineLimit(1)
+                .minimumScaleFactor(0.88)
 
             Spacer(minLength: 8)
-
-            if showsStatus {
-                KiioStatusBadge(
-                    text: L10n.tr("legal.status.draft", locale: appState.locale),
-                    tone: .muted
-                )
-            }
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 12, weight: .bold))

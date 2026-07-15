@@ -5,7 +5,6 @@ struct ProfileView: View {
     @EnvironmentObject private var authStore: AuthStore
     @EnvironmentObject private var bootstrapStore: BootstrapStore
 
-    @State private var isConfirmingSignOut = false
     @State private var isShowingAbout = false
 
     var body: some View {
@@ -22,7 +21,6 @@ struct ProfileView: View {
                     title: L10n.tr("profile.groups.system", locale: appState.locale),
                     rows: systemRows
                 )
-                signOutButton
             }
             .padding(20)
         }
@@ -32,18 +30,6 @@ struct ProfileView: View {
         .refreshable {
             await bootstrapStore.refresh()
             authStore.updateUser(bootstrapStore.userInfo)
-        }
-        .confirmationDialog(
-            L10n.tr("profile.signOut", locale: appState.locale),
-            isPresented: $isConfirmingSignOut,
-            titleVisibility: .visible
-        ) {
-            Button(L10n.tr("profile.signOut", locale: appState.locale), role: .destructive) {
-                signOut()
-            }
-            Button(L10n.tr("common.cancel", locale: appState.locale), role: .cancel) {}
-        } message: {
-            Text(L10n.tr("profile.signOutConfirm", locale: appState.locale))
         }
         .alert(L10n.tr("profile.about", locale: appState.locale), isPresented: $isShowingAbout) {
             Button(L10n.tr("common.ok", locale: appState.locale), role: .cancel) {}
@@ -228,20 +214,6 @@ struct ProfileView: View {
         }
     }
 
-    private var signOutButton: some View {
-        Button {
-            isConfirmingSignOut = true
-        } label: {
-            Text(L10n.tr("profile.signOut", locale: appState.locale))
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(KiioTheme.danger)
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(KiioTheme.surface)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        }
-    }
-
     private var user: UserDetail? {
         bootstrapStore.userInfo ?? authStore.currentUser
     }
@@ -278,12 +250,6 @@ struct ProfileView: View {
 
     private var aboutMessage: String {
         "\(serviceName)\n\(L10n.tr("profile.currentVersion", locale: appState.locale)) \(versionText)"
-    }
-
-    private func signOut() {
-        authStore.logout()
-        bootstrapStore.reset()
-        appState.showAuth()
     }
 }
 
