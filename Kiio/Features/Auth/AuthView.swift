@@ -33,51 +33,58 @@ struct AuthView: View {
     @State private var registrationLegalError: String?
     @State private var isSendingCode = false
 
+    private let legalFooterReservedHeight: CGFloat = 80
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                if !mode.isSignInMode {
-                    backToSignInButton
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    if !mode.isSignInMode {
+                        backToSignInButton
+                    }
+
+                    header
+
+                    if mode.isSignInMode && emailVerificationEnabled {
+                        signInMethodPicker
+                    }
+
+                    formFields
+
+                    if mode == .register {
+                        registrationLegalConsent
+                    }
+
+                    KiioPrimaryButton(
+                        title: primaryButtonTitle,
+                        isLoading: authStore.isLoading && !isSendingCode,
+                        isDisabled: !canSubmit || isSendingCode
+                    ) {
+                        Task { await submit() }
+                    }
+
+                    if mode.isSignInMode {
+                        secondaryActions
+                    }
                 }
-
-                header
-
-                if mode.isSignInMode && emailVerificationEnabled {
-                    signInMethodPicker
-                }
-
-                formFields
-
-                if mode == .register {
-                    registrationLegalConsent
-                }
-
-                KiioPrimaryButton(
-                    title: primaryButtonTitle,
-                    isLoading: authStore.isLoading && !isSendingCode,
-                    isDisabled: !canSubmit || isSendingCode
-                ) {
-                    Task { await submit() }
-                }
-
-                if mode.isSignInMode {
-                    secondaryActions
-                }
-            }
-            .frame(maxWidth: 460, alignment: .leading)
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 24)
-            .padding(.top, mode.isSignInMode ? 48 : 16)
-            .padding(.bottom, 16)
-        }
-        .scrollDismissesKeyboard(.interactively)
-        .background(KiioTheme.background.ignoresSafeArea())
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            legalFooter
+                .frame(maxWidth: 460, alignment: .leading)
                 .padding(.horizontal, 24)
-                .padding(.vertical, 12)
-                .background(KiioTheme.background)
+                .frame(maxWidth: .infinity)
+                .frame(
+                    minHeight: max(0, geometry.size.height - legalFooterReservedHeight),
+                    alignment: .center
+                )
+                .padding(.vertical, 16)
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                legalFooter
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(KiioTheme.background)
+            }
         }
+        .background(KiioTheme.background.ignoresSafeArea())
         .kiioErrorAlert(message: $alertMessage, locale: appState.locale)
         .task {
             await bootstrapStore.ensureLoaded()
@@ -127,17 +134,17 @@ struct AuthView: View {
                 .keyboardType(.emailAddress)
                 .kiioTextField()
 
-            if mode.needsEmailCode {
-                emailCodeField
-            }
-
-            if mode != .code {
+            if mode == .password || mode == .register || mode == .forgot {
                 SecureField(
                     "",
                     text: $password,
                     prompt: Text(passwordPlaceholder).foregroundColor(authFieldPlaceholderColor)
                 )
                 .kiioTextField()
+            }
+
+            if mode.needsEmailCode {
+                emailCodeField
             }
         }
     }
