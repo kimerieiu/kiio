@@ -40,10 +40,11 @@ struct AuthView: View {
             ZStack(alignment: .top) {
                 ScrollView {
                     VStack(spacing: 0) {
-                        Spacer(minLength: mode.isSignInMode ? 24 : 64)
+                        Spacer(minLength: mode.isSignInMode ? 12 : 52)
 
                         VStack(alignment: .leading, spacing: 20) {
                             header
+                                .padding(.bottom, 10)
 
                             if mode.isSignInMode && emailVerificationEnabled {
                                 signInMethodPicker
@@ -65,13 +66,14 @@ struct AuthView: View {
 
                             if mode.isSignInMode {
                                 secondaryActions
+                                    .frame(height: 52, alignment: .bottom)
                             }
                         }
                         .frame(maxWidth: 460, alignment: .leading)
                         .padding(.horizontal, 24)
                         .frame(maxWidth: .infinity)
 
-                        Spacer(minLength: 112)
+                        Spacer(minLength: 124)
                     }
                     .frame(
                         minHeight: max(0, geometry.size.height - legalFooterReservedHeight)
@@ -86,7 +88,6 @@ struct AuthView: View {
                         .padding(.horizontal, 24)
                         .padding(.vertical, 12)
                         .frame(maxWidth: .infinity)
-                        .background(KiioTheme.background.opacity(0.96))
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
