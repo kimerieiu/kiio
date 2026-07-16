@@ -52,16 +52,16 @@ struct AuthView: View {
 
                             formFields
 
-                            if mode == .register {
-                                registrationLegalConsent
-                            }
-
                             KiioPrimaryButton(
                                 title: primaryButtonTitle,
                                 isLoading: authStore.isLoading && !isSendingCode,
                                 isDisabled: !canSubmit || isSendingCode
                             ) {
                                 Task { await submit() }
+                            }
+
+                            if mode == .register {
+                                registrationLegalConsent
                             }
 
                             if mode.isSignInMode {
@@ -285,18 +285,7 @@ struct AuthView: View {
                 .padding(.leading, 30)
             }
         }
-        .padding(13)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(hasAcceptedRegistrationTerms ? KiioTheme.accent.opacity(0.06) : KiioTheme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(
-                    hasAcceptedRegistrationTerms ? KiioTheme.accent.opacity(0.36) : KiioTheme.border,
-                    lineWidth: 1
-                )
-        )
-        .animation(.easeInOut(duration: 0.18), value: hasAcceptedRegistrationTerms)
     }
 
     private var legalFooter: some View {
