@@ -108,20 +108,27 @@ struct SettingsView: View {
     }
 
     private var signOutButton: some View {
-        KiioCard(padding: 0) {
-            Button {
-                isConfirmingSignOut = true
-            } label: {
-                SettingsMenuRow(
-                    icon: "rectangle.portrait.and.arrow.right",
-                    title: L10n.tr("profile.signOut", locale: appState.locale),
-                    subtitle: L10n.tr("profile.signOutSubtitle", locale: appState.locale),
-                    accessory: .none
-                )
+        Button {
+            isConfirmingSignOut = true
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "rectangle.portrait.and.arrow.right")
+                    .font(.system(size: 15, weight: .semibold))
+                Text(L10n.tr("profile.signOut", locale: appState.locale))
+                    .font(.system(size: 15, weight: .semibold))
             }
-            .buttonStyle(.plain)
-            .disabled(authStore.isLoading)
+            .foregroundStyle(KiioTheme.danger)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(KiioTheme.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(KiioTheme.border, lineWidth: 1)
+            )
         }
+        .buttonStyle(.plain)
+        .disabled(authStore.isLoading)
     }
 
     private var currentAppLanguageSubtitle: String {
