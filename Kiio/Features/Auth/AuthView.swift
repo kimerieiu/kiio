@@ -37,54 +37,69 @@ struct AuthView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    if !mode.isSignInMode {
-                        backToSignInButton
+            ZStack(alignment: .top) {
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Spacer(minLength: mode.isSignInMode ? 24 : 64)
+
+                        VStack(alignment: .leading, spacing: 20) {
+                            header
+
+                            if mode.isSignInMode && emailVerificationEnabled {
+                                signInMethodPicker
+                            }
+
+                            formFields
+
+                            if mode == .register {
+                                registrationLegalConsent
+                            }
+
+                            KiioPrimaryButton(
+                                title: primaryButtonTitle,
+                                isLoading: authStore.isLoading && !isSendingCode,
+                                isDisabled: !canSubmit || isSendingCode
+                            ) {
+                                Task { await submit() }
+                            }
+
+                            if mode.isSignInMode {
+                                secondaryActions
+                            }
+                        }
+                        .frame(maxWidth: 460, alignment: .leading)
+                        .padding(.horizontal, 24)
+                        .frame(maxWidth: .infinity)
+
+                        Spacer(minLength: 112)
                     }
-
-                    header
-
-                    if mode.isSignInMode && emailVerificationEnabled {
-                        signInMethodPicker
-                    }
-
-                    formFields
-
-                    if mode == .register {
-                        registrationLegalConsent
-                    }
-
-                    KiioPrimaryButton(
-                        title: primaryButtonTitle,
-                        isLoading: authStore.isLoading && !isSendingCode,
-                        isDisabled: !canSubmit || isSendingCode
-                    ) {
-                        Task { await submit() }
-                    }
-
-                    if mode.isSignInMode {
-                        secondaryActions
-                    }
+                    .frame(
+                        minHeight: max(0, geometry.size.height - legalFooterReservedHeight)
+                    )
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: 460, alignment: .leading)
-                .padding(.horizontal, 24)
-                .frame(maxWidth: .infinity)
-                .frame(
-                    minHeight: max(0, geometry.size.height - legalFooterReservedHeight),
-                    alignment: .center
-                )
-                .padding(.vertical, 16)
+                .scrollDismissesKeyboard(.interactively)
+
+                if !mode.isSignInMode {
+                    backToSignInButton
+                        .frame(maxWidth: 460, alignment: .leading)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .frame(maxWidth: .infinity)
+                        .background(KiioTheme.background.opacity(0.96))
+                }
             }
-            .scrollDismissesKeyboard(.interactively)
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 legalFooter
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                     .background(KiioTheme.background)
+                    .overlay(alignment: .top) {
+                        Divider()
+                    }
             }
         }
-        .background(KiioTheme.background.ignoresSafeArea())
+        .background(authBackground.ignoresSafeArea())
         .kiioErrorAlert(message: $alertMessage, locale: appState.locale)
         .task {
             await bootstrapStore.ensureLoaded()
@@ -107,15 +122,33 @@ struct AuthView: View {
         }
     }
 
+    private var authBackground: some View {
+        ZStack {
+            KiioTheme.background
+            LinearGradient(
+                colors: [KiioTheme.accent.opacity(0.07), KiioTheme.background.opacity(0)],
+                startPoint: .topLeading,
+                endPoint: .center
+            )
+        }
+    }
+
     private var header: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            Text(headerTitle)
-                .font(.system(size: 28, weight: .bold))
-                .foregroundStyle(KiioTheme.text)
-            Text(headerSubtitle)
-                .font(.system(size: 14))
-                .lineSpacing(2)
-                .foregroundStyle(KiioTheme.secondaryText)
+        HStack(alignment: .top, spacing: 12) {
+            RoundedRectangle(cornerRadius: 2, style: .continuous)
+                .fill(KiioTheme.accent)
+                .frame(width: 4, height: 31)
+                .padding(.top, 3)
+
+            VStack(alignment: .leading, spacing: 7) {
+                Text(headerTitle)
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundStyle(KiioTheme.text)
+                Text(headerSubtitle)
+                    .font(.system(size: 14))
+                    .lineSpacing(2)
+                    .foregroundStyle(KiioTheme.secondaryText)
+            }
         }
     }
 
@@ -125,6 +158,13 @@ struct AuthView: View {
             Text(L10n.tr("auth.mode.code", locale: appState.locale)).tag(AuthMode.code)
         }
         .pickerStyle(.segmented)
+        .padding(4)
+        .background(KiioTheme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                .stroke(KiioTheme.border, lineWidth: 1)
+        )
     }
 
     @ViewBuilder
@@ -197,7 +237,7 @@ struct AuthView: View {
 
     private var registrationLegalConsent: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top, spacing: 10) {
+            HStack(alignment: .center, spacing: 10) {
                 Button {
                     guard registrationLegalReady else {
                         Task { await loadRegistrationLegalVersions(force: true) }
@@ -208,6 +248,7 @@ struct AuthView: View {
                     Image(systemName: hasAcceptedRegistrationTerms ? "checkmark.square.fill" : "square")
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundStyle(hasAcceptedRegistrationTerms ? KiioTheme.accent : KiioTheme.mutedText)
+                        .frame(width: 24, height: 24)
                 }
                 .buttonStyle(.plain)
                 .disabled(!registrationLegalReady)
@@ -218,6 +259,7 @@ struct AuthView: View {
                     .foregroundStyle(KiioTheme.secondaryText)
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
+                    .frame(minHeight: 24, alignment: .leading)
                     .tint(KiioTheme.accent)
                     .environment(\.openURL, OpenURLAction { url in
                         openRegistrationLegalURL(url)
@@ -244,12 +286,16 @@ struct AuthView: View {
         }
         .padding(13)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(KiioTheme.surface)
+        .background(hasAcceptedRegistrationTerms ? KiioTheme.accent.opacity(0.06) : KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(KiioTheme.border, lineWidth: 1)
+                .stroke(
+                    hasAcceptedRegistrationTerms ? KiioTheme.accent.opacity(0.36) : KiioTheme.border,
+                    lineWidth: 1
+                )
         )
+        .animation(.easeInOut(duration: 0.18), value: hasAcceptedRegistrationTerms)
     }
 
     private var legalFooter: some View {
@@ -282,7 +328,7 @@ struct AuthView: View {
                 } label: {
                     Text(L10n.tr("auth.forgotPasswordLink", locale: appState.locale))
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(KiioTheme.text)
+                        .foregroundStyle(KiioTheme.accent)
                 }
                 .frame(maxWidth: .infinity)
             }
@@ -290,13 +336,13 @@ struct AuthView: View {
             if userRegistrationEnabled {
                 HStack(spacing: 5) {
                     Text(L10n.tr("auth.noAccountPrompt", locale: appState.locale))
-                        .foregroundStyle(KiioTheme.text)
+                        .foregroundStyle(KiioTheme.secondaryText)
                     Button {
                         enterSecondaryMode(.register)
                     } label: {
                         Text(L10n.tr("auth.createAccountLink", locale: appState.locale))
                             .fontWeight(.semibold)
-                            .foregroundStyle(KiioTheme.text)
+                            .foregroundStyle(KiioTheme.accent)
                     }
                 }
                 .font(.system(size: 14))
