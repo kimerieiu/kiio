@@ -9,7 +9,6 @@
 "common.loading" = "Loading...";
 "common.version" = "Version";
 "common.api" = "API";
-"common.soon" = "Soon";
 "common.delete" = "Delete";
 "common.complete" = "Complete";
 "common.confirm" = "Confirm";
@@ -306,14 +305,12 @@
 "profile.id" = "ID: %@";
 "profile.devices" = "Devices";
 "profile.settings" = "Settings";
-"profile.settingsSubtitle" = "Language, account, and session";
+"profile.settingsSubtitle" = "Account, language, and privacy";
 "profile.signOut" = "Sign Out";
-"profile.signOutSubtitle" = "Clear local token";
+"profile.signOutSubtitle" = "Sign out of your account on this device";
 "profile.proTitle" = "Kiio Pro";
 "profile.proDesc" = "Manage subscription benefits and usage.";
 "profile.manageSubscription" = "Manage";
-"profile.orders" = "Orders";
-"profile.ordersSub" = "Review subscription orders and payment status";
 "profile.currentVersion" = "Current version";
 "settings.title" = "Settings";
 "settings.account" = "Account";
@@ -321,21 +318,9 @@
 "settings.appLanguage" = "App Display Language";
 "settings.appLanguageSub" = "Current: %@";
 "settings.appLanguageHint" = "Choose the display language for this app. Changes apply immediately and sync to your account preference.";
-"settings.about" = "About";
-"settings.notificationsPrivacy" = "Notifications & Privacy";
-"settings.notificationsSecurity" = "Notifications & Security";
 "settings.legal" = "Legal & Privacy";
-"settings.support" = "Support";
-"settings.push" = "Push notifications";
-"settings.pushSub" = "Backend notification preferences are not wired on iOS yet.";
-"settings.privacy" = "Privacy";
-"settings.privacySub" = "Privacy controls are waiting for product confirmation.";
-"settings.security" = "Security";
-"settings.securitySub" = "Account security details currently share the main account flow.";
-"settings.help" = "Help";
-"settings.helpSub" = "Help center content is not connected in this build.";
-"settings.agreement" = "Agreement";
-"settings.agreementSub" = "Legal documents will open here after the iOS route is confirmed.";
+"settings.securitySub" = "Manage sign-in status and account deletion";
+"settings.session" = "Sign-In Status";
 
 "common.loadMore" = "Load more";
 "common.loadingMore" = "Loading more...";
@@ -499,11 +484,10 @@
 "settingsLanguage.agentPreview.arSa" = "مرحبًا، كيف يمكنني مساعدتك؟";
 "settingsLanguage.agentPreview.ukUa" = "Вітаю, чим можу допомогти?";
 
-"profile.groups.assets" = "Assets";
 "profile.groups.system" = "System";
 "profile.accountSecurity" = "Account & Security";
 "profile.about" = "About";
-"profile.signOutConfirm" = "Sign out and clear the local token on this device?";
+"profile.signOutConfirm" = "Sign out of your account on this device?";
 "settings.dangerZone" = "Danger Zone";
 "settings.deleteAccount" = "Delete Account";
 "settings.deleteAccountSub" = "Starts a 7-day cooling-off period while your data is retained.";
@@ -594,6 +578,3 @@
 "legal.document.deletion.title" = "Account Deletion";
 "legal.document.membership.title" = "Membership Terms";
 "legal.document.mail.title" = "Mail Authorization";
-"orders.title" = "Orders";
-"orders.empty.title" = "No orders yet";
-"orders.empty.message" = "Subscription orders and payment status will appear here when the iOS order flow is enabled.";

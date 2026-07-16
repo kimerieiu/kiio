@@ -14,10 +14,6 @@ struct ProfileView: View {
                 profileHeader
                 proBanner
                 menuGroup(
-                    title: L10n.tr("profile.groups.assets", locale: appState.locale),
-                    rows: assetRows
-                )
-                menuGroup(
                     title: L10n.tr("profile.groups.system", locale: appState.locale),
                     rows: systemRows
                 )
@@ -156,22 +152,11 @@ struct ProfileView: View {
         .buttonStyle(.plain)
     }
 
-    private var assetRows: [ProfileMenuRowData] {
-        [
-            ProfileMenuRowData(
-                icon: "receipt",
-                title: L10n.tr("profile.orders", locale: appState.locale),
-                subtitle: L10n.tr("profile.ordersSub", locale: appState.locale),
-                destination: .orders
-            )
-        ]
-    }
-
     private var systemRows: [ProfileMenuRowData] {
         [
             ProfileMenuRowData(
                 icon: "shield",
-                title: L10n.tr("profile.accountSecurity", locale: appState.locale),
+                title: L10n.tr("profile.settings", locale: appState.locale),
                 subtitle: L10n.tr("profile.settingsSubtitle", locale: appState.locale),
                 destination: .settings
             ),
@@ -195,9 +180,6 @@ struct ProfileView: View {
             VStack(spacing: 10) {
                 ForEach(rows) { row in
                     switch row.destination {
-                    case .orders:
-                        NavigationLink { OrdersPlaceholderView().kiioHidesTabBar() } label: { ProfileMenuRow(row: row) }
-                            .buttonStyle(.plain)
                     case .settings:
                         NavigationLink { SettingsView().kiioHidesTabBar() } label: { ProfileMenuRow(row: row) }
                             .buttonStyle(.plain)
@@ -312,37 +294,6 @@ private struct ProfileMenuRowData: Identifiable {
 }
 
 private enum ProfileMenuDestination: Equatable {
-    case orders
     case settings
     case about
-}
-
-private struct OrdersPlaceholderView: View {
-    @EnvironmentObject private var appState: AppState
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
-                KiioCard {
-                    HStack(alignment: .top, spacing: 14) {
-                        KiioIconBadge(systemImage: "receipt", size: 52, iconSize: 22)
-                        VStack(alignment: .leading, spacing: 7) {
-                            KiioStatusBadge(text: L10n.tr("common.soon", locale: appState.locale), tone: .muted)
-                            Text(L10n.tr("orders.empty.title", locale: appState.locale))
-                                .font(.system(size: 22, weight: .bold))
-                                .foregroundStyle(KiioTheme.text)
-                            Text(L10n.tr("orders.empty.message", locale: appState.locale))
-                                .font(.system(size: 14))
-                                .foregroundStyle(KiioTheme.secondaryText)
-                                .lineSpacing(4)
-                        }
-                    }
-                }
-            }
-            .padding(20)
-        }
-        .background(KiioTheme.background.ignoresSafeArea())
-        .navigationTitle(L10n.tr("orders.title", locale: appState.locale))
-        .kiioHidesTabBar()
-    }
 }

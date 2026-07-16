@@ -9,7 +9,6 @@
 "common.loading" = "加载中...";
 "common.version" = "版本";
 "common.api" = "接口";
-"common.soon" = "即将支持";
 "common.delete" = "删除";
 "common.complete" = "完成";
 "common.confirm" = "确认";
@@ -306,14 +305,12 @@
 "profile.id" = "ID: %@";
 "profile.devices" = "设备";
 "profile.settings" = "设置";
-"profile.settingsSubtitle" = "语言、账号与登录状态";
+"profile.settingsSubtitle" = "账号、语言与隐私";
 "profile.signOut" = "退出登录";
-"profile.signOutSubtitle" = "清除本地令牌";
+"profile.signOutSubtitle" = "退出当前设备上的账号";
 "profile.proTitle" = "Kiio Pro";
 "profile.proDesc" = "管理订阅权益和使用额度。";
 "profile.manageSubscription" = "管理";
-"profile.orders" = "订单";
-"profile.ordersSub" = "查看订阅订单和支付状态";
 "profile.currentVersion" = "当前版本";
 "settings.title" = "设置";
 "settings.account" = "账号";
@@ -321,21 +318,9 @@
 "settings.appLanguage" = "App 显示语言";
 "settings.appLanguageSub" = "当前：%@";
 "settings.appLanguageHint" = "选择此 App 界面的显示语言。修改后会立即应用，并同步到账号偏好。";
-"settings.about" = "关于";
-"settings.notificationsPrivacy" = "通知与隐私";
-"settings.notificationsSecurity" = "通知与安全";
 "settings.legal" = "法律与隐私";
-"settings.support" = "支持";
-"settings.push" = "推送通知";
-"settings.pushSub" = "iOS 端尚未接入后端通知偏好。";
-"settings.privacy" = "隐私";
-"settings.privacySub" = "隐私控制项等待产品确认后接入。";
-"settings.security" = "安全";
-"settings.securitySub" = "账号安全信息当前沿用主账号流程。";
-"settings.help" = "帮助";
-"settings.helpSub" = "帮助中心内容暂未在此版本接入。";
-"settings.agreement" = "用户协议";
-"settings.agreementSub" = "iOS 路由确认后将在这里打开法律文档。";
+"settings.securitySub" = "管理登录状态与账号注销";
+"settings.session" = "登录状态";
 
 "common.loadMore" = "加载更多";
 "common.loadingMore" = "正在加载更多...";
@@ -499,11 +484,10 @@
 "settingsLanguage.agentPreview.arSa" = "مرحبًا، كيف يمكنني مساعدتك؟";
 "settingsLanguage.agentPreview.ukUa" = "Вітаю, чим можу допомогти?";
 
-"profile.groups.assets" = "资产";
 "profile.groups.system" = "系统";
 "profile.accountSecurity" = "账号与安全";
 "profile.about" = "关于";
-"profile.signOutConfirm" = "退出登录并清除此设备上的本地令牌？";
+"profile.signOutConfirm" = "确认退出当前设备上的账号？";
 "settings.dangerZone" = "危险操作";
 "settings.deleteAccount" = "注销账号";
 "settings.deleteAccountSub" = "提交后进入 7 天冷静期，期间数据仍会保留。";
@@ -515,9 +499,6 @@
 "profile.role.user" = "用户";
 
 "subscription.title" = "Kiio Pro";
-"orders.title" = "订单";
-"orders.empty.title" = "暂无订单";
-"orders.empty.message" = "启用 iOS 订单流程后，订阅订单和支付状态会显示在这里。";
 "subscription.currentStatus" = "当前权益";
 "subscription.billingCycle" = "计费周期";
 "subscription.channel" = "激活渠道";

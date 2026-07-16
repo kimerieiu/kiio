@@ -6,31 +6,12 @@ struct SettingsView: View {
     @EnvironmentObject private var bootstrapStore: BootstrapStore
     @Environment(\.dismiss) private var dismiss
 
-    @State private var isConfirmingSignOut = false
-    @State private var isConfirmingAccountDeletion = false
-    @State private var accountDeletionError: String?
-
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 accountCard
                 languageSection
-                pendingSection(
-                    title: L10n.tr("settings.notificationsSecurity", locale: appState.locale),
-                    rows: [
-                        SettingsPendingRow(icon: "bell.badge", titleKey: "settings.push", subtitleKey: "settings.pushSub"),
-                        SettingsPendingRow(icon: "lock.shield", titleKey: "settings.security", subtitleKey: "settings.securitySub")
-                    ]
-                )
                 legalSection
-                pendingSection(
-                    title: L10n.tr("settings.support", locale: appState.locale),
-                    rows: [
-                        SettingsPendingRow(icon: "questionmark.circle", titleKey: "settings.help", subtitleKey: "settings.helpSub")
-                    ]
-                )
-                signOutButton
-                accountDeletionSection
             }
             .padding(20)
         }
@@ -49,60 +30,52 @@ struct SettingsView: View {
             await bootstrapStore.refresh()
             authStore.updateUser(bootstrapStore.userInfo)
         }
-        .confirmationDialog(
-            L10n.tr("profile.signOut", locale: appState.locale),
-            isPresented: $isConfirmingSignOut,
-            titleVisibility: .visible
-        ) {
-            Button(L10n.tr("profile.signOut", locale: appState.locale), role: .destructive) {
-                signOut()
-            }
-            Button(L10n.tr("common.cancel", locale: appState.locale), role: .cancel) {}
-        } message: {
-            Text(L10n.tr("profile.signOutConfirm", locale: appState.locale))
-        }
-        .confirmationDialog(
-            L10n.tr("settings.deleteAccountConfirmTitle", locale: appState.locale),
-            isPresented: $isConfirmingAccountDeletion,
-            titleVisibility: .visible
-        ) {
-            Button(L10n.tr("settings.deleteAccountAction", locale: appState.locale), role: .destructive) {
-                Task {
-                    await deleteAccount()
-                }
-            }
-            Button(L10n.tr("common.cancel", locale: appState.locale), role: .cancel) {}
-        } message: {
-            Text(L10n.tr("settings.deleteAccountConfirmMessage", locale: appState.locale))
-        }
-        .kiioErrorAlert(message: $accountDeletionError, locale: appState.locale)
     }
 
     private var accountCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             KiioSectionTitle(title: L10n.tr("settings.account", locale: appState.locale), icon: "person")
 
-            KiioCard {
-                HStack(spacing: 14) {
-                    Text(initial)
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 58, height: 58)
-                        .background(KiioTheme.accent)
-                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            KiioCard(padding: 0) {
+                VStack(spacing: 0) {
+                    HStack(spacing: 14) {
+                        Text(initial)
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 58, height: 58)
+                            .background(KiioTheme.accent)
+                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
 
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text(displayName)
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundStyle(KiioTheme.text)
-                            .lineLimit(1)
-                        Text(L10n.tr("profile.id", locale: appState.locale, userId))
-                            .font(.system(size: 11, design: .monospaced))
-                            .foregroundStyle(KiioTheme.secondaryText)
-                            .lineLimit(1)
+                        VStack(alignment: .leading, spacing: 7) {
+                            Text(displayName)
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundStyle(KiioTheme.text)
+                                .lineLimit(1)
+                            Text(L10n.tr("profile.id", locale: appState.locale, userId))
+                                .font(.system(size: 11, design: .monospaced))
+                                .foregroundStyle(KiioTheme.secondaryText)
+                                .lineLimit(1)
+                        }
+
+                        Spacer()
                     }
+                    .padding(16)
 
-                    Spacer()
+                    Divider()
+                        .padding(.leading, 16)
+
+                    NavigationLink {
+                        AccountSecurityView()
+                            .kiioHidesTabBar()
+                    } label: {
+                        SettingsMenuRow(
+                            icon: "lock.shield",
+                            title: L10n.tr("profile.accountSecurity", locale: appState.locale),
+                            subtitle: L10n.tr("settings.securitySub", locale: appState.locale),
+                            accessory: .chevron
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -152,51 +125,116 @@ struct SettingsView: View {
         }
     }
 
-    private func pendingSection(title: String, rows: [SettingsPendingRow]) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            KiioSectionTitle(title: title)
-            KiioCard(padding: 0) {
-                VStack(spacing: 0) {
-                    ForEach(rows.indices, id: \.self) { index in
-                        SettingsMenuRow(
-                            icon: rows[index].icon,
-                            title: L10n.tr(rows[index].titleKey, locale: appState.locale),
-                            subtitle: L10n.tr(rows[index].subtitleKey, locale: appState.locale),
-                            accessory: .badge(L10n.tr("common.soon", locale: appState.locale))
-                        )
+    private var user: UserDetail? {
+        bootstrapStore.userInfo ?? authStore.currentUser
+    }
 
-                        if index != rows.count - 1 {
-                            Divider()
-                                .padding(.leading, 60)
-                        }
-                    }
-                }
-            }
+    private var currentAppLanguageSubtitle: String {
+        L10n.tr("settings.appLanguageSub", locale: appState.locale, appLanguageName(for: appState.locale))
+    }
+
+    private func appLanguageName(for locale: String) -> String {
+        switch L10n.backendLocale(locale) {
+        case "zh_CN":
+            return L10n.tr("language.zh", locale: appState.locale)
+        default:
+            return L10n.tr("language.en", locale: appState.locale)
         }
     }
 
-    private var signOutButton: some View {
-        Button {
-            isConfirmingSignOut = true
-        } label: {
-            HStack(spacing: 10) {
-                Image(systemName: "rectangle.portrait.and.arrow.right")
-                    .font(.system(size: 15, weight: .semibold))
-                Text(L10n.tr("profile.signOut", locale: appState.locale))
-                    .font(.system(size: 15, weight: .semibold))
+    private var displayName: String {
+        user?.username?.isEmpty == false ? user!.username! : L10n.tr("profile.defaultUser", locale: appState.locale)
+    }
+
+    private var initial: String {
+        String(displayName.prefix(1)).uppercased()
+    }
+
+    private var userId: String {
+        user?.id ?? "--"
+    }
+}
+
+private struct AccountSecurityView: View {
+    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var authStore: AuthStore
+    @EnvironmentObject private var bootstrapStore: BootstrapStore
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var isConfirmingSignOut = false
+    @State private var isConfirmingAccountDeletion = false
+    @State private var accountDeletionError: String?
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                sessionSection
+                accountDeletionSection
             }
-            .foregroundStyle(KiioTheme.danger)
-            .frame(maxWidth: .infinity)
-            .frame(height: 52)
-            .background(KiioTheme.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(KiioTheme.border, lineWidth: 1)
-            )
+            .padding(20)
         }
-        .buttonStyle(.plain)
-        .disabled(authStore.isLoading)
+        .navigationTitle(L10n.tr("profile.accountSecurity", locale: appState.locale))
+        .kiioHidesTabBar()
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                KiioBackButton {
+                    dismiss()
+                }
+            }
+        }
+        .background(KiioTheme.background.ignoresSafeArea())
+        .confirmationDialog(
+            L10n.tr("profile.signOut", locale: appState.locale),
+            isPresented: $isConfirmingSignOut,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.tr("profile.signOut", locale: appState.locale), role: .destructive) {
+                signOut()
+            }
+            Button(L10n.tr("common.cancel", locale: appState.locale), role: .cancel) {}
+        } message: {
+            Text(L10n.tr("profile.signOutConfirm", locale: appState.locale))
+        }
+        .confirmationDialog(
+            L10n.tr("settings.deleteAccountConfirmTitle", locale: appState.locale),
+            isPresented: $isConfirmingAccountDeletion,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.tr("settings.deleteAccountAction", locale: appState.locale), role: .destructive) {
+                Task {
+                    await deleteAccount()
+                }
+            }
+            Button(L10n.tr("common.cancel", locale: appState.locale), role: .cancel) {}
+        } message: {
+            Text(L10n.tr("settings.deleteAccountConfirmMessage", locale: appState.locale))
+        }
+        .kiioErrorAlert(message: $accountDeletionError, locale: appState.locale)
+    }
+
+    private var sessionSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            KiioSectionTitle(
+                title: L10n.tr("settings.session", locale: appState.locale),
+                icon: "key"
+            )
+
+            KiioCard(padding: 0) {
+                Button {
+                    isConfirmingSignOut = true
+                } label: {
+                    SettingsMenuRow(
+                        icon: "rectangle.portrait.and.arrow.right",
+                        title: L10n.tr("profile.signOut", locale: appState.locale),
+                        subtitle: L10n.tr("profile.signOutSubtitle", locale: appState.locale),
+                        accessory: .none
+                    )
+                }
+                .buttonStyle(.plain)
+                .disabled(authStore.isLoading)
+            }
+        }
     }
 
     private var accountDeletionSection: some View {
@@ -255,35 +293,6 @@ struct SettingsView: View {
             .buttonStyle(.plain)
             .disabled(authStore.isLoading)
         }
-    }
-
-    private var user: UserDetail? {
-        bootstrapStore.userInfo ?? authStore.currentUser
-    }
-
-    private var currentAppLanguageSubtitle: String {
-        L10n.tr("settings.appLanguageSub", locale: appState.locale, appLanguageName(for: appState.locale))
-    }
-
-    private func appLanguageName(for locale: String) -> String {
-        switch L10n.backendLocale(locale) {
-        case "zh_CN":
-            return L10n.tr("language.zh", locale: appState.locale)
-        default:
-            return L10n.tr("language.en", locale: appState.locale)
-        }
-    }
-
-    private var displayName: String {
-        user?.username?.isEmpty == false ? user!.username! : L10n.tr("profile.defaultUser", locale: appState.locale)
-    }
-
-    private var initial: String {
-        String(displayName.prefix(1)).uppercased()
-    }
-
-    private var userId: String {
-        user?.id ?? "--"
     }
 
     private func signOut() {
@@ -394,17 +403,10 @@ private struct AppLanguageOption: Identifiable {
     var id: String { code }
 }
 
-private struct SettingsPendingRow {
-    let icon: String
-    let titleKey: String
-    let subtitleKey: String
-}
-
 private enum SettingsAccessory {
     case none
     case checkmark
     case chevron
-    case badge(String)
 }
 
 private struct SettingsMenuRow: View {
@@ -450,8 +452,6 @@ private struct SettingsMenuRow: View {
             Image(systemName: "chevron.right")
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(KiioTheme.mutedText)
-        case .badge(let text):
-            KiioStatusBadge(text: text, tone: .muted)
         }
     }
 }
