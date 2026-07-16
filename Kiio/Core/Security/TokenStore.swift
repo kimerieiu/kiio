@@ -8,7 +8,7 @@ enum TokenSessionState {
 }
 
 final class TokenStore {
-    private let service = "com.kimerie.Kiio"
+    private let service = "com.jbternal.kiio"
     private let account = "auth-token"
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
