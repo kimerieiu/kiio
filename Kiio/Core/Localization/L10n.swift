@@ -23,6 +23,15 @@ enum L10n {
         }
     }
 
+    static func legalLocale(_ locale: String) -> String {
+        switch locale {
+        case "zh", "zh_CN", "zh-CN":
+            return "zh-CN"
+        default:
+            return "en-US"
+        }
+    }
+
     static func backendAgentLocale(_ locale: String) -> String {
         let normalized = locale.trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: "-", with: "_")

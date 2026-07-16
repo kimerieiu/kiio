@@ -156,6 +156,8 @@ struct UserSubscriptionDTO: Decodable, Equatable {
 
 struct RedeemCodeRequest: Encodable {
     let code: String
+    let legalConsents: [LegalConsentSelection]?
+    let legalConsentContext: LegalConsentContext?
 }
 
 struct RedeemCodePreviewDTO: Decodable, Equatable {

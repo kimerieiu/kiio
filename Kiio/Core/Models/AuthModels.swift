@@ -25,6 +25,8 @@ struct RegisterRequest: Encodable {
     let password: String
     let emailCaptcha: String
     let language: String
+    let legalConsents: [LegalConsentSelection]
+    let legalConsentContext: LegalConsentContext
 }
 
 struct ResetPasswordRequest: Encodable {

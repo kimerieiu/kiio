@@ -9,11 +9,15 @@ struct SubscriptionView: View {
 }
 
 private struct SubscriptionScene: View {
+    @EnvironmentObject private var dependencies: AppDependencies
     @EnvironmentObject private var appState: AppState
     @StateObject private var store: SubscriptionStore
     @State private var redeemCode = ""
     @State private var previewToConfirm: RedeemCodePreviewDTO?
     @State private var alertMessage: String?
+    @State private var membershipLegalVersion: LegalDocumentVersionDTO?
+    @State private var isLoadingMembershipLegal = false
+    @State private var membershipLegalError: String?
     @FocusState private var isCodeFocused: Bool
 
     init(store: SubscriptionStore) {
@@ -40,6 +44,9 @@ private struct SubscriptionScene: View {
         .kiioHidesTabBar()
         .task {
             await loadCurrent(showError: true)
+        }
+        .task(id: L10n.legalLocale(appState.locale)) {
+            await loadMembershipLegal(force: true)
         }
         .refreshable {
             await loadCurrent(showError: true)
@@ -182,10 +189,29 @@ private struct SubscriptionScene: View {
 
             KiioCard(padding: 0) {
                 NavigationLink {
-                    LegalDocumentView(document: .membershipTerms)
+                    LegalDocumentView(
+                        document: .membershipTerms,
+                        requestedVersion: membershipLegalVersion
+                    )
                 } label: {
                     LegalDocumentRow(document: .membershipTerms)
                 }
+                .buttonStyle(.plain)
+            }
+
+            if isLoadingMembershipLegal {
+                HStack(spacing: 8) {
+                    ProgressView().controlSize(.small)
+                    Text(L10n.tr("subscription.legalLoading", locale: appState.locale))
+                }
+                .font(.system(size: 12))
+                .foregroundStyle(KiioTheme.secondaryText)
+            } else if membershipLegalError != nil {
+                Button(L10n.tr("subscription.legalRetry", locale: appState.locale)) {
+                    Task { await loadMembershipLegal(force: true) }
+                }
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(KiioTheme.danger)
                 .buttonStyle(.plain)
             }
         }
@@ -208,12 +234,13 @@ private struct SubscriptionScene: View {
             "subscription.confirmMessage",
             locale: appState.locale,
             preview.planName ?? preview.planCode ?? "--",
-            formatDateTime(preview.codeExpireTime) ?? "--"
+            formatDateTime(preview.codeExpireTime) ?? "--",
+            membershipLegalVersion?.version ?? "--"
         )
     }
 
     private var actionDisabled: Bool {
-        trimmedCode.isEmpty || store.isPreviewing || store.isRedeeming
+        trimmedCode.isEmpty || store.isPreviewing || store.isRedeeming || membershipLegalVersion == nil
     }
 
     private var actionTitle: String {
@@ -302,12 +329,39 @@ private struct SubscriptionScene: View {
             return
         }
 
-        let ok = await store.redeem(code: trimmedCode)
+        guard let membershipLegalVersion else {
+            alertMessage = L10n.tr("subscription.legalRequired", locale: appState.locale)
+            return
+        }
+        let ok = await store.redeem(
+            code: trimmedCode,
+            membershipConsent: membershipLegalVersion.consentSelection,
+            context: .ios(locale: appState.locale, source: "MEMBERSHIP_REDEMPTION")
+        )
         if ok {
             redeemCode = ""
             alertMessage = L10n.tr("subscription.redeemSuccess", locale: appState.locale)
         } else {
             alertMessage = store.errorMessage
+        }
+    }
+
+    private func loadMembershipLegal(force: Bool = false) async {
+        guard !isLoadingMembershipLegal else { return }
+        let locale = L10n.legalLocale(appState.locale)
+        if !force, membershipLegalVersion?.locale == locale { return }
+
+        isLoadingMembershipLegal = true
+        membershipLegalError = nil
+        defer { isLoadingMembershipLegal = false }
+        do {
+            membershipLegalVersion = try await dependencies.legalDocumentService.latest(
+                slug: "membership",
+                locale: locale
+            )
+        } catch {
+            membershipLegalVersion = nil
+            membershipLegalError = AppError.from(error).errorDescription
         }
     }
 

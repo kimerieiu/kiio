@@ -53,9 +53,23 @@ final class AuthStore: ObservableObject {
         }
     }
 
-    func register(email: String, password: String, code: String, language: String) async throws {
+    func register(
+        email: String,
+        password: String,
+        code: String,
+        language: String,
+        legalConsents: [LegalConsentSelection],
+        legalConsentContext: LegalConsentContext
+    ) async throws {
         try await runLoading {
-            let token = try await authService.register(email: email, password: password, code: code, language: language)
+            let token = try await authService.register(
+                email: email,
+                password: password,
+                code: code,
+                language: language,
+                legalConsents: legalConsents,
+                legalConsentContext: legalConsentContext
+            )
             setAuthenticated(token)
         }
     }

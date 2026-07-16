@@ -15,14 +15,22 @@ final class SubscriptionService {
     func previewRedeemCode(_ code: String) async throws -> RedeemCodePreviewDTO {
         try await apiClient.post(
             "/subscription/redeem-codes/preview",
-            body: RedeemCodeRequest(code: code)
+            body: RedeemCodeRequest(code: code, legalConsents: nil, legalConsentContext: nil)
         )
     }
 
-    func redeemCode(_ code: String) async throws -> RedeemCodeRedeemDTO {
+    func redeemCode(
+        _ code: String,
+        membershipConsent: LegalConsentSelection,
+        context: LegalConsentContext
+    ) async throws -> RedeemCodeRedeemDTO {
         try await apiClient.post(
             "/subscription/redeem-codes/redeem",
-            body: RedeemCodeRequest(code: code)
+            body: RedeemCodeRequest(
+                code: code,
+                legalConsents: [membershipConsent],
+                legalConsentContext: context
+            )
         )
     }
 }

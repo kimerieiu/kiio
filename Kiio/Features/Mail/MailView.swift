@@ -211,6 +211,7 @@ private struct MailListScene: View {
 }
 
 private struct MailAccountFormView: View {
+    @EnvironmentObject private var dependencies: AppDependencies
     @EnvironmentObject private var appState: AppState
     @Environment(\.dismiss) private var dismiss
 
@@ -229,6 +230,10 @@ private struct MailAccountFormView: View {
     @State private var isDefault: Bool
     @State private var isSaving = false
     @State private var alertMessage: String?
+    @State private var hasAcceptedMailAuthorization = false
+    @State private var mailLegalVersions: [LegalDocumentVersionDTO] = []
+    @State private var isLoadingMailLegal = false
+    @State private var mailLegalError: String?
 
     init(
         account: MailAccountDTO?,
@@ -282,7 +287,10 @@ private struct MailAccountFormView: View {
 
                 Section(L10n.tr("mail.authorizationSection", locale: appState.locale)) {
                     NavigationLink {
-                        LegalDocumentView(document: .mailAccountAuthorization)
+                        LegalDocumentView(
+                            document: .mailAccountAuthorization,
+                            requestedVersion: legalVersion(slug: "mail")
+                        )
                     } label: {
                         HStack(spacing: 12) {
                             Image(systemName: "envelope.badge")
@@ -300,6 +308,43 @@ private struct MailAccountFormView: View {
                             }
                         }
                         .padding(.vertical, 4)
+                    }
+
+                    NavigationLink {
+                        LegalDocumentView(
+                            document: .sensitivePersonalInformationConsent,
+                            requestedVersion: legalVersion(slug: "sensitive")
+                        )
+                    } label: {
+                        Label(
+                            L10n.tr("legal.document.sensitive.title", locale: appState.locale),
+                            systemImage: "lock.shield"
+                        )
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(KiioTheme.text)
+                    }
+
+                    if account == nil {
+                        Toggle(
+                            L10n.tr("mail.authorizationConsent", locale: appState.locale),
+                            isOn: $hasAcceptedMailAuthorization
+                        )
+                        .disabled(!mailLegalReady)
+
+                        if isLoadingMailLegal {
+                            HStack(spacing: 8) {
+                                ProgressView().controlSize(.small)
+                                Text(L10n.tr("mail.authorizationLoading", locale: appState.locale))
+                            }
+                            .font(.system(size: 12))
+                            .foregroundStyle(KiioTheme.secondaryText)
+                        } else if mailLegalError != nil {
+                            Button(L10n.tr("mail.authorizationRetry", locale: appState.locale)) {
+                                Task { await loadMailLegalVersions(force: true) }
+                            }
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(KiioTheme.danger)
+                        }
                     }
                 }
 
@@ -343,10 +388,15 @@ private struct MailAccountFormView: View {
                     Button(L10n.tr("common.save", locale: appState.locale)) {
                         Task { await save() }
                     }
-                    .disabled(isSaving)
+                    .disabled(isSaving || (account == nil && (!mailLegalReady || !hasAcceptedMailAuthorization)))
                 }
             }
             .kiioErrorAlert(message: $alertMessage, locale: appState.locale)
+            .task(id: L10n.legalLocale(appState.locale)) {
+                if account == nil {
+                    await loadMailLegalVersions()
+                }
+            }
         }
     }
 
@@ -398,6 +448,10 @@ private struct MailAccountFormView: View {
             alertMessage = L10n.tr("mail.errorPort", locale: appState.locale)
             return nil
         }
+        if account == nil && (!mailLegalReady || !hasAcceptedMailAuthorization) {
+            alertMessage = L10n.tr("mail.authorizationRequired", locale: appState.locale)
+            return nil
+        }
 
         return MailAccountSaveRequest(
             email: normalizedEmail,
@@ -407,8 +461,40 @@ private struct MailAccountFormView: View {
             smtpPort: smtpPortValue,
             authCode: normalizedAuthCode.isEmpty ? nil : normalizedAuthCode,
             isDefault: isDefault ? 1 : 0,
-            enabled: isEnabled ? 1 : 0
+            enabled: isEnabled ? 1 : 0,
+            legalConsents: account == nil ? mailLegalVersions.map(\.consentSelection) : nil,
+            legalConsentContext: account == nil
+                ? .ios(locale: appState.locale, source: "MAIL_BINDING")
+                : nil
         )
+    }
+
+    private var mailLegalReady: Bool {
+        Set(mailLegalVersions.map(\.slug)) == Set(["mail", "sensitive"])
+            && mailLegalVersions.allSatisfy { $0.locale == L10n.legalLocale(appState.locale) }
+    }
+
+    private func legalVersion(slug: String) -> LegalDocumentVersionDTO? {
+        mailLegalVersions.first { $0.slug == slug }
+    }
+
+    private func loadMailLegalVersions(force: Bool = false) async {
+        guard !isLoadingMailLegal else { return }
+        if mailLegalReady, !force { return }
+
+        hasAcceptedMailAuthorization = false
+        isLoadingMailLegal = true
+        mailLegalError = nil
+        defer { isLoadingMailLegal = false }
+        do {
+            let locale = L10n.legalLocale(appState.locale)
+            let mail = try await dependencies.legalDocumentService.latest(slug: "mail", locale: locale)
+            let sensitive = try await dependencies.legalDocumentService.latest(slug: "sensitive", locale: locale)
+            mailLegalVersions = [mail, sensitive]
+        } catch {
+            mailLegalVersions = []
+            mailLegalError = AppError.from(error).errorDescription
+        }
     }
 
     private func normalizedPort(_ value: String) -> Int? {

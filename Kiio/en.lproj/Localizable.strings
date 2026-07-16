@@ -102,6 +102,9 @@
 "auth.legal.consentPrefix" = "I have read and agree to";
 "auth.legal.and" = "and";
 "auth.legal.consentAccessibility" = "Agree to the Terms of Service and Privacy Policy";
+"auth.legal.loading" = "Loading current legal versions…";
+"auth.legal.retry" = "Could not load terms. Tap to retry";
+"auth.legal.loadFailed" = "The current legal versions could not be loaded. Reload them before registering.";
 
 "home.companionReady" = "Companion ready";
 "home.morning" = "Good morning";
@@ -503,11 +506,11 @@
 "profile.signOutConfirm" = "Sign out and clear the local token on this device?";
 "settings.dangerZone" = "Danger Zone";
 "settings.deleteAccount" = "Delete Account";
-"settings.deleteAccountSub" = "Permanently delete your account and associated Kiio data.";
-"settings.deleteAccountConfirmTitle" = "Delete your account?";
-"settings.deleteAccountConfirmMessage" = "This cannot be undone. Your account, devices, companions, conversations, and Kiio service data will be permanently deleted on all devices.";
-"settings.deleteAccountAction" = "Delete Account Permanently";
-"settings.deletingAccount" = "Deleting Account…";
+"settings.deleteAccountSub" = "Starts a 7-day cooling-off period while your data is retained.";
+"settings.deleteAccountConfirmTitle" = "Request account deletion?";
+"settings.deleteAccountConfirmMessage" = "You will be signed out on all devices. Your account, devices, companions, conversations, and Kiio service data will be permanently deleted after 7 days. Sign in again during the cooling-off period to cancel deletion.";
+"settings.deleteAccountAction" = "Start 7-Day Cooling-Off Period";
+"settings.deletingAccount" = "Submitting Deletion Request…";
 "profile.role.admin" = "Admin";
 "profile.role.user" = "User";
 
@@ -532,8 +535,11 @@
 "subscription.redeeming" = "Activating...";
 "subscription.redeemEmpty" = "Enter a redemption code first.";
 "subscription.confirmTitle" = "Confirm Activation";
-"subscription.confirmAction" = "Activate";
-"subscription.confirmMessage" = "%@\nCode expires: %@";
+"subscription.confirmAction" = "Agree & Activate";
+"subscription.confirmMessage" = "%@\nCode expires: %@\nBy redeeming, you agree to Membership Terms version %@.";
+"subscription.legalLoading" = "Loading current Membership Terms…";
+"subscription.legalRetry" = "Could not load Membership Terms. Tap to retry";
+"subscription.legalRequired" = "Load and review the current Membership Terms first.";
 "subscription.redeemUnavailable" = "This code cannot be redeemed. Status: %@";
 "subscription.redeemSuccess" = "Subscription activated";
 "subscription.status.active" = "Active";
@@ -558,6 +564,10 @@
 
 "subscription.legalSection" = "Membership Terms";
 "mail.authorizationSection" = "Authorization & Privacy";
+"mail.authorizationConsent" = "I have read and agree to the Mail Authorization and Sensitive Information terms";
+"mail.authorizationLoading" = "Loading current authorization versions…";
+"mail.authorizationRetry" = "Could not load authorization. Tap to retry";
+"mail.authorizationRequired" = "Read and accept the mail authorization and sensitive information terms first.";
 "mail.authorizationHint" = "Review mail access and credential protection before saving.";
 
 "legal.center.title" = "Terms & Privacy";
@@ -565,12 +575,15 @@
 "legal.section.core" = "Core Documents";
 "legal.section.privacy" = "Privacy & Data";
 "legal.section.features" = "Feature Terms";
-"legal.status.draft" = "Draft";
-"legal.document.draftNotice" = "This entry is ready, but the legal text is still being prepared. Until publication, this page confirms information architecture only and is not the final legal document.";
+"legal.document.loading" = "Loading terms…";
+"legal.document.cached" = "Showing the last verified cached version";
+"legal.document.loadFailed" = "Unable to load this document";
+"legal.document.loadFailedMessage" = "Check your connection and try again. Consent is never recorded without the complete document.";
+"legal.document.retry" = "Try Again";
+"legal.document.versionValue" = "Version %@";
 "legal.document.information" = "Document Information";
 "legal.document.status" = "Status";
 "legal.document.version" = "Version";
-"legal.document.unpublished" = "Not published";
 
 "legal.document.terms.title" = "Terms of Service";
 "legal.document.privacy.title" = "Privacy Policy";

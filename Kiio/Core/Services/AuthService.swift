@@ -36,10 +36,24 @@ final class AuthService {
         )
     }
 
-    func register(email: String, password: String, code: String, language: String) async throws -> TokenDTO {
+    func register(
+        email: String,
+        password: String,
+        code: String,
+        language: String,
+        legalConsents: [LegalConsentSelection],
+        legalConsentContext: LegalConsentContext
+    ) async throws -> TokenDTO {
         try await apiClient.post(
             "/user/register",
-            body: RegisterRequest(email: email, password: password, emailCaptcha: code, language: language),
+            body: RegisterRequest(
+                email: email,
+                password: password,
+                emailCaptcha: code,
+                language: language,
+                legalConsents: legalConsents,
+                legalConsentContext: legalConsentContext
+            ),
             authenticated: false
         )
     }

@@ -48,13 +48,21 @@ final class SubscriptionStore: ObservableObject {
         }
     }
 
-    func redeem(code: String) async -> Bool {
+    func redeem(
+        code: String,
+        membershipConsent: LegalConsentSelection,
+        context: LegalConsentContext
+    ) async -> Bool {
         guard !isRedeeming else { return false }
         isRedeeming = true
         defer { isRedeeming = false }
 
         do {
-            let result = try await service.redeemCode(code)
+            let result = try await service.redeemCode(
+                code,
+                membershipConsent: membershipConsent,
+                context: context
+            )
             if let subscription = result.subscription {
                 self.subscription = subscription
             }

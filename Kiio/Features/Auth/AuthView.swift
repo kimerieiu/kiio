@@ -27,6 +27,7 @@ private enum AuthMode: String, CaseIterable, Identifiable {
 }
 
 struct AuthView: View {
+    @EnvironmentObject private var dependencies: AppDependencies
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var authStore: AuthStore
     @EnvironmentObject private var bootstrapStore: BootstrapStore
@@ -38,6 +39,9 @@ struct AuthView: View {
     @State private var alertMessage: String?
     @State private var hasAcceptedRegistrationTerms = false
     @State private var presentedLegalDocument: LegalDocument?
+    @State private var registrationLegalVersions: [LegalDocumentVersionDTO] = []
+    @State private var isLoadingRegistrationLegal = false
+    @State private var registrationLegalError: String?
 
     var body: some View {
         ScrollView {
@@ -82,13 +86,22 @@ struct AuthView: View {
         .kiioErrorAlert(message: $alertMessage, locale: appState.locale)
         .task {
             await bootstrapStore.ensureLoaded()
+            await loadRegistrationLegalVersions()
             normalizeModeAvailability()
         }
         .onChange(of: bootstrapStore.publicConfig) { _ in
             normalizeModeAvailability()
         }
         .sheet(item: $presentedLegalDocument) { document in
-            LegalDocumentSheet(document: document)
+            LegalDocumentSheet(
+                document: document,
+                requestedVersion: registrationLegalVersions.first { $0.slug == document.slug }
+            )
+        }
+        .onChange(of: appState.locale) { _ in
+            hasAcceptedRegistrationTerms = false
+            registrationLegalVersions = []
+            Task { await loadRegistrationLegalVersions(force: true) }
         }
     }
 
@@ -156,6 +169,10 @@ struct AuthView: View {
     private var registrationLegalConsent: some View {
         HStack(alignment: .top, spacing: 11) {
             Button {
+                guard registrationLegalReady else {
+                    Task { await loadRegistrationLegalVersions(force: true) }
+                    return
+                }
                 hasAcceptedRegistrationTerms.toggle()
             } label: {
                 Image(systemName: hasAcceptedRegistrationTerms ? "checkmark.square.fill" : "square")
@@ -163,6 +180,7 @@ struct AuthView: View {
                     .foregroundStyle(hasAcceptedRegistrationTerms ? KiioTheme.accent : KiioTheme.mutedText)
             }
             .buttonStyle(.plain)
+            .disabled(!registrationLegalReady)
             .accessibilityLabel(L10n.tr("auth.legal.consentAccessibility", locale: appState.locale))
 
             VStack(alignment: .leading, spacing: 7) {
@@ -176,6 +194,22 @@ struct AuthView: View {
                         .font(.system(size: 13))
                         .foregroundStyle(KiioTheme.secondaryText)
                     legalButton(.privacyPolicy)
+                }
+
+                if isLoadingRegistrationLegal {
+                    HStack(spacing: 7) {
+                        ProgressView().controlSize(.small)
+                        Text(L10n.tr("auth.legal.loading", locale: appState.locale))
+                    }
+                    .font(.system(size: 12))
+                    .foregroundStyle(KiioTheme.secondaryText)
+                } else if registrationLegalError != nil {
+                    Button(L10n.tr("auth.legal.retry", locale: appState.locale)) {
+                        Task { await loadRegistrationLegalVersions(force: true) }
+                    }
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(KiioTheme.danger)
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -351,7 +385,10 @@ struct AuthView: View {
         case .code:
             return normalizedCode.count >= 4
         case .register:
-            return normalizedCode.count >= 4 && password.count >= 6 && hasAcceptedRegistrationTerms
+            return normalizedCode.count >= 4
+                && password.count >= 6
+                && hasAcceptedRegistrationTerms
+                && registrationLegalReady
         case .forgot:
             return normalizedCode.count >= 4 && password.count >= 6
         }
@@ -380,11 +417,17 @@ struct AuthView: View {
                 try await authStore.loginWithCode(email: normalizedEmail, code: normalizedCode)
                 await finishAuthenticatedFlow()
             case .register:
+                guard registrationLegalReady else {
+                    alertMessage = L10n.tr("auth.legal.loadFailed", locale: appState.locale)
+                    return
+                }
                 try await authStore.register(
                     email: normalizedEmail,
                     password: password,
                     code: normalizedCode,
-                    language: L10n.backendLocale(appState.locale)
+                    language: L10n.backendLocale(appState.locale),
+                    legalConsents: registrationLegalVersions.map(\.consentSelection),
+                    legalConsentContext: .ios(locale: appState.locale, source: "REGISTRATION")
                 )
                 await finishAuthenticatedFlow(destination: .invite)
             case .forgot:
@@ -396,6 +439,29 @@ struct AuthView: View {
             }
         } catch {
             alertMessage = AppError.from(error).errorDescription
+        }
+    }
+
+    private var registrationLegalReady: Bool {
+        Set(registrationLegalVersions.map(\.slug)) == Set(["terms", "privacy"])
+            && registrationLegalVersions.allSatisfy { $0.locale == L10n.legalLocale(appState.locale) }
+    }
+
+    private func loadRegistrationLegalVersions(force: Bool = false) async {
+        guard !isLoadingRegistrationLegal else { return }
+        if registrationLegalReady, !force { return }
+
+        isLoadingRegistrationLegal = true
+        registrationLegalError = nil
+        defer { isLoadingRegistrationLegal = false }
+        do {
+            let locale = L10n.legalLocale(appState.locale)
+            let terms = try await dependencies.legalDocumentService.latest(slug: "terms", locale: locale)
+            let privacy = try await dependencies.legalDocumentService.latest(slug: "privacy", locale: locale)
+            registrationLegalVersions = [terms, privacy]
+        } catch {
+            registrationLegalVersions = []
+            registrationLegalError = AppError.from(error).errorDescription
         }
     }
 

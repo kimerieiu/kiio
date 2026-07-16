@@ -102,6 +102,9 @@
 "auth.legal.consentPrefix" = "我已阅读并同意";
 "auth.legal.and" = "和";
 "auth.legal.consentAccessibility" = "同意用户服务协议和隐私政策";
+"auth.legal.loading" = "正在获取当前协议版本…";
+"auth.legal.retry" = "协议加载失败，点击重试";
+"auth.legal.loadFailed" = "未能取得当前协议版本，请重新加载后再注册。";
 
 "home.companionReady" = "伙伴已就绪";
 "home.morning" = "上午好";
@@ -503,11 +506,11 @@
 "profile.signOutConfirm" = "退出登录并清除此设备上的本地令牌？";
 "settings.dangerZone" = "危险操作";
 "settings.deleteAccount" = "注销账号";
-"settings.deleteAccountSub" = "永久删除账号及与 Kiio 关联的数据。";
-"settings.deleteAccountConfirmTitle" = "确定注销账号？";
-"settings.deleteAccountConfirmMessage" = "此操作无法撤销。你的账号、设备绑定、智能体、对话记录和 Kiio 服务数据将从所有设备永久删除。";
-"settings.deleteAccountAction" = "永久注销账号";
-"settings.deletingAccount" = "正在注销账号…";
+"settings.deleteAccountSub" = "提交后进入 7 天冷静期，期间数据仍会保留。";
+"settings.deleteAccountConfirmTitle" = "申请注销账号？";
+"settings.deleteAccountConfirmMessage" = "提交后你将从所有设备退出登录。账号、设备绑定、智能体、对话记录和 Kiio 服务数据将在 7 天后永久删除；冷静期内使用原账号重新登录即可撤销注销。";
+"settings.deleteAccountAction" = "开始 7 天冷静期";
+"settings.deletingAccount" = "正在提交注销申请…";
 "profile.role.admin" = "管理员";
 "profile.role.user" = "用户";
 
@@ -535,8 +538,11 @@
 "subscription.redeeming" = "正在激活...";
 "subscription.redeemEmpty" = "请先输入兑换码。";
 "subscription.confirmTitle" = "确认激活";
-"subscription.confirmAction" = "激活";
-"subscription.confirmMessage" = "%@\n兑换码有效期至：%@";
+"subscription.confirmAction" = "同意并激活";
+"subscription.confirmMessage" = "%@\n兑换码有效期至：%@\n确认兑换即表示同意会员服务协议（版本 %@）。";
+"subscription.legalLoading" = "正在获取当前会员协议…";
+"subscription.legalRetry" = "会员协议加载失败，点击重试";
+"subscription.legalRequired" = "请先加载并阅读当前会员服务协议。";
 "subscription.redeemUnavailable" = "该兑换码不可兑换。状态：%@";
 "subscription.redeemSuccess" = "订阅已激活";
 "subscription.status.active" = "已生效";
@@ -561,6 +567,10 @@
 
 "subscription.legalSection" = "会员协议";
 "mail.authorizationSection" = "授权与隐私";
+"mail.authorizationConsent" = "我已阅读并同意邮箱账号授权协议及敏感个人信息处理规则";
+"mail.authorizationLoading" = "正在获取当前授权版本…";
+"mail.authorizationRetry" = "授权文件加载失败，点击重试";
+"mail.authorizationRequired" = "请先阅读并同意邮箱授权及敏感个人信息处理规则。";
 "mail.authorizationHint" = "保存前请了解邮件访问范围与凭据保护方式。";
 
 "legal.center.title" = "协议与隐私";
@@ -568,12 +578,15 @@
 "legal.section.core" = "基础协议";
 "legal.section.privacy" = "隐私与数据";
 "legal.section.features" = "功能协议";
-"legal.status.draft" = "待发布";
-"legal.document.draftNotice" = "该入口已完成，协议正文仍在准备中。正式发布前，此页面仅用于确认信息架构，不作为最终法律文本。";
+"legal.document.loading" = "正在加载协议…";
+"legal.document.cached" = "当前显示已校验的本地缓存版本";
+"legal.document.loadFailed" = "协议暂时无法加载";
+"legal.document.loadFailedMessage" = "请检查网络后重试。未能取得完整协议时不会记录您的同意。";
+"legal.document.retry" = "重新加载";
+"legal.document.versionValue" = "版本 %@";
 "legal.document.information" = "文档信息";
 "legal.document.status" = "状态";
 "legal.document.version" = "版本";
-"legal.document.unpublished" = "尚未发布";
 
 "legal.document.terms.title" = "用户服务协议";
 "legal.document.privacy.title" = "隐私政策";

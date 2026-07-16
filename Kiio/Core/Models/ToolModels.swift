@@ -302,6 +302,8 @@ struct MailAccountSaveRequest: Encodable {
     let authCode: String?
     let isDefault: Int?
     let enabled: Int?
+    let legalConsents: [LegalConsentSelection]?
+    let legalConsentContext: LegalConsentContext?
 }
 
 struct MailOperationDTO: Decodable, Identifiable, Equatable {
