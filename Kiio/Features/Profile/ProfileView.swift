@@ -159,17 +159,17 @@ struct ProfileView: View {
     private var systemRows: [ProfileMenuRowData] {
         [
             ProfileMenuRowData(
-                icon: "shield",
-                title: L10n.tr("profile.settings", locale: appState.locale),
-                subtitle: L10n.tr("profile.settingsSubtitle", locale: appState.locale),
-                destination: .settings
-            ),
-            ProfileMenuRowData(
                 icon: "info.circle",
                 title: L10n.tr("profile.about", locale: appState.locale),
                 subtitle: "\(serviceName) \(versionText)",
                 destination: .about,
                 badgeText: versionText
+            ),
+            ProfileMenuRowData(
+                icon: "shield",
+                title: L10n.tr("profile.settings", locale: appState.locale),
+                subtitle: L10n.tr("profile.settingsSubtitle", locale: appState.locale),
+                destination: .settings
             )
         ]
     }

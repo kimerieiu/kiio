@@ -321,8 +321,7 @@
 "settings.appLanguageSub" = "当前：%@";
 "settings.appLanguageHint" = "选择此 App 界面的显示语言。修改后会立即应用，并同步到账号偏好。";
 "settings.legal" = "法律与隐私";
-"settings.securitySub" = "管理登录状态与账号注销";
-"settings.session" = "登录状态";
+"settings.securitySub" = "管理账号注销";
 
 "common.loadMore" = "加载更多";
 "common.loadingMore" = "正在加载更多...";

@@ -5,13 +5,15 @@ struct SettingsView: View {
     @EnvironmentObject private var authStore: AuthStore
     @EnvironmentObject private var bootstrapStore: BootstrapStore
     @Environment(\.dismiss) private var dismiss
+    @State private var isConfirmingSignOut = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                accountCard
+                accountSection
                 languageSection
                 legalSection
+                signOutButton
             }
             .padding(20)
         }
@@ -26,57 +28,37 @@ struct SettingsView: View {
             }
         }
         .background(KiioTheme.background.ignoresSafeArea())
-        .refreshable {
-            await bootstrapStore.refresh()
-            authStore.updateUser(bootstrapStore.userInfo)
+        .confirmationDialog(
+            L10n.tr("profile.signOut", locale: appState.locale),
+            isPresented: $isConfirmingSignOut,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.tr("profile.signOut", locale: appState.locale), role: .destructive) {
+                signOut()
+            }
+            Button(L10n.tr("common.cancel", locale: appState.locale), role: .cancel) {}
+        } message: {
+            Text(L10n.tr("profile.signOutConfirm", locale: appState.locale))
         }
     }
 
-    private var accountCard: some View {
+    private var accountSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             KiioSectionTitle(title: L10n.tr("settings.account", locale: appState.locale), icon: "person")
 
             KiioCard(padding: 0) {
-                VStack(spacing: 0) {
-                    HStack(spacing: 14) {
-                        Text(initial)
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundStyle(.white)
-                            .frame(width: 58, height: 58)
-                            .background(KiioTheme.accent)
-                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-
-                        VStack(alignment: .leading, spacing: 7) {
-                            Text(displayName)
-                                .font(.system(size: 18, weight: .bold))
-                                .foregroundStyle(KiioTheme.text)
-                                .lineLimit(1)
-                            Text(L10n.tr("profile.id", locale: appState.locale, userId))
-                                .font(.system(size: 11, design: .monospaced))
-                                .foregroundStyle(KiioTheme.secondaryText)
-                                .lineLimit(1)
-                        }
-
-                        Spacer()
-                    }
-                    .padding(16)
-
-                    Divider()
-                        .padding(.leading, 16)
-
-                    NavigationLink {
-                        AccountSecurityView()
-                            .kiioHidesTabBar()
-                    } label: {
-                        SettingsMenuRow(
-                            icon: "lock.shield",
-                            title: L10n.tr("profile.accountSecurity", locale: appState.locale),
-                            subtitle: L10n.tr("settings.securitySub", locale: appState.locale),
-                            accessory: .chevron
-                        )
-                    }
-                    .buttonStyle(.plain)
+                NavigationLink {
+                    AccountSecurityView()
+                        .kiioHidesTabBar()
+                } label: {
+                    SettingsMenuRow(
+                        icon: "lock.shield",
+                        title: L10n.tr("profile.accountSecurity", locale: appState.locale),
+                        subtitle: L10n.tr("settings.securitySub", locale: appState.locale),
+                        accessory: .chevron
+                    )
                 }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -125,8 +107,21 @@ struct SettingsView: View {
         }
     }
 
-    private var user: UserDetail? {
-        bootstrapStore.userInfo ?? authStore.currentUser
+    private var signOutButton: some View {
+        KiioCard(padding: 0) {
+            Button {
+                isConfirmingSignOut = true
+            } label: {
+                SettingsMenuRow(
+                    icon: "rectangle.portrait.and.arrow.right",
+                    title: L10n.tr("profile.signOut", locale: appState.locale),
+                    subtitle: L10n.tr("profile.signOutSubtitle", locale: appState.locale),
+                    accessory: .none
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(authStore.isLoading)
+        }
     }
 
     private var currentAppLanguageSubtitle: String {
@@ -142,16 +137,10 @@ struct SettingsView: View {
         }
     }
 
-    private var displayName: String {
-        user?.username?.isEmpty == false ? user!.username! : L10n.tr("profile.defaultUser", locale: appState.locale)
-    }
-
-    private var initial: String {
-        String(displayName.prefix(1)).uppercased()
-    }
-
-    private var userId: String {
-        user?.id ?? "--"
+    private func signOut() {
+        authStore.logout()
+        bootstrapStore.reset()
+        appState.showAuth()
     }
 }
 
@@ -161,14 +150,12 @@ private struct AccountSecurityView: View {
     @EnvironmentObject private var bootstrapStore: BootstrapStore
     @Environment(\.dismiss) private var dismiss
 
-    @State private var isConfirmingSignOut = false
     @State private var isConfirmingAccountDeletion = false
     @State private var accountDeletionError: String?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                sessionSection
                 accountDeletionSection
             }
             .padding(20)
@@ -185,18 +172,6 @@ private struct AccountSecurityView: View {
         }
         .background(KiioTheme.background.ignoresSafeArea())
         .confirmationDialog(
-            L10n.tr("profile.signOut", locale: appState.locale),
-            isPresented: $isConfirmingSignOut,
-            titleVisibility: .visible
-        ) {
-            Button(L10n.tr("profile.signOut", locale: appState.locale), role: .destructive) {
-                signOut()
-            }
-            Button(L10n.tr("common.cancel", locale: appState.locale), role: .cancel) {}
-        } message: {
-            Text(L10n.tr("profile.signOutConfirm", locale: appState.locale))
-        }
-        .confirmationDialog(
             L10n.tr("settings.deleteAccountConfirmTitle", locale: appState.locale),
             isPresented: $isConfirmingAccountDeletion,
             titleVisibility: .visible
@@ -211,30 +186,6 @@ private struct AccountSecurityView: View {
             Text(L10n.tr("settings.deleteAccountConfirmMessage", locale: appState.locale))
         }
         .kiioErrorAlert(message: $accountDeletionError, locale: appState.locale)
-    }
-
-    private var sessionSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            KiioSectionTitle(
-                title: L10n.tr("settings.session", locale: appState.locale),
-                icon: "key"
-            )
-
-            KiioCard(padding: 0) {
-                Button {
-                    isConfirmingSignOut = true
-                } label: {
-                    SettingsMenuRow(
-                        icon: "rectangle.portrait.and.arrow.right",
-                        title: L10n.tr("profile.signOut", locale: appState.locale),
-                        subtitle: L10n.tr("profile.signOutSubtitle", locale: appState.locale),
-                        accessory: .none
-                    )
-                }
-                .buttonStyle(.plain)
-                .disabled(authStore.isLoading)
-            }
-        }
     }
 
     private var accountDeletionSection: some View {
@@ -293,12 +244,6 @@ private struct AccountSecurityView: View {
             .buttonStyle(.plain)
             .disabled(authStore.isLoading)
         }
-    }
-
-    private func signOut() {
-        authStore.logout()
-        bootstrapStore.reset()
-        appState.showAuth()
     }
 
     private func deleteAccount() async {

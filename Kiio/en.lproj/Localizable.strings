@@ -321,8 +321,7 @@
 "settings.appLanguageSub" = "Current: %@";
 "settings.appLanguageHint" = "Choose the display language for this app. Changes apply immediately and sync to your account preference.";
 "settings.legal" = "Legal & Privacy";
-"settings.securitySub" = "Manage sign-in status and account deletion";
-"settings.session" = "Sign-In Status";
+"settings.securitySub" = "Manage account deletion";
 
 "common.loadMore" = "Load more";
 "common.loadingMore" = "Loading more...";
