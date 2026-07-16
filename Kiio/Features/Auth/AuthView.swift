@@ -1,21 +1,10 @@
 import SwiftUI
 
-private enum AuthMode: String, CaseIterable, Identifiable {
+private enum AuthMode: Hashable {
     case password
     case code
     case register
     case forgot
-
-    var id: String { rawValue }
-
-    var localizationKey: String {
-        switch self {
-        case .password: return "auth.mode.password"
-        case .code: return "auth.mode.code"
-        case .register: return "auth.mode.register"
-        case .forgot: return "auth.mode.forgot"
-        }
-    }
 
     var isSignInMode: Bool {
         self == .password || self == .code
@@ -42,10 +31,11 @@ struct AuthView: View {
     @State private var registrationLegalVersions: [LegalDocumentVersionDTO] = []
     @State private var isLoadingRegistrationLegal = false
     @State private var registrationLegalError: String?
+    @State private var isSendingCode = false
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 20) {
                 if !mode.isSignInMode {
                     backToSignInButton
                 }
@@ -58,31 +48,36 @@ struct AuthView: View {
 
                 formFields
 
-                if mode.needsEmailCode {
-                    sendCodeButton
-                }
-
                 if mode == .register {
                     registrationLegalConsent
                 }
 
                 KiioPrimaryButton(
                     title: primaryButtonTitle,
-                    isLoading: authStore.isLoading,
-                    isDisabled: !canSubmit
+                    isLoading: authStore.isLoading && !isSendingCode,
+                    isDisabled: !canSubmit || isSendingCode
                 ) {
                     Task { await submit() }
                 }
 
-                secondaryActions
-
-                if mode != .register {
-                    legalFooter
+                if mode.isSignInMode {
+                    secondaryActions
                 }
             }
-            .padding(24)
+            .frame(maxWidth: 460, alignment: .leading)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 24)
+            .padding(.top, mode.isSignInMode ? 48 : 16)
+            .padding(.bottom, 16)
         }
+        .scrollDismissesKeyboard(.interactively)
         .background(KiioTheme.background.ignoresSafeArea())
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            legalFooter
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(KiioTheme.background)
+        }
         .kiioErrorAlert(message: $alertMessage, locale: appState.locale)
         .task {
             await bootstrapStore.ensureLoaded()
@@ -106,34 +101,23 @@ struct AuthView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            KiioLogoView(size: 56)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text(headerTitle)
-                    .font(.system(size: 30, weight: .bold))
-                    .foregroundStyle(KiioTheme.text)
-                Text(headerSubtitle)
-                    .font(.system(size: 15))
-                    .lineSpacing(3)
-                    .foregroundStyle(KiioTheme.text)
-            }
+        VStack(alignment: .leading, spacing: 7) {
+            Text(headerTitle)
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(KiioTheme.text)
+            Text(headerSubtitle)
+                .font(.system(size: 14))
+                .lineSpacing(2)
+                .foregroundStyle(KiioTheme.secondaryText)
         }
-        .padding(.top, 24)
     }
 
     private var signInMethodPicker: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(L10n.tr("auth.signInMethod", locale: appState.locale))
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(KiioTheme.text)
-
-            Picker("", selection: $mode) {
-                Text(L10n.tr("auth.mode.password", locale: appState.locale)).tag(AuthMode.password)
-                Text(L10n.tr("auth.mode.code", locale: appState.locale)).tag(AuthMode.code)
-            }
-            .pickerStyle(.segmented)
+        Picker("", selection: $mode) {
+            Text(L10n.tr("auth.mode.password", locale: appState.locale)).tag(AuthMode.password)
+            Text(L10n.tr("auth.mode.code", locale: appState.locale)).tag(AuthMode.code)
         }
+        .pickerStyle(.segmented)
     }
 
     @ViewBuilder
@@ -143,77 +127,115 @@ struct AuthView: View {
                 .keyboardType(.emailAddress)
                 .kiioTextField()
 
-            if mode != .code {
-                SecureField("", text: $password, prompt: Text(passwordPlaceholder).foregroundColor(authFieldPlaceholderColor))
-                    .kiioTextField()
+            if mode.needsEmailCode {
+                emailCodeField
             }
 
-            if mode != .password {
-                TextField("", text: $code, prompt: fieldPrompt("auth.code.placeholder"))
-                    .keyboardType(.numberPad)
-                    .kiioTextField()
+            if mode != .code {
+                SecureField(
+                    "",
+                    text: $password,
+                    prompt: Text(passwordPlaceholder).foregroundColor(authFieldPlaceholderColor)
+                )
+                .kiioTextField()
             }
         }
     }
 
-    private var sendCodeButton: some View {
-        KiioSecondaryButton(
-            title: L10n.tr("auth.sendCode", locale: appState.locale),
-            isLoading: authStore.isLoading,
-            isDisabled: !isValidEmail(normalizedEmail)
-        ) {
-            Task { await sendCode() }
+    private var emailCodeField: some View {
+        HStack(spacing: 10) {
+            TextField("", text: $code, prompt: fieldPrompt("auth.code.placeholder"))
+                .keyboardType(.numberPad)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .foregroundStyle(KiioTheme.text)
+                .tint(KiioTheme.accent)
+
+            Divider()
+                .frame(height: 24)
+
+            Button {
+                Task { await sendCode() }
+            } label: {
+                Group {
+                    if isSendingCode {
+                        ProgressView()
+                            .controlSize(.small)
+                            .tint(KiioTheme.accent)
+                    } else {
+                        Text(L10n.tr("auth.sendCode", locale: appState.locale))
+                            .font(.system(size: 13, weight: .semibold))
+                            .lineLimit(1)
+                    }
+                }
+                .foregroundStyle(canSendCode ? KiioTheme.accent : KiioTheme.mutedText)
+                .frame(minWidth: 82)
+                .frame(height: 38)
+                .background(canSendCode ? KiioTheme.accentSoft : KiioTheme.disabledFill.opacity(0.7))
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .disabled(!canSendCode || authStore.isLoading)
         }
+        .padding(.leading, 14)
+        .padding(.trailing, 6)
+        .frame(height: 50)
+        .background(KiioTheme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(KiioTheme.border, lineWidth: 1)
+        )
     }
 
     private var registrationLegalConsent: some View {
-        HStack(alignment: .top, spacing: 11) {
-            Button {
-                guard registrationLegalReady else {
-                    Task { await loadRegistrationLegalVersions(force: true) }
-                    return
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
+                Button {
+                    guard registrationLegalReady else {
+                        Task { await loadRegistrationLegalVersions(force: true) }
+                        return
+                    }
+                    hasAcceptedRegistrationTerms.toggle()
+                } label: {
+                    Image(systemName: hasAcceptedRegistrationTerms ? "checkmark.square.fill" : "square")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(hasAcceptedRegistrationTerms ? KiioTheme.accent : KiioTheme.mutedText)
                 }
-                hasAcceptedRegistrationTerms.toggle()
-            } label: {
-                Image(systemName: hasAcceptedRegistrationTerms ? "checkmark.square.fill" : "square")
-                    .font(.system(size: 21, weight: .semibold))
-                    .foregroundStyle(hasAcceptedRegistrationTerms ? KiioTheme.accent : KiioTheme.mutedText)
-            }
-            .buttonStyle(.plain)
-            .disabled(!registrationLegalReady)
-            .accessibilityLabel(L10n.tr("auth.legal.consentAccessibility", locale: appState.locale))
+                .buttonStyle(.plain)
+                .disabled(!registrationLegalReady)
+                .accessibilityLabel(L10n.tr("auth.legal.consentAccessibility", locale: appState.locale))
 
-            VStack(alignment: .leading, spacing: 7) {
-                Text(L10n.tr("auth.legal.consentPrefix", locale: appState.locale))
+                Text(registrationConsentText)
                     .font(.system(size: 13))
                     .foregroundStyle(KiioTheme.secondaryText)
+                    .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .tint(KiioTheme.accent)
+                    .environment(\.openURL, OpenURLAction { url in
+                        openRegistrationLegalURL(url)
+                    })
+            }
 
-                HStack(spacing: 6) {
-                    legalButton(.termsOfService)
-                    Text(L10n.tr("auth.legal.and", locale: appState.locale))
-                        .font(.system(size: 13))
-                        .foregroundStyle(KiioTheme.secondaryText)
-                    legalButton(.privacyPolicy)
+            if isLoadingRegistrationLegal {
+                HStack(spacing: 7) {
+                    ProgressView().controlSize(.small)
+                    Text(L10n.tr("auth.legal.loading", locale: appState.locale))
                 }
-
-                if isLoadingRegistrationLegal {
-                    HStack(spacing: 7) {
-                        ProgressView().controlSize(.small)
-                        Text(L10n.tr("auth.legal.loading", locale: appState.locale))
-                    }
-                    .font(.system(size: 12))
-                    .foregroundStyle(KiioTheme.secondaryText)
-                } else if registrationLegalError != nil {
-                    Button(L10n.tr("auth.legal.retry", locale: appState.locale)) {
-                        Task { await loadRegistrationLegalVersions(force: true) }
-                    }
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(KiioTheme.danger)
-                    .buttonStyle(.plain)
+                .font(.system(size: 12))
+                .foregroundStyle(KiioTheme.secondaryText)
+                .padding(.leading, 30)
+            } else if registrationLegalError != nil {
+                Button(L10n.tr("auth.legal.retry", locale: appState.locale)) {
+                    Task { await loadRegistrationLegalVersions(force: true) }
                 }
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(KiioTheme.danger)
+                .buttonStyle(.plain)
+                .padding(.leading, 30)
             }
         }
-        .padding(14)
+        .padding(13)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(KiioTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -231,7 +253,6 @@ struct AuthView: View {
             legalButton(.privacyPolicy)
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 2)
     }
 
     private func legalButton(_ document: LegalDocument) -> some View {
@@ -246,51 +267,34 @@ struct AuthView: View {
         .buttonStyle(.plain)
     }
 
-    @ViewBuilder
     private var secondaryActions: some View {
-        if mode.isSignInMode {
-            VStack(spacing: 14) {
-                if mode == .password && emailVerificationEnabled {
-                    Button {
-                        enterSecondaryMode(.forgot)
-                    } label: {
-                        Text(L10n.tr("auth.forgotPasswordLink", locale: appState.locale))
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(KiioTheme.text)
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-
-                if userRegistrationEnabled {
-                    HStack(spacing: 5) {
-                        Text(L10n.tr("auth.noAccountPrompt", locale: appState.locale))
-                            .foregroundStyle(KiioTheme.text)
-                        Button {
-                            enterSecondaryMode(.register)
-                        } label: {
-                            Text(L10n.tr("auth.createAccountLink", locale: appState.locale))
-                                .fontWeight(.semibold)
-                                .foregroundStyle(KiioTheme.text)
-                        }
-                    }
-                    .font(.system(size: 14))
-                    .frame(maxWidth: .infinity)
-                }
-            }
-        } else {
-            HStack(spacing: 5) {
-                Text(L10n.tr("auth.haveAccountPrompt", locale: appState.locale))
-                    .foregroundStyle(KiioTheme.text)
+        VStack(spacing: 12) {
+            if mode == .password && emailVerificationEnabled {
                 Button {
-                    returnToSignIn()
+                    enterSecondaryMode(.forgot)
                 } label: {
-                    Text(L10n.tr("auth.signIn", locale: appState.locale))
-                        .fontWeight(.semibold)
+                    Text(L10n.tr("auth.forgotPasswordLink", locale: appState.locale))
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(KiioTheme.text)
                 }
+                .frame(maxWidth: .infinity)
             }
-            .font(.system(size: 14))
-            .frame(maxWidth: .infinity)
+
+            if userRegistrationEnabled {
+                HStack(spacing: 5) {
+                    Text(L10n.tr("auth.noAccountPrompt", locale: appState.locale))
+                        .foregroundStyle(KiioTheme.text)
+                    Button {
+                        enterSecondaryMode(.register)
+                    } label: {
+                        Text(L10n.tr("auth.createAccountLink", locale: appState.locale))
+                            .fontWeight(.semibold)
+                            .foregroundStyle(KiioTheme.text)
+                    }
+                }
+                .font(.system(size: 14))
+                .frame(maxWidth: .infinity)
+            }
         }
     }
 
@@ -306,7 +310,6 @@ struct AuthView: View {
             }
             .foregroundStyle(KiioTheme.text)
         }
-        .padding(.top, 8)
     }
 
     private var primaryButtonTitle: String {
@@ -374,6 +377,28 @@ struct AuthView: View {
         KiioTheme.text.opacity(0.58)
     }
 
+    private var canSendCode: Bool {
+        mode.needsEmailCode
+            && availableModes.contains(mode)
+            && isValidEmail(normalizedEmail)
+    }
+
+    private var registrationConsentText: AttributedString {
+        var result = AttributedString(L10n.tr("auth.legal.consentPrefix", locale: appState.locale) + " ")
+
+        var terms = AttributedString(L10n.tr(LegalDocument.termsOfService.titleKey, locale: appState.locale))
+        terms.link = URL(string: "kiio-legal://terms")
+        result += terms
+
+        result += AttributedString(" " + L10n.tr("auth.legal.and", locale: appState.locale) + " ")
+
+        var privacy = AttributedString(L10n.tr(LegalDocument.privacyPolicy.titleKey, locale: appState.locale))
+        privacy.link = URL(string: "kiio-legal://privacy")
+        result += privacy
+
+        return result
+    }
+
     private var canSubmit: Bool {
         guard availableModes.contains(mode), isValidEmail(normalizedEmail) else {
             return false
@@ -405,6 +430,22 @@ struct AuthView: View {
     private func fieldPrompt(_ key: String) -> Text {
         Text(L10n.tr(key, locale: appState.locale))
             .foregroundColor(authFieldPlaceholderColor)
+    }
+
+    private func openRegistrationLegalURL(_ url: URL) -> OpenURLAction.Result {
+        guard url.scheme == "kiio-legal" else {
+            return .systemAction
+        }
+
+        switch url.host {
+        case "terms":
+            presentedLegalDocument = .termsOfService
+        case "privacy":
+            presentedLegalDocument = .privacyPolicy
+        default:
+            return .discarded
+        }
+        return .handled
     }
 
     private func submit() async {
@@ -466,11 +507,14 @@ struct AuthView: View {
     }
 
     private func sendCode() async {
+        guard !isSendingCode, !authStore.isLoading else { return }
         guard isValidEmail(normalizedEmail) else {
             alertMessage = L10n.tr("auth.invalidEmail", locale: appState.locale)
             return
         }
 
+        isSendingCode = true
+        defer { isSendingCode = false }
         do {
             try await authStore.sendEmailCode(email: normalizedEmail)
             alertMessage = L10n.tr("auth.codeSent", locale: appState.locale)

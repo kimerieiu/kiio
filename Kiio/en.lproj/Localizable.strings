@@ -74,13 +74,12 @@
 "auth.mode.register" = "Register";
 "auth.mode.forgot" = "Reset";
 "auth.title" = "Sign in to Kiio";
-"auth.subtitle" = "Welcome back. Sign in to manage your Kiio devices and conversations.";
-"auth.codeSubtitle" = "Use a one-time email code when you do not want to enter your password.";
+"auth.subtitle" = "Sign in to manage your Kiio devices and services.";
+"auth.codeSubtitle" = "Sign in quickly with an email code.";
 "auth.registerTitle" = "Create your Kiio account";
-"auth.registerSubtitle" = "Verify your email and set a password. After signup, you can connect your first device.";
+"auth.registerSubtitle" = "Verify your email and set a sign-in password.";
 "auth.forgotTitle" = "Reset your password";
-"auth.forgotSubtitle" = "Verify your email, then set a new password for your Kiio account.";
-"auth.signInMethod" = "Sign-in method";
+"auth.forgotSubtitle" = "Verify your email, then set a new password.";
 "auth.email.placeholder" = "Email";
 "auth.password.placeholder" = "Password";
 "auth.newPassword.placeholder" = "New password";
@@ -89,7 +88,7 @@
 "auth.signInCode" = "Sign In with Code";
 "auth.createAccount" = "Create Account";
 "auth.resetPassword" = "Reset Password";
-"auth.sendCode" = "Send Email Code";
+"auth.sendCode" = "Send code";
 "auth.backToSignIn" = "Back to sign in";
 "auth.codeSent" = "Email code sent.";
 "auth.invalidEmail" = "Enter a valid email first.";
@@ -97,7 +96,6 @@
 "auth.forgotPasswordLink" = "Forgot password?";
 "auth.noAccountPrompt" = "New to Kiio?";
 "auth.createAccountLink" = "Create account";
-"auth.haveAccountPrompt" = "Already have an account?";
 "auth.legal.consentPrefix" = "I have read and agree to";
 "auth.legal.and" = "and";
 "auth.legal.consentAccessibility" = "Agree to the Terms of Service and Privacy Policy";
