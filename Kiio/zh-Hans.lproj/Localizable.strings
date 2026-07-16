@@ -311,6 +311,8 @@
 "profile.proTitle" = "Kiio Pro";
 "profile.proDesc" = "管理订阅权益和使用额度。";
 "profile.manageSubscription" = "管理";
+"profile.orders" = "订单";
+"profile.ordersSub" = "查看已兑换的 Shopify 订阅订单";
 "profile.currentVersion" = "当前版本";
 "settings.title" = "设置";
 "settings.account" = "账号";
@@ -484,6 +486,7 @@
 "settingsLanguage.agentPreview.arSa" = "مرحبًا، كيف يمكنني مساعدتك؟";
 "settingsLanguage.agentPreview.ukUa" = "Вітаю, чим можу допомогти?";
 
+"profile.groups.services" = "服务记录";
 "profile.groups.system" = "系统";
 "profile.accountSecurity" = "账号与安全";
 "profile.about" = "关于";
@@ -499,6 +502,34 @@
 "profile.role.user" = "用户";
 
 "subscription.title" = "Kiio Pro";
+"orders.title" = "订单";
+"orders.loading" = "正在加载订单…";
+"orders.loadingDetail" = "正在加载订单详情…";
+"orders.empty.title" = "暂无订单";
+"orders.empty.message" = "在 Shopify 购买并完成兑换后，关联订单会显示在这里。";
+"orders.detail.title" = "订单详情";
+"orders.detail.empty.title" = "订单不存在";
+"orders.detail.empty.message" = "该订单可能已失效，或不属于当前账号。";
+"orders.subscriptionItem" = "Kiio 订阅服务";
+"orders.items" = "商品";
+"orders.summary" = "订单信息";
+"orders.number" = "订单号";
+"orders.paymentStatus" = "支付状态";
+"orders.refundStatus" = "退款状态";
+"orders.purchaseTime" = "购买时间";
+"orders.redeemedTime" = "兑换时间";
+"orders.status.paid" = "已支付";
+"orders.status.processing" = "处理中";
+"orders.status.refunded" = "已退款";
+"orders.status.partiallyRefunded" = "部分退款";
+"orders.refund.none" = "无退款";
+"orders.redemption.redeemed" = "已兑换";
+"orders.redemption.invalidated" = "已失效";
+"orders.redemption.partial" = "部分失效";
+"orders.quantity" = "数量：%d";
+"orders.quantityShort" = "× %d";
+"orders.durationDays" = "%d 天服务期";
+"orders.unitPriceValue" = "单价：%@";
 "subscription.currentStatus" = "当前权益";
 "subscription.billingCycle" = "计费周期";
 "subscription.channel" = "激活渠道";

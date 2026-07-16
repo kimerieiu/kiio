@@ -18,6 +18,7 @@ final class AppDependencies: ObservableObject {
     let outfitService: OutfitService
     let mailService: MailService
     let subscriptionService: SubscriptionService
+    let orderService: OrderService
     let legalDocumentService: LegalDocumentService
     let legalDocumentCache: LegalDocumentCache
     let notifyService: NotifyService
@@ -45,6 +46,7 @@ final class AppDependencies: ObservableObject {
         let outfitService = OutfitService(apiClient: apiClient)
         let mailService = MailService(apiClient: apiClient)
         let subscriptionService = SubscriptionService(apiClient: apiClient)
+        let orderService = OrderService(apiClient: apiClient)
         let legalDocumentService = LegalDocumentService(apiClient: apiClient)
         let legalDocumentCache = LegalDocumentCache()
         let notifyService = NotifyService(apiClient: apiClient)
@@ -81,6 +83,7 @@ final class AppDependencies: ObservableObject {
         self.outfitService = outfitService
         self.mailService = mailService
         self.subscriptionService = subscriptionService
+        self.orderService = orderService
         self.legalDocumentService = legalDocumentService
         self.legalDocumentCache = legalDocumentCache
         self.notifyService = notifyService

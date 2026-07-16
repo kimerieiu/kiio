@@ -311,6 +311,8 @@
 "profile.proTitle" = "Kiio Pro";
 "profile.proDesc" = "Manage subscription benefits and usage.";
 "profile.manageSubscription" = "Manage";
+"profile.orders" = "Orders";
+"profile.ordersSub" = "View redeemed Shopify subscription orders";
 "profile.currentVersion" = "Current version";
 "settings.title" = "Settings";
 "settings.account" = "Account";
@@ -484,6 +486,7 @@
 "settingsLanguage.agentPreview.arSa" = "مرحبًا، كيف يمكنني مساعدتك؟";
 "settingsLanguage.agentPreview.ukUa" = "Вітаю, чим можу допомогти?";
 
+"profile.groups.services" = "Service History";
 "profile.groups.system" = "System";
 "profile.accountSecurity" = "Account & Security";
 "profile.about" = "About";
@@ -499,6 +502,34 @@
 "profile.role.user" = "User";
 
 "subscription.title" = "Kiio Pro";
+"orders.title" = "Orders";
+"orders.loading" = "Loading orders…";
+"orders.loadingDetail" = "Loading order details…";
+"orders.empty.title" = "No orders";
+"orders.empty.message" = "Orders appear here after a Shopify purchase has been redeemed to this account.";
+"orders.detail.title" = "Order Details";
+"orders.detail.empty.title" = "Order not found";
+"orders.detail.empty.message" = "This order may no longer be available or does not belong to this account.";
+"orders.subscriptionItem" = "Kiio Subscription";
+"orders.items" = "Items";
+"orders.summary" = "Order Information";
+"orders.number" = "Order number";
+"orders.paymentStatus" = "Payment status";
+"orders.refundStatus" = "Refund status";
+"orders.purchaseTime" = "Purchased";
+"orders.redeemedTime" = "Redeemed";
+"orders.status.paid" = "Paid";
+"orders.status.processing" = "Processing";
+"orders.status.refunded" = "Refunded";
+"orders.status.partiallyRefunded" = "Partially Refunded";
+"orders.refund.none" = "No refund";
+"orders.redemption.redeemed" = "Redeemed";
+"orders.redemption.invalidated" = "Invalidated";
+"orders.redemption.partial" = "Partially Invalidated";
+"orders.quantity" = "Quantity: %d";
+"orders.quantityShort" = "× %d";
+"orders.durationDays" = "%d-day service";
+"orders.unitPriceValue" = "Unit price: %@";
 "subscription.currentStatus" = "Current Access";
 "subscription.billingCycle" = "Billing cycle";
 "subscription.channel" = "Channel";

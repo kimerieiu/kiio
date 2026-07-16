@@ -14,6 +14,10 @@ struct ProfileView: View {
                 profileHeader
                 proBanner
                 menuGroup(
+                    title: L10n.tr("profile.groups.services", locale: appState.locale),
+                    rows: serviceRows
+                )
+                menuGroup(
                     title: L10n.tr("profile.groups.system", locale: appState.locale),
                     rows: systemRows
                 )
@@ -170,6 +174,17 @@ struct ProfileView: View {
         ]
     }
 
+    private var serviceRows: [ProfileMenuRowData] {
+        [
+            ProfileMenuRowData(
+                icon: "receipt",
+                title: L10n.tr("profile.orders", locale: appState.locale),
+                subtitle: L10n.tr("profile.ordersSub", locale: appState.locale),
+                destination: .orders
+            )
+        ]
+    }
+
     private func menuGroup(title: String, rows: [ProfileMenuRowData]) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
@@ -180,6 +195,9 @@ struct ProfileView: View {
             VStack(spacing: 10) {
                 ForEach(rows) { row in
                     switch row.destination {
+                    case .orders:
+                        NavigationLink { OrderView().kiioHidesTabBar() } label: { ProfileMenuRow(row: row) }
+                            .buttonStyle(.plain)
                     case .settings:
                         NavigationLink { SettingsView().kiioHidesTabBar() } label: { ProfileMenuRow(row: row) }
                             .buttonStyle(.plain)
@@ -294,6 +312,7 @@ private struct ProfileMenuRowData: Identifiable {
 }
 
 private enum ProfileMenuDestination: Equatable {
+    case orders
     case settings
     case about
 }
