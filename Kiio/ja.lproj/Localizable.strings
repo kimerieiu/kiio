@@ -527,7 +527,7 @@
 "orders.loading" = "注文を読み込んでいます…";
 "orders.loadingDetail" = "注文の詳細を読み込んでいます…";
 "orders.empty.title" = "注文はありません";
-"orders.empty.message" = "Shopify での購入がこのアカウントに引き換えられた後、注文がここに表示されます。";
+"orders.empty.message" = "注文はここに表示されます。";
 "orders.detail.title" = "注文の詳細";
 "orders.detail.empty.title" = "注文が見つかりません";
 "orders.detail.empty.message" = "この注文はもう入手できないか、このアカウントに属していない可能性があります。";

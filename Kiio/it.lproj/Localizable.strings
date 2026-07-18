@@ -527,7 +527,7 @@
 "orders.loading" = "Caricamento ordini…";
 "orders.loadingDetail" = "Caricamento dettagli ordine…";
 "orders.empty.title" = "Nessun ordine";
-"orders.empty.message" = "Gli ordini vengono visualizzati qui dopo che un acquisto Shopify è stato riscattato su questo account.";
+"orders.empty.message" = "Gli ordini verranno visualizzati qui.";
 "orders.detail.title" = "Dettagli dell'ordine";
 "orders.detail.empty.title" = "Ordine non trovato";
 "orders.detail.empty.message" = "Questo ordine potrebbe non essere più disponibile o non appartenere a questo account.";

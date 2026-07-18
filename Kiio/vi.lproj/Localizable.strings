@@ -527,7 +527,7 @@
 "orders.loading" = "Đang tải đơn đặt hàng…";
 "orders.loadingDetail" = "Đang tải chi tiết đơn hàng…";
 "orders.empty.title" = "Không có đơn đặt hàng";
-"orders.empty.message" = "Đơn hàng xuất hiện ở đây sau khi giao dịch mua trên Shopify được đổi vào tài khoản này.";
+"orders.empty.message" = "Đơn hàng sẽ hiển thị ở đây.";
 "orders.detail.title" = "Chi tiết đặt hàng";
 "orders.detail.empty.title" = "Không tìm thấy đơn hàng";
 "orders.detail.empty.message" = "Đơn đặt hàng này có thể không còn nữa hoặc không thuộc về tài khoản này.";

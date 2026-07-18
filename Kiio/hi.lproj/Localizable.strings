@@ -527,7 +527,7 @@
 "orders.loading" = "ऑर्डर लोड हो रहे हैं...";
 "orders.loadingDetail" = "ऑर्डर विवरण लोड हो रहा है…";
 "orders.empty.title" = "कोई आदेश नहीं";
-"orders.empty.message" = "Shopify खरीदारी को इस खाते में भुनाए जाने के बाद ऑर्डर यहां दिखाई देते हैं।";
+"orders.empty.message" = "ऑर्डर यहां दिखाई देंगे।";
 "orders.detail.title" = "ऑर्डर विवरण";
 "orders.detail.empty.title" = "ऑर्डर नहीं मिला";
 "orders.detail.empty.message" = "यह ऑर्डर अब उपलब्ध नहीं हो सकता है या इस खाते से संबंधित नहीं है।";

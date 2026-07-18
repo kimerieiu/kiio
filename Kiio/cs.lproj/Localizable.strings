@@ -527,7 +527,7 @@
 "orders.loading" = "Načítání objednávek…";
 "orders.loadingDetail" = "Načítání podrobností objednávky…";
 "orders.empty.title" = "Žádné rozkazy";
-"orders.empty.message" = "Objednávky se zde objeví poté, co byl nákup Shopify uplatněn na tento účet.";
+"orders.empty.message" = "Objednávky se zobrazí zde.";
 "orders.detail.title" = "Podrobnosti objednávky";
 "orders.detail.empty.title" = "Objednávka nenalezena";
 "orders.detail.empty.message" = "Tato objednávka již nemusí být dostupná nebo nepatří k tomuto účtu.";

@@ -527,7 +527,7 @@
 "orders.loading" = "กำลังโหลดคำสั่งซื้อ...";
 "orders.loadingDetail" = "กำลังโหลดรายละเอียดคำสั่งซื้อ...";
 "orders.empty.title" = "ไม่มีคำสั่ง";
-"orders.empty.message" = "คำสั่งซื้อจะปรากฏที่นี่หลังจากแลกซื้อ Shopify ไปยังบัญชีนี้แล้ว";
+"orders.empty.message" = "คำสั่งซื้อจะแสดงที่นี่";
 "orders.detail.title" = "รายละเอียดการสั่งซื้อ";
 "orders.detail.empty.title" = "ไม่พบคำสั่งซื้อ";
 "orders.detail.empty.message" = "คำสั่งซื้อนี้อาจไม่สามารถใช้ได้อีกต่อไปหรือไม่ได้เป็นของบัญชีนี้";

@@ -527,7 +527,7 @@
 "orders.loading" = "Carregando pedidos…";
 "orders.loadingDetail" = "Carregando detalhes do pedido…";
 "orders.empty.title" = "Sem pedidos";
-"orders.empty.message" = "Os pedidos aparecem aqui depois de uma compra Shopify ter sido resgatada para esta conta.";
+"orders.empty.message" = "Os pedidos serão apresentados aqui.";
 "orders.detail.title" = "Detalhes do pedido";
 "orders.detail.empty.title" = "Pedido não encontrado";
 "orders.detail.empty.message" = "Este pedido pode já não estar disponível ou não pertencer a esta conta.";

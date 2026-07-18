@@ -527,7 +527,7 @@
 "orders.loading" = "Se încarcă comenzi…";
 "orders.loadingDetail" = "Se încarcă detaliile comenzii...";
 "orders.empty.title" = "Fara comenzi";
-"orders.empty.message" = "Comenzile apar aici după ce o achiziție Shopify a fost valorificată în acest cont.";
+"orders.empty.message" = "Comenzile vor apărea aici.";
 "orders.detail.title" = "Detalii de comandă";
 "orders.detail.empty.title" = "Comanda nu a fost găsită";
 "orders.detail.empty.message" = "Este posibil ca această comandă să nu mai fie disponibilă sau să nu aparțină acestui cont.";

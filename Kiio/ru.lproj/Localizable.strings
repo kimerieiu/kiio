@@ -527,7 +527,7 @@
 "orders.loading" = "Загрузка заказов…";
 "orders.loadingDetail" = "Загрузка деталей заказа…";
 "orders.empty.title" = "Нет заказов";
-"orders.empty.message" = "Заказы появляются здесь после того, как покупка Shopify была погашена на этот счет.";
+"orders.empty.message" = "Заказы будут отображаться здесь.";
 "orders.detail.title" = "Детали заказа";
 "orders.detail.empty.title" = "Заказ не найден";
 "orders.detail.empty.message" = "Возможно, этот заказ больше недоступен или не принадлежит этому аккаунту.";

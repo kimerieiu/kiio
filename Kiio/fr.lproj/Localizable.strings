@@ -527,7 +527,7 @@
 "orders.loading" = "Chargement des commandes…";
 "orders.loadingDetail" = "Chargement des détails de la commande…";
 "orders.empty.title" = "Aucune commande";
-"orders.empty.message" = "Les commandes apparaissent ici après qu'un achat Shopify a été effectué sur ce compte.";
+"orders.empty.message" = "Les commandes apparaîtront ici.";
 "orders.detail.title" = "Détails de la commande";
 "orders.detail.empty.title" = "Commande introuvable";
 "orders.detail.empty.message" = "Cette commande n'est peut-être plus disponible ou n'appartient pas à ce compte.";

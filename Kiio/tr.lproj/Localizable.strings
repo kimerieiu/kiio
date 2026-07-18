@@ -527,7 +527,7 @@
 "orders.loading" = "Siparişler yükleniyor…";
 "orders.loadingDetail" = "Sipariş ayrıntıları yükleniyor…";
 "orders.empty.title" = "Sipariş yok";
-"orders.empty.message" = "Bir Shopify satın alma işlemi bu hesaba aktarıldıktan sonra siparişler burada görünür.";
+"orders.empty.message" = "Siparişler burada görünecek.";
 "orders.detail.title" = "Sipariş Detayları";
 "orders.detail.empty.title" = "Sipariş bulunamadı";
 "orders.detail.empty.message" = "Bu sipariş artık mevcut olmayabilir veya bu hesaba ait olmayabilir.";

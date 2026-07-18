@@ -527,7 +527,7 @@
 "orders.loading" = "Bestellungen werden geladen…";
 "orders.loadingDetail" = "Bestelldetails werden geladen…";
 "orders.empty.title" = "Keine Befehle";
-"orders.empty.message" = "Bestellungen werden hier angezeigt, nachdem ein Shopify-Kauf auf dieses Konto eingelöst wurde.";
+"orders.empty.message" = "Bestellungen werden hier angezeigt.";
 "orders.detail.title" = "Bestelldetails";
 "orders.detail.empty.title" = "Bestellung nicht gefunden";
 "orders.detail.empty.message" = "Diese Bestellung ist möglicherweise nicht mehr verfügbar oder gehört nicht zu diesem Konto.";

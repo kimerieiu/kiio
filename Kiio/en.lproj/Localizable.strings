@@ -527,7 +527,7 @@
 "orders.loading" = "Loading orders…";
 "orders.loadingDetail" = "Loading order details…";
 "orders.empty.title" = "No orders";
-"orders.empty.message" = "Orders appear here after a Shopify purchase has been redeemed to this account.";
+"orders.empty.message" = "Orders will appear here.";
 "orders.detail.title" = "Order Details";
 "orders.detail.empty.title" = "Order not found";
 "orders.detail.empty.message" = "This order may no longer be available or does not belong to this account.";

@@ -527,7 +527,7 @@
 "orders.loading" = "Cargando pedidos…";
 "orders.loadingDetail" = "Cargando detalles del pedido...";
 "orders.empty.title" = "Sin pedidos";
-"orders.empty.message" = "Los pedidos aparecen aquí después de que se haya canjeado una compra de Shopify en esta cuenta.";
+"orders.empty.message" = "Los pedidos aparecerán aquí.";
 "orders.detail.title" = "Detalles del pedido";
 "orders.detail.empty.title" = "Orden no encontrada";
 "orders.detail.empty.message" = "Es posible que este pedido ya no esté disponible o no pertenezca a esta cuenta.";

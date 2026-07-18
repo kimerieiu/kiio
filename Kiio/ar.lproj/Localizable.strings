@@ -527,7 +527,7 @@
 "orders.loading" = "جارٍ تحميل الطلبات…";
 "orders.loadingDetail" = "جارٍ تحميل تفاصيل الطلب…";
 "orders.empty.title" = "لا أوامر";
-"orders.empty.message" = "تظهر الطلبات هنا بعد استرداد قيمة الشراء على Shopify إلى هذا الحساب.";
+"orders.empty.message" = "ستظهر الطلبات هنا.";
 "orders.detail.title" = "تفاصيل الطلب";
 "orders.detail.empty.title" = "لم يتم العثور على الطلب";
 "orders.detail.empty.message" = "ربما لم يعد هذا الطلب متاحًا أو لا ينتمي إلى هذا الحساب.";

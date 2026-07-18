@@ -527,7 +527,7 @@
 "orders.loading" = "正在加載訂單...";
 "orders.loadingDetail" = "正在加載訂單詳細資訊...";
 "orders.empty.title" = "沒有訂單";
-"orders.empty.message" = "Shopify 購買已兌換至此帳戶後，訂單將顯示在此。";
+"orders.empty.message" = "訂單會顯示在這裡。";
 "orders.detail.title" = "訂單詳情";
 "orders.detail.empty.title" = "未找到訂單";
 "orders.detail.empty.message" = "該訂單可能不再可用或不屬於該帳戶。";

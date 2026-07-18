@@ -527,7 +527,7 @@
 "orders.loading" = "Memuat pesanan…";
 "orders.loadingDetail" = "Memuat detail pesanan…";
 "orders.empty.title" = "Tidak ada perintah";
-"orders.empty.message" = "Pesanan muncul di sini setelah pembelian Shopify ditukarkan ke akun ini.";
+"orders.empty.message" = "Pesanan akan muncul di sini.";
 "orders.detail.title" = "Detail Pesanan";
 "orders.detail.empty.title" = "Pesanan tidak ditemukan";
 "orders.detail.empty.message" = "Pesanan ini mungkin tidak lagi tersedia atau bukan milik akun ini.";

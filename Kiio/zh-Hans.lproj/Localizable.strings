@@ -527,7 +527,7 @@
 "orders.loading" = "正在加载订单…";
 "orders.loadingDetail" = "正在加载订单详情…";
 "orders.empty.title" = "暂无订单";
-"orders.empty.message" = "在 Shopify 购买并完成兑换后，关联订单会显示在这里。";
+"orders.empty.message" = "订单会显示在这里。";
 "orders.detail.title" = "订单详情";
 "orders.detail.empty.title" = "订单不存在";
 "orders.detail.empty.message" = "该订单可能已失效，或不属于当前账号。";
