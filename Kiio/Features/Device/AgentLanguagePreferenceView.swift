@@ -7,6 +7,7 @@ struct AgentLanguagePreferenceView: View {
 
     @State private var selected = "en_US"
     @State private var isSaving = false
+    @State private var isConfirmingLanguageChange = false
     @State private var alertMessage: String?
 
     private let languages = SupportedLanguage.all
@@ -29,13 +30,28 @@ struct AgentLanguagePreferenceView: View {
                 title: L10n.tr("common.save", locale: appState.locale),
                 isLoading: isSaving
             ) {
-                Task { await saveLanguage() }
+                requestSave()
             }
             .padding(20)
             .background(KiioTheme.background.opacity(0.96))
         }
         .task {
             selected = L10n.backendAgentLocale(bootstrapStore.preference?.agentLanguage ?? appState.locale)
+        }
+        .confirmationDialog(
+            L10n.tr("common.confirm", locale: appState.locale),
+            isPresented: $isConfirmingLanguageChange,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.tr("common.confirm", locale: appState.locale)) {
+                Task { await saveLanguage() }
+            }
+            Button(L10n.tr("common.cancel", locale: appState.locale), role: .cancel) {}
+        } message: {
+            Text(
+                "\(L10n.tr("settings.agentLanguage", locale: appState.locale)): "
+                + L10n.tr(currentLanguage.agentNameKey, locale: appState.locale)
+            )
         }
         .kiioErrorAlert(message: $alertMessage, locale: appState.locale)
     }
@@ -149,6 +165,17 @@ struct AgentLanguagePreferenceView: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(KiioTheme.border, lineWidth: 1)
         )
+    }
+
+    private func requestSave() {
+        let savedLanguage = L10n.backendAgentLocale(
+            bootstrapStore.preference?.agentLanguage ?? appState.locale
+        )
+        guard selected != savedLanguage else {
+            dismiss()
+            return
+        }
+        isConfirmingLanguageChange = true
     }
 
     private func saveLanguage() async {

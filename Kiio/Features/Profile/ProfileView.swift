@@ -13,10 +13,11 @@ struct ProfileView: View {
                 topBar
                 profileHeader
                 // proBanner
-                menuGroup(
-                    title: L10n.tr("profile.groups.services", locale: appState.locale),
-                    rows: serviceRows
-                )
+                // 订单入口暂时隐藏。
+                // menuGroup(
+                //     title: L10n.tr("profile.groups.services", locale: appState.locale),
+                //     rows: serviceRows
+                // )
                 menuGroup(
                     title: L10n.tr("profile.groups.system", locale: appState.locale),
                     rows: systemRows

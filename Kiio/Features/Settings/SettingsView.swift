@@ -266,6 +266,8 @@ private struct AppLanguagePreferenceView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var alertMessage: String?
     @State private var isSaving = false
+    @State private var pendingLocale: String?
+    @State private var isConfirmingLanguageChange = false
 
     private let languages = SupportedLanguage.all
 
@@ -300,6 +302,23 @@ private struct AppLanguagePreferenceView: View {
             }
         }
         .background(KiioTheme.background.ignoresSafeArea())
+        .confirmationDialog(
+            L10n.tr("common.confirm", locale: appState.locale),
+            isPresented: $isConfirmingLanguageChange,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.tr("common.confirm", locale: appState.locale)) {
+                confirmLocaleChange()
+            }
+            Button(L10n.tr("common.cancel", locale: appState.locale), role: .cancel) {
+                pendingLocale = nil
+            }
+        } message: {
+            Text(
+                "\(L10n.tr("settings.appLanguage", locale: appState.locale)): "
+                + pendingLanguageName
+            )
+        }
         .kiioErrorAlert(message: $alertMessage, locale: appState.locale)
     }
 
@@ -308,7 +327,7 @@ private struct AppLanguagePreferenceView: View {
             VStack(spacing: 0) {
                 ForEach(languages) { language in
                     Button {
-                        updateLocale(language.code)
+                        requestLocaleChange(language.code)
                     } label: {
                         SettingsMenuRow(
                             icon: "globe",
@@ -327,6 +346,26 @@ private struct AppLanguagePreferenceView: View {
                 }
             }
         }
+    }
+
+    private var pendingLanguageName: String {
+        guard let pendingLocale else { return "" }
+        let language = SupportedLanguage.option(for: pendingLocale)
+        return L10n.tr(language.appNameKey, locale: appState.locale)
+    }
+
+    private func requestLocaleChange(_ locale: String) {
+        let requestedLocale = L10n.backendLocale(locale)
+        guard L10n.backendLocale(appState.locale) != requestedLocale, !isSaving else { return }
+
+        pendingLocale = requestedLocale
+        isConfirmingLanguageChange = true
+    }
+
+    private func confirmLocaleChange() {
+        guard let pendingLocale else { return }
+        self.pendingLocale = nil
+        updateLocale(pendingLocale)
     }
 
     private func updateLocale(_ locale: String) {
