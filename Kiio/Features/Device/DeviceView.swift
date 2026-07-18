@@ -630,38 +630,6 @@ private struct DeviceDetailHeroCard: View {
     }
 }
 
-private struct DeviceDetailMetricCard: View {
-    let icon: String
-    let title: String
-    let value: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 5) {
-                Image(systemName: icon)
-                    .font(.system(size: 11, weight: .semibold))
-                Text(title)
-                    .font(.system(size: 11, weight: .semibold))
-            }
-            .foregroundStyle(KiioTheme.secondaryText)
-
-            Text(value)
-                .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(KiioTheme.text)
-                .lineLimit(2)
-                .minimumScaleFactor(0.75)
-        }
-        .padding(13)
-        .frame(maxWidth: .infinity, minHeight: 78, alignment: .leading)
-        .background(KiioTheme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(KiioTheme.border, lineWidth: 1)
-        )
-    }
-}
-
 struct DeviceDetailView: View {
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var bootstrapStore: BootstrapStore
@@ -694,52 +662,6 @@ struct DeviceDetailView: View {
             }
             .listRowBackground(Color.clear)
             .listRowInsets(EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 20))
-
-            Section {
-                LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible())], spacing: 10) {
-                    DeviceDetailMetricCard(
-                        icon: "cpu",
-                        title: L10n.tr("device.board", locale: appState.locale),
-                        value: DeviceConnectionHelper.boardText(currentDevice)
-                    )
-                    DeviceDetailMetricCard(
-                        icon: "bolt",
-                        title: L10n.tr("device.version", locale: appState.locale),
-                        value: DeviceConnectionHelper.versionText(currentDevice)
-                    )
-                    DeviceDetailMetricCard(
-                        icon: "gearshape",
-                        title: L10n.tr("device.autoUpdate", locale: appState.locale),
-                        value: currentDevice.autoUpdate == 1
-                        ? L10n.tr("device.enabled", locale: appState.locale)
-                        : L10n.tr("device.disabled", locale: appState.locale)
-                    )
-                    DeviceDetailMetricCard(
-                        icon: "clock.arrow.circlepath",
-                        title: L10n.tr("device.latestConnection", locale: appState.locale),
-                        value: DeviceConnectionHelper.formatLastConnected(currentDevice.lastConnectedAt, locale: appState.locale)
-                    )
-                }
-            }
-            .listRowBackground(Color.clear)
-            .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 8, trailing: 20))
-
-            Section(L10n.tr("device.identity", locale: appState.locale)) {
-                labeled(L10n.tr("device.name", locale: appState.locale), currentDevice.displayName)
-                labeled(L10n.tr("device.id", locale: appState.locale), currentDevice.id)
-                labeled(L10n.tr("device.mac", locale: appState.locale), currentDevice.macAddress ?? "--")
-                labeled(L10n.tr("device.board", locale: appState.locale), currentDevice.board ?? "--")
-            }
-
-            Section(L10n.tr("device.firmware", locale: appState.locale)) {
-                labeled(L10n.tr("device.version", locale: appState.locale), currentDevice.appVersion ?? "--")
-                labeled(
-                    L10n.tr("device.autoUpdate", locale: appState.locale),
-                    currentDevice.autoUpdate == 1
-                    ? L10n.tr("device.enabled", locale: appState.locale)
-                    : L10n.tr("device.disabled", locale: appState.locale)
-                )
-            }
 
             Section(L10n.tr("device.settings", locale: appState.locale)) {
                 Button {
@@ -883,15 +805,6 @@ struct DeviceDetailView: View {
                     }
                 }
             }
-        }
-    }
-
-    private func labeled(_ title: String, _ value: String) -> some View {
-        HStack {
-            Text(title)
-            Spacer()
-            Text(value)
-                .foregroundStyle(KiioTheme.secondaryText)
         }
     }
 
