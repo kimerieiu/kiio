@@ -12,7 +12,7 @@ struct ProfileView: View {
             VStack(alignment: .leading, spacing: 18) {
                 topBar
                 profileHeader
-                proBanner
+                // proBanner
                 menuGroup(
                     title: L10n.tr("profile.groups.services", locale: appState.locale),
                     rows: serviceRows

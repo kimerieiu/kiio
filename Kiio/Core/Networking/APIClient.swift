@@ -157,13 +157,6 @@ final class APIClient {
     }
 
     private func acceptLanguageHeader() -> String {
-        switch localeProvider?() ?? "" {
-        case "en", "en_US", "en-US":
-            return "en-US"
-        case "zh", "zh_CN", "zh-CN":
-            return "zh-CN"
-        default:
-            return "en-US"
-        }
+        L10n.languageTag(localeProvider?() ?? "")
     }
 }

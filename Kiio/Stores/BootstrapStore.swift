@@ -81,16 +81,18 @@ final class BootstrapStore: ObservableObject {
         errorMessage = nil
     }
 
-    func updateLanguagePreference(_ locale: String) async {
+    func updateLanguagePreference(_ locale: String) async -> Bool {
         guard tokenStore.load()?.token.isEmpty == false else {
-            return
+            return false
         }
 
         do {
             preference = try await userService.updateUserPreference(language: L10n.backendLocale(locale))
             errorMessage = nil
+            return true
         } catch {
             errorMessage = AppError.from(error).errorDescription
+            return false
         }
     }
 

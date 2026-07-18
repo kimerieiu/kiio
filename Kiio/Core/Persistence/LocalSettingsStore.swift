@@ -14,8 +14,13 @@ final class LocalSettingsStore {
     }
 
     var locale: String {
-        get { defaults.string(forKey: Key.locale) ?? "en_US" }
-        set { defaults.set(normalizeLocale(newValue), forKey: Key.locale) }
+        get {
+            guard let storedLocale = defaults.string(forKey: Key.locale) else {
+                return L10n.preferredLocale()
+            }
+            return L10n.backendLocale(storedLocale)
+        }
+        set { defaults.set(L10n.backendLocale(newValue), forKey: Key.locale) }
     }
 
     var didChooseLanguage: Bool {
@@ -33,16 +38,5 @@ final class LocalSettingsStore {
 
     func markWelcomeDone() {
         defaults.set(true, forKey: Key.welcomeDone)
-    }
-
-    private func normalizeLocale(_ value: String) -> String {
-        switch value {
-        case "en", "en_US", "en-US":
-            return "en_US"
-        case "zh", "zh_CN", "zh-CN":
-            return "zh_CN"
-        default:
-            return "en_US"
-        }
     }
 }

@@ -2,56 +2,62 @@ import SwiftUI
 
 struct LanguageSelectionView: View {
     @EnvironmentObject private var appState: AppState
-    @State private var selectedLocale = "en_US"
+    @State private var selectedLocale = L10n.preferredLocale()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             KiioLogoView(size: 54)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(L10n.tr("language.title", locale: appState.locale))
+                Text(L10n.tr("language.title", locale: selectedLocale))
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(KiioTheme.text)
-                Text(L10n.tr("language.subtitle", locale: appState.locale))
+                Text(L10n.tr("language.subtitle", locale: selectedLocale))
                     .font(.system(size: 15))
                     .foregroundStyle(KiioTheme.secondaryText)
             }
 
-            VStack(spacing: 12) {
-                languageRow(title: L10n.tr("language.en", locale: appState.locale), subtitle: "en_US", value: "en_US")
-                languageRow(title: L10n.tr("language.zh", locale: appState.locale), subtitle: "zh_CN", value: "zh_CN")
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    ForEach(SupportedLanguage.all) { language in
+                        languageRow(language)
+                    }
+                }
             }
 
-            Spacer()
-
-            KiioPrimaryButton(title: L10n.tr("common.continue", locale: appState.locale)) {
+            KiioPrimaryButton(title: L10n.tr("common.continue", locale: selectedLocale)) {
                 appState.completeLanguage(selectedLocale)
             }
         }
         .padding(24)
         .background(KiioTheme.background.ignoresSafeArea())
+        .environment(\.locale, Locale(identifier: selectedLocale))
+        .environment(
+            \.layoutDirection,
+            L10n.isRightToLeft(selectedLocale) ? .rightToLeft : .leftToRight
+        )
         .onAppear {
             selectedLocale = appState.locale
         }
     }
 
-    private func languageRow(title: String, subtitle: String, value: String) -> some View {
+    private func languageRow(_ language: SupportedLanguage) -> some View {
         Button {
-            selectedLocale = value
+            selectedLocale = language.code
         } label: {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
+                    Text(L10n.tr(language.appNameKey, locale: selectedLocale))
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundStyle(KiioTheme.text)
-                    Text(subtitle)
+                    Text(language.displayCode)
                         .font(.system(size: 13))
                         .foregroundStyle(KiioTheme.secondaryText)
                 }
                 Spacer()
-                Image(systemName: selectedLocale == value ? "checkmark.circle.fill" : "circle")
+                Image(systemName: selectedLocale == language.code ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(selectedLocale == value ? KiioTheme.accent : KiioTheme.mutedText)
+                    .foregroundStyle(selectedLocale == language.code ? KiioTheme.accent : KiioTheme.mutedText)
             }
             .padding(16)
             .background(KiioTheme.surface)

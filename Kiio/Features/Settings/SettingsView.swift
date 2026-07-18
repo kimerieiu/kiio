@@ -136,12 +136,8 @@ struct SettingsView: View {
     }
 
     private func appLanguageName(for locale: String) -> String {
-        switch L10n.backendLocale(locale) {
-        case "zh_CN":
-            return L10n.tr("language.zh", locale: appState.locale)
-        default:
-            return L10n.tr("language.en", locale: appState.locale)
-        }
+        let language = SupportedLanguage.option(for: locale)
+        return L10n.tr(language.appNameKey, locale: appState.locale)
     }
 
     private func signOut() {
@@ -269,11 +265,9 @@ private struct AppLanguagePreferenceView: View {
     @EnvironmentObject private var bootstrapStore: BootstrapStore
     @Environment(\.dismiss) private var dismiss
     @State private var alertMessage: String?
+    @State private var isSaving = false
 
-    private let languages: [AppLanguageOption] = [
-        AppLanguageOption(code: "zh_CN", displayCode: "zh-CN", nameKey: "language.zh"),
-        AppLanguageOption(code: "en_US", displayCode: "en-US", nameKey: "language.en")
-    ]
+    private let languages = SupportedLanguage.all
 
     var body: some View {
         ScrollView {
@@ -318,12 +312,13 @@ private struct AppLanguagePreferenceView: View {
                     } label: {
                         SettingsMenuRow(
                             icon: "globe",
-                            title: L10n.tr(language.nameKey, locale: appState.locale),
+                            title: L10n.tr(language.appNameKey, locale: appState.locale),
                             subtitle: language.displayCode,
                             accessory: L10n.backendLocale(appState.locale) == language.code ? .checkmark : .none
                         )
                     }
                     .buttonStyle(.plain)
+                    .disabled(isSaving)
 
                     if language.id != languages.last?.id {
                         Divider()
@@ -335,24 +330,24 @@ private struct AppLanguagePreferenceView: View {
     }
 
     private func updateLocale(_ locale: String) {
-        guard L10n.backendLocale(appState.locale) != locale else { return }
+        let previousLocale = L10n.backendLocale(appState.locale)
+        let requestedLocale = L10n.backendLocale(locale)
+        guard previousLocale != requestedLocale, !isSaving else { return }
 
-        appState.setLocale(locale)
+        isSaving = true
+        appState.setLocale(requestedLocale)
         Task {
-            await bootstrapStore.updateLanguagePreference(locale)
-            if let errorMessage = bootstrapStore.errorMessage {
-                alertMessage = errorMessage
+            let succeeded = await bootstrapStore.updateLanguagePreference(requestedLocale)
+            isSaving = false
+
+            if succeeded {
+                appState.setLocale(bootstrapStore.preference?.language ?? requestedLocale)
+            } else {
+                appState.setLocale(previousLocale)
+                alertMessage = bootstrapStore.errorMessage
             }
         }
     }
-}
-
-private struct AppLanguageOption: Identifiable {
-    let code: String
-    let displayCode: String
-    let nameKey: String
-
-    var id: String { code }
 }
 
 private enum SettingsAccessory {

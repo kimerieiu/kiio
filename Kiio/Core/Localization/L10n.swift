@@ -13,19 +13,12 @@ enum L10n {
     }
 
     static func backendLocale(_ locale: String) -> String {
-        switch locale {
-        case "en", "en_US", "en-US":
-            return "en_US"
-        case "zh", "zh_CN", "zh-CN":
-            return "zh_CN"
-        default:
-            return "en_US"
-        }
+        canonicalLocale(locale)
     }
 
     static func legalLocale(_ locale: String) -> String {
-        switch locale {
-        case "zh", "zh_CN", "zh-CN":
+        switch canonicalLocale(locale) {
+        case "zh_CN", "zh_TW", "zh_HK":
             return "zh-CN"
         default:
             return "en-US"
@@ -33,57 +26,97 @@ enum L10n {
     }
 
     static func backendAgentLocale(_ locale: String) -> String {
+        canonicalLocale(locale)
+    }
+
+    static func languageTag(_ locale: String) -> String {
+        SupportedLanguage.option(for: locale).displayCode
+    }
+
+    static func isRightToLeft(_ locale: String) -> Bool {
+        canonicalLocale(locale) == "ar_SA"
+    }
+
+    static func preferredLocale(_ preferredLanguages: [String] = Locale.preferredLanguages) -> String {
+        preferredLanguages.lazy.compactMap(canonicalLocaleIfSupported).first ?? "en_US"
+    }
+
+    private static func canonicalLocale(_ locale: String) -> String {
+        canonicalLocaleIfSupported(locale) ?? "en_US"
+    }
+
+    private static func canonicalLocaleIfSupported(_ locale: String) -> String? {
         let normalized = locale.trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: "-", with: "_")
             .lowercased()
 
-        switch normalized {
-        case "zh", "zh_cn", "zh_hans":
-            return "zh_CN"
-        case "zh_tw", "zh_hant":
-            return "zh_TW"
-        case "zh_hk", "yue", "cantonese":
+        if normalized == "cantonese" || normalized.hasPrefix("yue") {
             return "zh_HK"
-        case "en", "en_us":
+        }
+
+        if normalized == "zh" || normalized.hasPrefix("zh_") {
+            if normalized.contains("_hk") {
+                return "zh_HK"
+            }
+            if normalized.contains("_tw") || normalized.contains("_hant") {
+                return "zh_TW"
+            }
+            return "zh_CN"
+        }
+
+        if normalized == "en" || normalized.hasPrefix("en_") {
             return "en_US"
-        case "ja", "jp", "ja_jp":
+        }
+
+        let languageCode = normalized.split(separator: "_").first.map(String.init) ?? normalized
+        switch normalized {
+        case "jp":
             return "ja_JP"
-        case "ko", "kr", "ko_kr":
+        case "kr":
             return "ko_KR"
-        case "es", "es_es":
+        default:
+            break
+        }
+
+        switch languageCode {
+        case "ja":
+            return "ja_JP"
+        case "ko":
+            return "ko_KR"
+        case "es":
             return "es_ES"
-        case "id", "id_id":
+        case "id":
             return "id_ID"
-        case "th", "th_th":
+        case "th":
             return "th_TH"
-        case "pt", "pt_pt":
+        case "pt":
             return "pt_PT"
-        case "ro", "ro_ro":
+        case "ro":
             return "ro_RO"
-        case "ru", "ru_ru":
+        case "ru":
             return "ru_RU"
-        case "pl", "pl_pl":
+        case "pl":
             return "pl_PL"
-        case "tr", "tr_tr":
+        case "tr":
             return "tr_TR"
-        case "fr", "fr_fr":
+        case "fr":
             return "fr_FR"
-        case "it", "it_it":
+        case "it":
             return "it_IT"
-        case "de", "de_de":
+        case "de":
             return "de_DE"
-        case "hi", "hi_in":
+        case "hi":
             return "hi_IN"
-        case "cs", "cs_cz":
+        case "cs":
             return "cs_CZ"
-        case "vi", "vi_vn":
+        case "vi":
             return "vi_VN"
-        case "ar", "ar_sa":
+        case "ar":
             return "ar_SA"
-        case "uk", "uk_ua":
+        case "uk":
             return "uk_UA"
         default:
-            return "en_US"
+            return nil
         }
     }
 
@@ -97,24 +130,10 @@ enum L10n {
     }
 
     private static func lprojName(for locale: String) -> String {
-        switch locale {
-        case "en", "en_US", "en-US":
-            return "en"
-        case "zh", "zh_CN", "zh-CN":
-            return "zh-Hans"
-        default:
-            return "en"
-        }
+        SupportedLanguage.option(for: locale).resourceName
     }
 
     private static func localeIdentifier(for locale: String) -> String {
-        switch locale {
-        case "en", "en_US", "en-US":
-            return "en_US"
-        case "zh", "zh_CN", "zh-CN":
-            return "zh_CN"
-        default:
-            return "en_US"
-        }
+        canonicalLocale(locale)
     }
 }

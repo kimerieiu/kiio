@@ -44,6 +44,11 @@ struct RootView: View {
             }
         }
         .background(KiioTheme.background.ignoresSafeArea())
+        .environment(\.locale, Locale(identifier: appState.locale))
+        .environment(
+            \.layoutDirection,
+            L10n.isRightToLeft(appState.locale) ? .rightToLeft : .leftToRight
+        )
         .onChange(of: authStore.isAuthenticated) { isAuthenticated in
             if !isAuthenticated {
                 dependencies.notifyWebSocketClient.disconnect()

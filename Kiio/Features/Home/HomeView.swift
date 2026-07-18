@@ -6,6 +6,7 @@ struct HomeView: View {
 
     @State private var viewMode: HomeViewMode = .card
     @State private var currentCard = 0
+    @State private var activeCardDestination: HomeToolDestination?
     @GestureState private var cardDragOffset: CGFloat = 0
 
     private let tools: [HomeToolItem] = [
@@ -76,6 +77,12 @@ struct HomeView: View {
         .background(KiioTheme.background.ignoresSafeArea())
         .refreshable {
             await bootstrapStore.refresh()
+        }
+        .navigationDestination(isPresented: cardDestinationBinding) {
+            if let activeCardDestination {
+                toolDestination(activeCardDestination)
+                    .kiioHidesTabBar()
+            }
         }
     }
 
@@ -165,28 +172,32 @@ struct HomeView: View {
                     ForEach(Array(tools.enumerated()), id: \.element.id) { index, tool in
                         let style = flowStyle(for: index, cardWidth: cardWidth)
 
-                        NavigationLink {
-                            toolDestination(tool.destination)
-                                .kiioHidesTabBar()
-                        } label: {
-                            HomeFeatureCard(tool: tool)
-                                .frame(width: cardWidth, height: cardHeight)
-                        }
-                        .buttonStyle(.plain)
-                        .rotation3DEffect(.degrees(style.rotation), axis: (x: 0, y: 1, z: 0), perspective: 0.74)
-                        .scaleEffect(style.scale)
-                        .offset(x: style.xOffset)
-                        .opacity(style.opacity)
-                        .zIndex(style.zIndex)
-                        .allowsHitTesting(index == currentCard)
-                        .accessibilityHidden(index != currentCard)
+                        HomeFeatureCard(tool: tool)
+                            .frame(width: cardWidth, height: cardHeight)
+                            .contentShape(Rectangle())
+                            .simultaneousGesture(cardInteractionGesture(for: tool.destination))
+                            .accessibilityElement(children: .combine)
+                            .accessibilityAddTraits(.isButton)
+                            .accessibilityAction {
+                                activeCardDestination = tool.destination
+                            }
+                            .rotation3DEffect(
+                                .degrees(style.rotation),
+                                axis: (x: 0, y: 1, z: 0),
+                                perspective: 0.74
+                            )
+                            .scaleEffect(style.scale)
+                            .offset(x: style.xOffset)
+                            .opacity(style.opacity)
+                            .zIndex(style.zIndex)
+                            .allowsHitTesting(index == currentCard)
+                            .accessibilityHidden(index != currentCard)
                     }
                 }
                 .frame(width: proxy.size.width, height: HomeFeatureCardMetrics.maxHeight)
                 .contentShape(Rectangle())
             }
             .frame(height: HomeFeatureCardMetrics.maxHeight)
-            .simultaneousGesture(cardDragGesture)
             .animation(.spring(response: 0.42, dampingFraction: 0.86), value: currentCard)
             .animation(.interactiveSpring(response: 0.26, dampingFraction: 0.88), value: cardDragOffset)
 
@@ -209,20 +220,39 @@ struct HomeView: View {
     }
 
     private var cardDragGesture: some Gesture {
-        DragGesture(minimumDistance: 12)
+        DragGesture(minimumDistance: HomeCardGestureThresholds.dragActivationDistance)
             .updating($cardDragOffset) { value, state, _ in
                 state = value.translation.width
             }
             .onEnded { value in
-                let threshold: CGFloat = 44
                 guard tools.count > 1 else { return }
 
-                if value.translation.width < -threshold {
+                if value.translation.width < -HomeCardGestureThresholds.pageSwitchDistance {
                     moveCard(by: 1)
-                } else if value.translation.width > threshold {
+                } else if value.translation.width > HomeCardGestureThresholds.pageSwitchDistance {
                     moveCard(by: -1)
                 }
             }
+    }
+
+    private func cardInteractionGesture(for destination: HomeToolDestination) -> some Gesture {
+        cardDragGesture.exclusively(
+            before: TapGesture()
+                .onEnded {
+                    activeCardDestination = destination
+                }
+        )
+    }
+
+    private var cardDestinationBinding: Binding<Bool> {
+        Binding(
+            get: { activeCardDestination != nil },
+            set: { isPresented in
+                if !isPresented {
+                    activeCardDestination = nil
+                }
+            }
+        )
     }
 
     private var currentToolAccent: Color {
@@ -345,6 +375,11 @@ private struct HomeFlowCardStyle {
     let scale: CGFloat
     let opacity: Double
     let zIndex: Double
+}
+
+private enum HomeCardGestureThresholds {
+    static let dragActivationDistance: CGFloat = 12
+    static let pageSwitchDistance: CGFloat = 44
 }
 
 private enum HomeFeatureCardMetrics {
