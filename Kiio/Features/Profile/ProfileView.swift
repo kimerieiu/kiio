@@ -13,11 +13,10 @@ struct ProfileView: View {
                 topBar
                 profileHeader
                 // proBanner
-                // 订单入口暂时隐藏。
-                // menuGroup(
-                //     title: L10n.tr("profile.groups.services", locale: appState.locale),
-                //     rows: serviceRows
-                // )
+                menuGroup(
+                    title: L10n.tr("profile.groups.services", locale: appState.locale),
+                    rows: serviceRows
+                )
                 menuGroup(
                     title: L10n.tr("profile.groups.system", locale: appState.locale),
                     rows: systemRows
@@ -180,7 +179,7 @@ struct ProfileView: View {
             ProfileMenuRowData(
                 icon: "receipt",
                 title: L10n.tr("profile.orders", locale: appState.locale),
-                subtitle: L10n.tr("profile.ordersSub", locale: appState.locale),
+                subtitle: nil,
                 destination: .orders
             )
         ]
@@ -270,10 +269,12 @@ private struct ProfileMenuRow: View {
                 Text(row.title)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(KiioTheme.text)
-                Text(row.subtitle)
-                    .font(.system(size: 12))
-                    .foregroundStyle(KiioTheme.secondaryText)
-                    .lineLimit(1)
+                if let subtitle = row.subtitle, !subtitle.isEmpty {
+                    Text(subtitle)
+                        .font(.system(size: 12))
+                        .foregroundStyle(KiioTheme.secondaryText)
+                        .lineLimit(1)
+                }
             }
 
             Spacer()
@@ -305,7 +306,7 @@ private struct ProfileMenuRow: View {
 private struct ProfileMenuRowData: Identifiable {
     let icon: String
     let title: String
-    let subtitle: String
+    let subtitle: String?
     let destination: ProfileMenuDestination
     var badgeText: String? = nil
 
