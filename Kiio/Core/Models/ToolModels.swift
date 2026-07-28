@@ -7,6 +7,9 @@ struct ReminderTaskDTO: Decodable, Identifiable, Equatable {
     let title: String?
     let content: String?
     let remindAt: String?
+    let itemType: String?
+    let endAt: String?
+    let allDay: Bool?
     let timezone: String?
     let repeatType: String?
     let repeatRule: String?

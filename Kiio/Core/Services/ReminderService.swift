@@ -19,6 +19,20 @@ final class ReminderService {
         return try await apiClient.get("/reminder/tasks", queryItems: queryItems)
     }
 
+    func allTasks(pageSize: Int = 100) async throws -> [ReminderTaskDTO] {
+        var page = 1
+        var items: [ReminderTaskDTO] = []
+
+        while true {
+            let result = try await tasks(status: nil, page: page, limit: pageSize)
+            items.append(contentsOf: result.list)
+            if items.count >= result.total || result.list.isEmpty {
+                return items
+            }
+            page += 1
+        }
+    }
+
     func detail(id: String) async throws -> ReminderTaskDTO {
         try await apiClient.get("/reminder/tasks/\(id)")
     }

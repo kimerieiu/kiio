@@ -13,6 +13,7 @@ final class AppDependencies: ObservableObject {
     let deviceService: DeviceService
     let chatService: ChatService
     let reminderService: ReminderService
+    let eventKitService: EventKitService
     let accountingService: AccountingService
     let newsService: NewsService
     let outfitService: OutfitService
@@ -28,6 +29,7 @@ final class AppDependencies: ObservableObject {
     let bootstrapStore: BootstrapStore
     let deviceStore: DeviceStore
     let syncStore: SyncStore
+    let eventKitStore: EventKitStore
     let notifyWebSocketClient: NotifyWebSocketClient
 
     init() {
@@ -41,6 +43,7 @@ final class AppDependencies: ObservableObject {
         let deviceService = DeviceService(apiClient: apiClient)
         let chatService = ChatService(apiClient: apiClient)
         let reminderService = ReminderService(apiClient: apiClient)
+        let eventKitService = EventKitService()
         let accountingService = AccountingService(apiClient: apiClient)
         let newsService = NewsService(apiClient: apiClient)
         let outfitService = OutfitService(apiClient: apiClient)
@@ -60,6 +63,7 @@ final class AppDependencies: ObservableObject {
         )
         let deviceStore = DeviceStore(deviceService: deviceService, bootstrapStore: bootstrapStore)
         let syncStore = SyncStore(notifyService: notifyService)
+        let eventKitStore = EventKitStore(service: eventKitService)
         let notifyWebSocketClient = NotifyWebSocketClient(tokenStore: tokenStore, syncStore: syncStore)
 
         apiClient.localeProvider = {
@@ -78,6 +82,7 @@ final class AppDependencies: ObservableObject {
         self.deviceService = deviceService
         self.chatService = chatService
         self.reminderService = reminderService
+        self.eventKitService = eventKitService
         self.accountingService = accountingService
         self.newsService = newsService
         self.outfitService = outfitService
@@ -92,6 +97,7 @@ final class AppDependencies: ObservableObject {
         self.bootstrapStore = bootstrapStore
         self.deviceStore = deviceStore
         self.syncStore = syncStore
+        self.eventKitStore = eventKitStore
         self.notifyWebSocketClient = notifyWebSocketClient
     }
 }

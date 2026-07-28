@@ -61,14 +61,25 @@ struct RootView: View {
             }
         }
         .onChange(of: scenePhase) { phase in
-            guard phase == .active,
-                  appState.rootRoute == .splash,
-                  startupGateError != nil else {
+            guard phase == .active else {
                 return
             }
 
             Task {
-                await runStartupGate()
+                if appState.rootRoute == .splash, startupGateError != nil {
+                    await runStartupGate()
+                } else if authStore.isAuthenticated {
+                    await syncNativeCalendar()
+                }
+            }
+        }
+        .onReceive(dependencies.syncStore.$latestEvent) { event in
+            guard event?.notifyModule == .reminderTask,
+                  dependencies.eventKitService.hasReadAccess() else {
+                return
+            }
+            Task {
+                await syncNativeCalendar()
             }
         }
     }
@@ -107,6 +118,26 @@ struct RootView: View {
         authStore.updateUser(bootstrapStore.userInfo)
         await dependencies.syncStore.syncVersions(silent: true)
         dependencies.notifyWebSocketClient.connect()
+        await syncNativeCalendar()
+    }
+
+    private func syncNativeCalendar() async {
+        guard dependencies.eventKitService.hasReadAccess() else {
+            return
+        }
+        do {
+            var tasks = try await dependencies.reminderService.allTasks()
+            let completedIds = await dependencies.eventKitService.completedBackendTaskIds(tasks)
+            for taskId in completedIds {
+                try await dependencies.reminderService.complete(id: taskId)
+            }
+            if !completedIds.isEmpty {
+                tasks = try await dependencies.reminderService.allTasks()
+            }
+            await dependencies.eventKitStore.sync(tasks: tasks)
+        } catch {
+            // Server data remains available even when native calendar synchronization fails.
+        }
     }
 }
 

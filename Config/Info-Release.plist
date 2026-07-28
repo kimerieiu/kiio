@@ -29,6 +29,14 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Kiio needs camera access to scan the device QR code for binding.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Kiio uses your calendars to read and create events you request.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Kiio uses your calendars to show and synchronize events you request.</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>Kiio uses Reminders to create and manage the reminders you request.</string>
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>Kiio uses Reminders to show and synchronize the reminders you request.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
