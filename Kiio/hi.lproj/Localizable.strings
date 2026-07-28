@@ -253,6 +253,10 @@
 "mail.operationType" = "ऑपरेशन प्रकार";
 "mail.accountId" = "खाता आईडी";
 "mail.rawText" = "कच्चा पाठ";
+"mail.from" = "प्रेषक";
+"mail.to" = "प्राप्तकर्ता";
+"mail.cc" = "प्रतिलिपि";
+"mail.bcc" = "गुप्त प्रतिलिपि";
 "mail.errorReason" = "असफलता का कारण";
 "mail.operation.search" = "मेल खोजें";
 "mail.operation.send" = "मेल भेजें";

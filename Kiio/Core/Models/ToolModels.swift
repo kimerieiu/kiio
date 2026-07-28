@@ -317,10 +317,37 @@ struct MailOperationDTO: Decodable, Identifiable, Equatable {
     let status: String?
     let errorMessage: String?
     let rawText: String?
+    let payloadJson: MailOperationPayloadDTO?
     let createdAt: String?
     let updatedAt: String?
 
     var displayTitle: String {
         title?.isEmpty == false ? title! : operationType ?? "Mail operation"
     }
+}
+
+struct MailOperationPayloadDTO: Decodable, Equatable {
+    let query: String?
+    let limit: Int?
+    let since: String?
+    let unreadOnly: Bool?
+    let results: [MailSearchResultDTO]?
+    let folders: [String]?
+    let draft: MailDraftDTO?
+}
+
+struct MailSearchResultDTO: Decodable, Equatable {
+    let id: String?
+    let from: String?
+    let subject: String?
+    let date: String?
+}
+
+struct MailDraftDTO: Decodable, Equatable {
+    let from: String?
+    let to: [String]?
+    let cc: [String]?
+    let bcc: [String]?
+    let subject: String?
+    let body: String?
 }

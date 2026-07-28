@@ -253,6 +253,10 @@
 "mail.operationType" = "Typ operace";
 "mail.accountId" = "ID účtu";
 "mail.rawText" = "Syrový text";
+"mail.from" = "Od";
+"mail.to" = "Komu";
+"mail.cc" = "Kopie";
+"mail.bcc" = "Skrytá kopie";
 "mail.errorReason" = "Důvod selhání";
 "mail.operation.search" = "Prohledejte poštu";
 "mail.operation.send" = "Odeslat poštu";

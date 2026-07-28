@@ -253,6 +253,10 @@
 "mail.operationType" = "操作の種類";
 "mail.accountId" = "アカウントID";
 "mail.rawText" = "生のテキスト";
+"mail.from" = "差出人";
+"mail.to" = "宛先";
+"mail.cc" = "Cc";
+"mail.bcc" = "Bcc";
 "mail.errorReason" = "失敗の理由";
 "mail.operation.search" = "メールの検索";
 "mail.operation.send" = "メールを送信する";

@@ -253,6 +253,10 @@
 "mail.operationType" = "Tipul operațiunii";
 "mail.accountId" = "ID contului";
 "mail.rawText" = "Text brut";
+"mail.from" = "De la";
+"mail.to" = "Către";
+"mail.cc" = "Cc";
+"mail.bcc" = "Bcc";
 "mail.errorReason" = "Motivul eșecului";
 "mail.operation.search" = "Caută prin e-mail";
 "mail.operation.send" = "Trimite mail";

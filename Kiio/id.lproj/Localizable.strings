@@ -253,6 +253,10 @@
 "mail.operationType" = "Jenis operasi";
 "mail.accountId" = "ID Akun";
 "mail.rawText" = "Teks mentah";
+"mail.from" = "Dari";
+"mail.to" = "Kepada";
+"mail.cc" = "Cc";
+"mail.bcc" = "Bcc";
 "mail.errorReason" = "Alasan kegagalan";
 "mail.operation.search" = "Cari surat";
 "mail.operation.send" = "Kirim email";

@@ -253,6 +253,10 @@
 "mail.operationType" = "Тип операції";
 "mail.accountId" = "ID облікового запису";
 "mail.rawText" = "Необроблений текст";
+"mail.from" = "Від";
+"mail.to" = "Кому";
+"mail.cc" = "Копія";
+"mail.bcc" = "Прихована копія";
 "mail.errorReason" = "Причина невдачі";
 "mail.operation.search" = "Пошук пошти";
 "mail.operation.send" = "Надіслати лист";

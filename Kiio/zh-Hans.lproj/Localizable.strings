@@ -253,6 +253,10 @@
 "mail.operationType" = "操作类型";
 "mail.accountId" = "账号 ID";
 "mail.rawText" = "原始内容";
+"mail.from" = "发件人";
+"mail.to" = "收件人";
+"mail.cc" = "抄送";
+"mail.bcc" = "密送";
 "mail.errorReason" = "失败原因";
 "mail.operation.search" = "搜索邮件";
 "mail.operation.send" = "发送邮件";

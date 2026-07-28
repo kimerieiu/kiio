@@ -253,6 +253,10 @@
 "mail.operationType" = "Operasyon türü";
 "mail.accountId" = "Hesap Kimliği";
 "mail.rawText" = "Ham metin";
+"mail.from" = "Kimden";
+"mail.to" = "Kime";
+"mail.cc" = "Cc";
+"mail.bcc" = "Bcc";
 "mail.errorReason" = "Arıza nedeni";
 "mail.operation.search" = "Postada ara";
 "mail.operation.send" = "Posta gönder";

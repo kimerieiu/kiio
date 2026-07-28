@@ -696,9 +696,15 @@ private struct MailOperationDetailScene: View {
                 KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
                     .kiioListCardRow()
             } else if let operation = store.operationDetail {
-                let summary = clean(operation.summary)
+                let draft = operation.payloadJson?.draft
+                let searchResults = operation.payloadJson?.results ?? []
+                let folders = operation.payloadJson?.folders?.compactMap(clean) ?? []
+                let rawSummary = clean(operation.summary)
+                let draftSubject = clean(draft?.subject)
+                let summary = rawSummary == draftSubject ? nil : rawSummary
                 let error = clean(operation.errorMessage)
-                let fallbackBody = summary == nil ? clean(operation.rawText) : nil
+                let hasPayloadContent = draft != nil || !searchResults.isEmpty || !folders.isEmpty
+                let fallbackBody = summary == nil && !hasPayloadContent ? clean(operation.rawText) : nil
 
                 Section {
                     VStack(alignment: .leading, spacing: 14) {
@@ -744,6 +750,33 @@ private struct MailOperationDetailScene: View {
                     .mailOperationDetailCard()
                 }
                 .kiioListCardRow()
+
+                if let draft {
+                    Section {
+                        MailDraftDetailCard(
+                            draft: draft,
+                            locale: appState.locale
+                        )
+                    }
+                    .kiioListCardRow()
+                }
+
+                if !searchResults.isEmpty {
+                    Section(L10n.tr("mail.operation.search", locale: appState.locale)) {
+                        MailSearchResultsCard(
+                            results: searchResults,
+                            locale: appState.locale
+                        )
+                    }
+                    .kiioListCardRow()
+                }
+
+                if !folders.isEmpty {
+                    Section(L10n.tr("mail.operation.list_folders", locale: appState.locale)) {
+                        MailFolderListCard(folders: folders)
+                    }
+                    .kiioListCardRow()
+                }
 
                 if let summary {
                     Section {
@@ -864,6 +897,156 @@ private struct MailOperationDetailScene: View {
         default:
             return KiioTheme.success
         }
+    }
+}
+
+private struct MailDraftDetailCard: View {
+    let draft: MailDraftDTO
+    let locale: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if let subject = clean(draft.subject) {
+                Text(subject)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(KiioTheme.text)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            VStack(alignment: .leading, spacing: 12) {
+                if let from = clean(draft.from) {
+                    MailAddressRow(
+                        label: L10n.tr("mail.from", locale: locale),
+                        value: from
+                    )
+                }
+                if let to = joined(draft.to) {
+                    MailAddressRow(
+                        label: L10n.tr("mail.to", locale: locale),
+                        value: to
+                    )
+                }
+                if let cc = joined(draft.cc) {
+                    MailAddressRow(
+                        label: L10n.tr("mail.cc", locale: locale),
+                        value: cc
+                    )
+                }
+                if let bcc = joined(draft.bcc) {
+                    MailAddressRow(
+                        label: L10n.tr("mail.bcc", locale: locale),
+                        value: bcc
+                    )
+                }
+            }
+
+            if let body = clean(draft.body) {
+                Divider()
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L10n.tr("common.content", locale: locale))
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(KiioTheme.secondaryText)
+                    Text(body)
+                        .font(.system(size: 15))
+                        .lineSpacing(4)
+                        .foregroundStyle(KiioTheme.text)
+                        .textSelection(.enabled)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .mailOperationDetailCard()
+    }
+
+    private func clean(_ value: String?) -> String? {
+        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed?.isEmpty == false ? trimmed : nil
+    }
+
+    private func joined(_ values: [String]?) -> String? {
+        let addresses = values?.compactMap(clean) ?? []
+        return addresses.isEmpty ? nil : addresses.joined(separator: ", ")
+    }
+}
+
+private struct MailAddressRow: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Text(label)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(KiioTheme.secondaryText)
+                .frame(minWidth: 54, alignment: .leading)
+            Text(value)
+                .font(.system(size: 14))
+                .foregroundStyle(KiioTheme.text)
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+private struct MailSearchResultsCard: View {
+    let results: [MailSearchResultDTO]
+    let locale: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(results.indices, id: \.self) { index in
+                if index > 0 {
+                    Divider()
+                        .padding(.vertical, 14)
+                }
+                resultView(results[index])
+            }
+        }
+        .mailOperationDetailCard()
+    }
+
+    @ViewBuilder
+    private func resultView(_ result: MailSearchResultDTO) -> some View {
+        VStack(alignment: .leading, spacing: 9) {
+            Text(clean(result.subject) ?? "--")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(KiioTheme.text)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let sender = clean(result.from) {
+                MailAddressRow(
+                    label: L10n.tr("mail.from", locale: locale),
+                    value: sender
+                )
+            }
+
+            if let date = clean(result.date) {
+                Label(date, systemImage: "clock")
+                    .font(.system(size: 12))
+                    .foregroundStyle(KiioTheme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private func clean(_ value: String?) -> String? {
+        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed?.isEmpty == false ? trimmed : nil
+    }
+}
+
+private struct MailFolderListCard: View {
+    let folders: [String]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(folders, id: \.self) { folder in
+                Label(folder, systemImage: "folder")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(KiioTheme.text)
+            }
+        }
+        .mailOperationDetailCard()
     }
 }
 

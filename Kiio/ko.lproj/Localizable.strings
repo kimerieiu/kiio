@@ -253,6 +253,10 @@
 "mail.operationType" = "작업 유형";
 "mail.accountId" = "계정 ID";
 "mail.rawText" = "원시 텍스트";
+"mail.from" = "보낸 사람";
+"mail.to" = "받는 사람";
+"mail.cc" = "참조";
+"mail.bcc" = "숨은 참조";
 "mail.errorReason" = "실패 이유";
 "mail.operation.search" = "메일 검색";
 "mail.operation.send" = "메일 보내기";

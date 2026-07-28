@@ -253,6 +253,10 @@
 "mail.operationType" = "Tipo de operación";
 "mail.accountId" = "ID de cuenta";
 "mail.rawText" = "Texto sin formato";
+"mail.from" = "De";
+"mail.to" = "Para";
+"mail.cc" = "Cc";
+"mail.bcc" = "Cco";
 "mail.errorReason" = "Motivo del fracaso";
 "mail.operation.search" = "buscar correo";
 "mail.operation.send" = "enviar correo";

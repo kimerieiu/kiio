@@ -253,6 +253,10 @@
 "mail.operationType" = "ประเภทการดำเนินงาน";
 "mail.accountId" = "รหัสบัญชี";
 "mail.rawText" = "ข้อความดิบ";
+"mail.from" = "จาก";
+"mail.to" = "ถึง";
+"mail.cc" = "สำเนา";
+"mail.bcc" = "สำเนาลับ";
 "mail.errorReason" = "เหตุผลที่ล้มเหลว";
 "mail.operation.search" = "ค้นหาเมล";
 "mail.operation.send" = "ส่งจดหมาย";

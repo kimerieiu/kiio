@@ -253,6 +253,10 @@
 "mail.operationType" = "Loại hoạt động";
 "mail.accountId" = "ID tài khoản";
 "mail.rawText" = "Văn bản thô";
+"mail.from" = "Từ";
+"mail.to" = "Đến";
+"mail.cc" = "Cc";
+"mail.bcc" = "Bcc";
 "mail.errorReason" = "Lý do thất bại";
 "mail.operation.search" = "Tìm kiếm thư";
 "mail.operation.send" = "Gửi thư";

@@ -253,6 +253,10 @@
 "mail.operationType" = "操作類型";
 "mail.accountId" = "帳戶ID";
 "mail.rawText" = "原始文字";
+"mail.from" = "寄件者";
+"mail.to" = "收件者";
+"mail.cc" = "副本";
+"mail.bcc" = "密件副本";
 "mail.errorReason" = "失敗原因";
 "mail.operation.search" = "搜尋郵件";
 "mail.operation.send" = "傳送郵件";

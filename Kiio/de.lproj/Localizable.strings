@@ -253,6 +253,10 @@
 "mail.operationType" = "Operationstyp";
 "mail.accountId" = "Konto-ID";
 "mail.rawText" = "Rohtext";
+"mail.from" = "Von";
+"mail.to" = "An";
+"mail.cc" = "Cc";
+"mail.bcc" = "Bcc";
 "mail.errorReason" = "Fehlergrund";
 "mail.operation.search" = "E-Mails durchsuchen";
 "mail.operation.send" = "Mail senden";

@@ -253,6 +253,10 @@
 "mail.operationType" = "Tipo di operazione";
 "mail.accountId" = "ID conto";
 "mail.rawText" = "Testo grezzo";
+"mail.from" = "Da";
+"mail.to" = "A";
+"mail.cc" = "Cc";
+"mail.bcc" = "Ccn";
 "mail.errorReason" = "Motivo del fallimento";
 "mail.operation.search" = "Cerca nella posta";
 "mail.operation.send" = "Invia posta";

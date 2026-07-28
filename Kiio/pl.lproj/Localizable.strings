@@ -253,6 +253,10 @@
 "mail.operationType" = "Typ operacji";
 "mail.accountId" = "Identyfikator konta";
 "mail.rawText" = "Surowy tekst";
+"mail.from" = "Od";
+"mail.to" = "Do";
+"mail.cc" = "DW";
+"mail.bcc" = "UDW";
 "mail.errorReason" = "Przyczyna niepowodzenia";
 "mail.operation.search" = "Wyszukaj pocztę";
 "mail.operation.send" = "Wyślij pocztę";

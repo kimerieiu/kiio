@@ -253,6 +253,10 @@
 "mail.operationType" = "Тип операции";
 "mail.accountId" = "Идентификатор аккаунта";
 "mail.rawText" = "Необработанный текст";
+"mail.from" = "От";
+"mail.to" = "Кому";
+"mail.cc" = "Копия";
+"mail.bcc" = "Скрытая копия";
 "mail.errorReason" = "Причина отказа";
 "mail.operation.search" = "Поиск почты";
 "mail.operation.send" = "Отправить письмо";

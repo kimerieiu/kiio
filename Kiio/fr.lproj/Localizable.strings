@@ -253,6 +253,10 @@
 "mail.operationType" = "Type d'opération";
 "mail.accountId" = "Identifiant du compte";
 "mail.rawText" = "Texte brut";
+"mail.from" = "De";
+"mail.to" = "À";
+"mail.cc" = "Cc";
+"mail.bcc" = "Cci";
 "mail.errorReason" = "Raison de l'échec";
 "mail.operation.search" = "Rechercher du courrier";
 "mail.operation.send" = "Envoyer un courrier";

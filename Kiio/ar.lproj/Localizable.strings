@@ -253,6 +253,10 @@
 "mail.operationType" = "نوع العملية";
 "mail.accountId" = "معرف الحساب";
 "mail.rawText" = "نص خام";
+"mail.from" = "من";
+"mail.to" = "إلى";
+"mail.cc" = "نسخة";
+"mail.bcc" = "نسخة مخفية";
 "mail.errorReason" = "سبب الفشل";
 "mail.operation.search" = "بحث في البريد";
 "mail.operation.send" = "إرسال البريد";

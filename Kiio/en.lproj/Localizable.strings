@@ -253,6 +253,10 @@
 "mail.operationType" = "Operation type";
 "mail.accountId" = "Account ID";
 "mail.rawText" = "Raw text";
+"mail.from" = "From";
+"mail.to" = "To";
+"mail.cc" = "Cc";
+"mail.bcc" = "Bcc";
 "mail.errorReason" = "Failure reason";
 "mail.operation.search" = "Search mail";
 "mail.operation.send" = "Send mail";
