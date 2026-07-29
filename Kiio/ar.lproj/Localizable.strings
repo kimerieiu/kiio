@@ -367,6 +367,7 @@
 "home.category.communication" = "الاتصالات";
 
 "device.dashboard.subtitle" = "حالة الرفيق، والربط، وتفضيلات الجهاز";
+"device.header.actionsHint" = "إضافة جهاز · تغيير اللغة";
 "device.loading" = "جارٍ مزامنة الأجهزة...";
 "device.noAgentTitle" = "لا يوجد رفيق متاح";
 "device.noAgentDesc" = "سيقوم Kiio بإنشاء مرافق افتراضي أثناء تهيئة الحساب. قم بالتحديث بعد اكتمال التهيئة.";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "اللغة";
 "settingsLanguage.preview" = "معاينة";
 "settingsLanguage.agentScope" = "لغة الوكيل";
-"settingsLanguage.agentHint" = "يؤدي هذا إلى تغيير لغة الرد الافتراضية للرفيق الخلفي. تبقى لغة التطبيق دون تغيير.";
+"settingsLanguage.agentHint" = "يغيّر هذا لغة ردود الوكيل فقط، ولا يؤثر في لغة واجهة التطبيق. أعد تشغيل الجهاز بعد التبديل.";
 "settingsLanguage.zhCn" = "الصينية المبسطة";
 "settingsLanguage.enUs" = "الإنجليزية";
 "settingsLanguage.previewZh" = "حسنًا، لا يوجد شيء آخر.";

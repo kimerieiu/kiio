@@ -367,6 +367,7 @@
 "home.category.communication" = "Komunikacja";
 
 "device.dashboard.subtitle" = "Status towarzysza, powiązanie i preferencje urządzenia";
+"device.header.actionsHint" = "Dodaj urządzenie · Zmień język";
 "device.loading" = "Synchronizowanie urządzeń...";
 "device.noAgentTitle" = "Brak dostępnego towarzysza";
 "device.noAgentDesc" = "Kiio utworzy domyślnego towarzysza podczas inicjalizacji konta. Odśwież po zakończeniu inicjalizacji.";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "Język";
 "settingsLanguage.preview" = "Podgląd";
 "settingsLanguage.agentScope" = "Język agenta";
-"settingsLanguage.agentHint" = "Spowoduje to zmianę domyślnego języka odpowiedzi dla towarzysza zaplecza. Język aplikacji pozostaje niezmieniony.";
+"settingsLanguage.agentHint" = "Zmienia tylko język odpowiedzi agenta, bez wpływu na język interfejsu aplikacji. Po zmianie uruchom ponownie urządzenie.";
 "settingsLanguage.zhCn" = "Uproszczony chiński";
 "settingsLanguage.enUs" = "Angielski";
 "settingsLanguage.previewZh" = "你好,我会优先使用中文与你交流。";

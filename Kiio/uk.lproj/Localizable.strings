@@ -367,6 +367,7 @@
 "home.category.communication" = "спілкування";
 
 "device.dashboard.subtitle" = "Статус компаньйона, прив’язка та параметри пристрою";
+"device.header.actionsHint" = "Додати пристрій · Змінити мову";
 "device.loading" = "Синхронізація пристроїв...";
 "device.noAgentTitle" = "Немає компаньйона";
 "device.noAgentDesc" = "Kiio створить компаньйона за умовчанням під час ініціалізації облікового запису. Оновити після завершення ініціалізації.";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "Мова";
 "settingsLanguage.preview" = "Попередній перегляд";
 "settingsLanguage.agentScope" = "Мова агента";
-"settingsLanguage.agentHint" = "Це змінює мову відповіді за умовчанням для серверного супутника. Мова програми залишається без змін.";
+"settingsLanguage.agentHint" = "Змінюється лише мова відповідей агента, мова інтерфейсу застосунку не змінюється. Після перемикання перезапустіть пристрій.";
 "settingsLanguage.zhCn" = "Спрощена китайська";
 "settingsLanguage.enUs" = "англійська";
 "settingsLanguage.previewZh" = "你好，我会优先使用中文与你交流。";

@@ -367,6 +367,7 @@
 "home.category.communication" = "Truyền thông";
 
 "device.dashboard.subtitle" = "Trạng thái đồng hành, ràng buộc và tùy chọn thiết bị";
+"device.header.actionsHint" = "Thêm thiết bị · Đổi ngôn ngữ";
 "device.loading" = "Đang đồng bộ hóa thiết bị...";
 "device.noAgentTitle" = "Không có bạn đồng hành";
 "device.noAgentDesc" = "Kiio sẽ tạo người bạn đồng hành mặc định trong quá trình khởi tạo tài khoản. Làm mới sau khi khởi tạo hoàn tất.";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "Ngôn ngữ";
 "settingsLanguage.preview" = "Xem trước";
 "settingsLanguage.agentScope" = "Ngôn ngữ đại lý";
-"settingsLanguage.agentHint" = "Điều này thay đổi ngôn ngữ trả lời mặc định cho người đồng hành phụ trợ. Ngôn ngữ ứng dụng không thay đổi.";
+"settingsLanguage.agentHint" = "Chỉ thay đổi ngôn ngữ phản hồi của tác nhân, không ảnh hưởng đến ngôn ngữ giao diện ứng dụng. Hãy khởi động lại thiết bị sau khi chuyển đổi.";
 "settingsLanguage.zhCn" = "Tiếng Trung giản thể";
 "settingsLanguage.enUs" = "Tiếng Anh";
 "settingsLanguage.previewZh" = "Bạn có thể làm được điều đó.";

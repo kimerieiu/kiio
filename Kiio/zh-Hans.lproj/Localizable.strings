@@ -367,6 +367,7 @@
 "home.category.communication" = "沟通";
 
 "device.dashboard.subtitle" = "查看连接状态、绑定流程与设备偏好";
+"device.header.actionsHint" = "添加设备 · 切换语言";
 "device.loading" = "正在同步设备...";
 "device.noAgentTitle" = "暂无可用智能体";
 "device.noAgentDesc" = "Kiio 会在账号初始化时创建默认智能体。初始化完成后下拉刷新即可继续。";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "语言";
 "settingsLanguage.preview" = "预览";
 "settingsLanguage.agentScope" = "智能体语言";
-"settingsLanguage.agentHint" = "这里会改变后端默认智能体的回复语言，不影响 App 界面语言。";
+"settingsLanguage.agentHint" = "仅改变智能体回复语言，不影响 App 界面语言。切换后请重启设备。";
 "settingsLanguage.zhCn" = "简体中文";
 "settingsLanguage.enUs" = "English";
 "settingsLanguage.previewZh" = "你好，我会优先使用中文与你交流。";

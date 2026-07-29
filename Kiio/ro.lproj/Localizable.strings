@@ -367,6 +367,7 @@
 "home.category.communication" = "Comunicare";
 
 "device.dashboard.subtitle" = "Starea însoțitorului, legarea și preferințele dispozitivului";
+"device.header.actionsHint" = "Adaugă dispozitiv · Schimbă limba";
 "device.loading" = "Se sincronizează dispozitivele...";
 "device.noAgentTitle" = "Nu există un însoțitor disponibil";
 "device.noAgentDesc" = "Kiio va crea un însoțitor implicit în timpul inițializării contului. Actualizează după finalizarea inițializării.";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "Limbă";
 "settingsLanguage.preview" = "Previzualizare";
 "settingsLanguage.agentScope" = "Limbajul agentului";
-"settingsLanguage.agentHint" = "Aceasta modifică limba implicită de răspuns pentru însoțitorul backend. Limba aplicației rămâne neschimbată.";
+"settingsLanguage.agentHint" = "Schimbă doar limba de răspuns a agentului, nu și limba interfeței aplicației. Reporniți dispozitivul după schimbare.";
 "settingsLanguage.zhCn" = "Chineză simplificată";
 "settingsLanguage.enUs" = "engleză";
 "settingsLanguage.previewZh" = "你好，我会优先使用中文与你交流。";

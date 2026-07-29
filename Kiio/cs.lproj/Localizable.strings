@@ -367,6 +367,7 @@
 "home.category.communication" = "Komunikace";
 
 "device.dashboard.subtitle" = "Stav doprovodu, vazba a předvolby zařízení";
+"device.header.actionsHint" = "Přidat zařízení · Změnit jazyk";
 "device.loading" = "Synchronizace zařízení...";
 "device.noAgentTitle" = "Není k dispozici žádný společník";
 "device.noAgentDesc" = "Kiio vytvoří výchozí doprovod během inicializace účtu. Obnovit po dokončení inicializace.";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "Jazyk";
 "settingsLanguage.preview" = "Náhled";
 "settingsLanguage.agentScope" = "Jazyk agenta";
-"settingsLanguage.agentHint" = "Tím se změní výchozí jazyk odpovědi pro doprovodnou službu back-end. Jazyk aplikace zůstane nezměněn.";
+"settingsLanguage.agentHint" = "Změní pouze jazyk odpovědí agenta, nikoli jazyk rozhraní aplikace. Po přepnutí zařízení restartujte.";
 "settingsLanguage.zhCn" = "Zjednodušená čínština";
 "settingsLanguage.enUs" = "anglicky";
 "settingsLanguage.previewZh" = "你好，我会优先使用中文与你交流。";

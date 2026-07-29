@@ -367,6 +367,7 @@
 "home.category.communication" = "Comunicação";
 
 "device.dashboard.subtitle" = "Estado complementar, ligação e preferências de dispositivo";
+"device.header.actionsHint" = "Adicionar dispositivo · Alterar idioma";
 "device.loading" = "Sincronizando dispositivos...";
 "device.noAgentTitle" = "Nenhum acompanhante disponível";
 "device.noAgentDesc" = "Kiio criará um suplemento padrão durante a inicialização da conta. Atualize após a conclusão da inicialização.";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "Idioma";
 "settingsLanguage.preview" = "Visualização";
 "settingsLanguage.agentScope" = "Idioma do agente";
-"settingsLanguage.agentHint" = "Isto altera o idioma de resposta padrão do complemento de back-end. O idioma da aplicação permanece inalterado.";
+"settingsLanguage.agentHint" = "Altera apenas o idioma de resposta do agente, sem afetar o idioma da interface da aplicação. Reinicie o dispositivo após a alteração.";
 "settingsLanguage.zhCn" = "Chinês simplificado";
 "settingsLanguage.enUs" = "Inglês";
 "settingsLanguage.previewZh" = "你好,我会优先使用中文与你交流。";

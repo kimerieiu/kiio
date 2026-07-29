@@ -367,6 +367,7 @@
 "home.category.communication" = "İletişim";
 
 "device.dashboard.subtitle" = "Tamamlayıcı durumu, bağlama ve cihaz tercihleri";
+"device.header.actionsHint" = "Cihaz ekle · Dili değiştir";
 "device.loading" = "Cihazlar senkronize ediliyor...";
 "device.noAgentTitle" = "Arkadaş yok";
 "device.noAgentDesc" = "Kiio, hesabın başlatılması sırasında varsayılan bir tamamlayıcı oluşturacaktır. Başlatma tamamlandıktan sonra yenileyin.";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "Dil";
 "settingsLanguage.preview" = "Önizleme";
 "settingsLanguage.agentScope" = "Aracı dili";
-"settingsLanguage.agentHint" = "Bu, arka uç tamamlayıcının varsayılan yanıt dilini değiştirir. Uygulama dili değişmeden kalır.";
+"settingsLanguage.agentHint" = "Yalnızca aracının yanıt dilini değiştirir; uygulama arayüzünün dilini etkilemez. Değişiklikten sonra cihazı yeniden başlatın.";
 "settingsLanguage.zhCn" = "Basitleştirilmiş Çince";
 "settingsLanguage.enUs" = "İngilizce";
 "settingsLanguage.previewZh" = "Bir başka deyişle, bu bir şey değil.";

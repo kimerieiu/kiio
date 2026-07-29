@@ -79,6 +79,23 @@ struct DeviceView: View {
 
             Spacer()
 
+            Text(L10n.tr("device.header.actionsHint", locale: appState.locale))
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(KiioTheme.accent)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 6)
+                .frame(maxWidth: 104)
+                .background(KiioTheme.accentSoft)
+                .clipShape(Capsule())
+                .overlay(
+                    Capsule()
+                        .stroke(KiioTheme.accent.opacity(0.16), lineWidth: 1)
+                )
+                .accessibilityHidden(true)
+
             Button {
                 isShowingAddSheet = true
             } label: {
@@ -89,6 +106,7 @@ struct DeviceView: View {
                     .background(KiioTheme.accentSoft)
                     .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
             }
+            .accessibilityLabel(L10n.tr("device.header.actionsHint", locale: appState.locale))
         }
     }
 

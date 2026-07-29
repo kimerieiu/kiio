@@ -367,6 +367,7 @@
 "home.category.communication" = "การสื่อสาร";
 
 "device.dashboard.subtitle" = "สถานะคู่หู การเชื่อมโยง และการตั้งค่าอุปกรณ์";
+"device.header.actionsHint" = "เพิ่มอุปกรณ์ · เปลี่ยนภาษา";
 "device.loading" = "กำลังซิงค์อุปกรณ์...";
 "device.noAgentTitle" = "ไม่มีเพื่อนร่วมทาง";
 "device.noAgentDesc" = "Kiio จะสร้างตัวช่วยเริ่มต้นระหว่างการเริ่มต้นบัญชี รีเฟรชหลังจากการเริ่มต้นเสร็จสิ้น";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "ภาษา";
 "settingsLanguage.preview" = "ดูตัวอย่าง";
 "settingsLanguage.agentScope" = "ภาษาตัวแทน";
-"settingsLanguage.agentHint" = "การดำเนินการนี้จะเปลี่ยนภาษาตอบกลับเริ่มต้นสำหรับการแสดงร่วมแบ็กเอนด์ ภาษาของแอปไม่เปลี่ยนแปลง";
+"settingsLanguage.agentHint" = "เปลี่ยนเฉพาะภาษาที่เอเจนต์ใช้ตอบกลับ โดยไม่กระทบต่อภาษาของอินเทอร์เฟซแอป โปรดรีสตาร์ทอุปกรณ์หลังจากเปลี่ยนภาษา";
 "settingsLanguage.zhCn" = "จีนตัวย่อ";
 "settingsLanguage.enUs" = "อังกฤษ";
 "settingsLanguage.previewZh" = "คุณ好，我会优先使用中文与คุณ交流。";

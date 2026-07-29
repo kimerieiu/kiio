@@ -367,6 +367,7 @@
 "home.category.communication" = "通訊";
 
 "device.dashboard.subtitle" = "伴侶狀態、綁定和設備首選項";
+"device.header.actionsHint" = "新增裝置 · 切換語言";
 "device.loading" = "正在同步設備...";
 "device.noAgentTitle" = "沒有同伴可用";
 "device.noAgentDesc" = "Kiio 會在帳號初始化時建立一個預設同伴。初始化完成後刷新。";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "語言";
 "settingsLanguage.preview" = "預覽";
 "settingsLanguage.agentScope" = "代理語言";
-"settingsLanguage.agentHint" = "這會更改後端配套的預設回覆語言。應用程式語言保持不變。";
+"settingsLanguage.agentHint" = "僅變更智能體回覆語言，不影響 App 介面語言。切換後請重新啟動裝置。";
 "settingsLanguage.zhCn" = "簡體中文";
 "settingsLanguage.enUs" = "英語";
 "settingsLanguage.previewZh" = "你好，我會優先使用中文與你溝通。";

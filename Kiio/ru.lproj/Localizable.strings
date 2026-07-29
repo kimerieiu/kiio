@@ -367,6 +367,7 @@
 "home.category.communication" = "Общение";
 
 "device.dashboard.subtitle" = "Статус Companion, привязка и настройки устройства";
+"device.header.actionsHint" = "Добавить устройство · Сменить язык";
 "device.loading" = "Синхронизация устройств...";
 "device.noAgentTitle" = "Нет доступных компаньонов";
 "device.noAgentDesc" = "Kiio создаст компаньона по умолчанию во время инициализации учетной записи. Обновите после завершения инициализации.";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "Язык";
 "settingsLanguage.preview" = "Предварительный просмотр";
 "settingsLanguage.agentScope" = "Язык агента";
-"settingsLanguage.agentHint" = "Это изменит язык ответа по умолчанию для внутреннего помощника. Язык приложения остается неизменным.";
+"settingsLanguage.agentHint" = "Изменяется только язык ответов агента, язык интерфейса приложения не меняется. После переключения перезапустите устройство.";
 "settingsLanguage.zhCn" = "Упрощенный китайский";
 "settingsLanguage.enUs" = "английский";
 "settingsLanguage.previewZh" = "你好,我会优先使用中文与你交流。";

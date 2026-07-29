@@ -367,6 +367,7 @@
 "home.category.communication" = "コミュニケーション";
 
 "device.dashboard.subtitle" = "コンパニオンのステータス、バインディング、およびデバイスの設定";
+"device.header.actionsHint" = "デバイス追加 · 言語切替";
 "device.loading" = "デバイスを同期中...";
 "device.noAgentTitle" = "同伴者がいません";
 "device.noAgentDesc" = "Kiio は、アカウントの初期化中にデフォルトのコンパニオンを作成します。初期化が完了したらリフレッシュしてください。";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "言語";
 "settingsLanguage.preview" = "プレビュー";
 "settingsLanguage.agentScope" = "エージェントの言語";
-"settingsLanguage.agentHint" = "これにより、バックエンド コンパニオンのデフォルトの応答言語が変更されます。アプリの言語は変更されません。";
+"settingsLanguage.agentHint" = "エージェントの返信言語のみが変更され、アプリの表示言語には影響しません。切り替え後、デバイスを再起動してください。";
 "settingsLanguage.zhCn" = "簡体字中国語";
 "settingsLanguage.enUs" = "英語";
 "settingsLanguage.previewZh" = "よろしくお願いします。私たちの会では中国語との交流を優先的に使用しています。";

@@ -367,6 +367,7 @@
 "home.category.communication" = "Komunikasi";
 
 "device.dashboard.subtitle" = "Status pendamping, pengikatan, dan preferensi perangkat";
+"device.header.actionsHint" = "Tambah perangkat · Ganti bahasa";
 "device.loading" = "Menyinkronkan perangkat...";
 "device.noAgentTitle" = "Tidak ada pendamping yang tersedia";
 "device.noAgentDesc" = "Kiio akan membuat pendamping default selama inisialisasi akun. Segarkan setelah inisialisasi selesai.";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "Bahasa";
 "settingsLanguage.preview" = "Pratinjau";
 "settingsLanguage.agentScope" = "Bahasa agen";
-"settingsLanguage.agentHint" = "Tindakan ini mengubah bahasa balasan default untuk pendamping backend. Bahasa aplikasi tetap tidak berubah.";
+"settingsLanguage.agentHint" = "Hanya mengubah bahasa balasan agen, tanpa memengaruhi bahasa antarmuka aplikasi. Mulai ulang perangkat setelah beralih.";
 "settingsLanguage.zhCn" = "Cina Sederhana";
 "settingsLanguage.enUs" = "bahasa Inggris";
 "settingsLanguage.previewZh" = "你好,我会优先使用中文与你交流。";

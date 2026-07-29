@@ -367,6 +367,7 @@
 "home.category.communication" = "संचार";
 
 "device.dashboard.subtitle" = "सहयोगी स्थिति, बाइंडिंग और डिवाइस प्राथमिकताएँ";
+"device.header.actionsHint" = "डिवाइस जोड़ें · भाषा बदलें";
 "device.loading" = "डिवाइस सिंक हो रहे हैं...";
 "device.noAgentTitle" = "कोई साथी उपलब्ध नहीं";
 "device.noAgentDesc" = "Kiio खाता आरंभीकरण के दौरान एक डिफ़ॉल्ट साथी बनाएगा। आरंभीकरण पूर्ण होने के बाद ताज़ा करें.";
@@ -461,7 +462,7 @@
 "settingsLanguage.title" = "भाषा";
 "settingsLanguage.preview" = "पूर्वावलोकन";
 "settingsLanguage.agentScope" = "एजेंट भाषा";
-"settingsLanguage.agentHint" = "यह बैकएंड साथी के लिए डिफ़ॉल्ट उत्तर भाषा को बदल देता है। ऐप की भाषा अपरिवर्तित रहती है.";
+"settingsLanguage.agentHint" = "यह केवल एजेंट की जवाब देने की भाषा बदलता है, ऐप इंटरफ़ेस की भाषा को प्रभावित नहीं करता। बदलने के बाद डिवाइस को रीस्टार्ट करें।";
 "settingsLanguage.zhCn" = "सरलीकृत चीनी";
 "settingsLanguage.enUs" = "अंग्रेजी";
 "settingsLanguage.previewZh" = "你好, 你会优先使用中文与你交流.";
