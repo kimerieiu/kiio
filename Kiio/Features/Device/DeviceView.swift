@@ -79,7 +79,10 @@ struct DeviceView: View {
 
             Spacer()
 
-            Text(L10n.tr("device.header.actionsHint", locale: appState.locale))
+            Text(
+                L10n.tr("device.header.actionsHint", locale: appState.locale)
+                    .replacingOccurrences(of: " · ", with: "\n")
+            )
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundStyle(KiioTheme.accent)
                 .multilineTextAlignment(.center)
