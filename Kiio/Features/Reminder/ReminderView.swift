@@ -24,8 +24,9 @@ private struct ReminderListScene: View {
     @EnvironmentObject private var syncStore: SyncStore
     @StateObject private var store: ReminderStore
     @ObservedObject private var eventKitStore: EventKitStore
-    @State private var selectedSource: ReminderDataSource = .system
+    @State private var selectedSource: ReminderDataSource = .kiio
     @State private var isPresentingCreate = false
+    private let showsSystemSource = false
 
     init(store: ReminderStore, eventKitStore: EventKitStore) {
         _store = StateObject(wrappedValue: store)
@@ -34,18 +35,20 @@ private struct ReminderListScene: View {
 
     var body: some View {
         List {
-            Section {
-                KiioCard(padding: 8, radius: 16) {
-                    Picker("", selection: $selectedSource) {
-                        Text("System").tag(ReminderDataSource.system)
-                        Text("Kiio").tag(ReminderDataSource.kiio)
+            if showsSystemSource {
+                Section {
+                    KiioCard(padding: 8, radius: 16) {
+                        Picker("", selection: $selectedSource) {
+                            Text("System").tag(ReminderDataSource.system)
+                            Text("Kiio").tag(ReminderDataSource.kiio)
+                        }
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
                     }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
+                    .kiioListHeaderRow()
                 }
-                .kiioListHeaderRow()
+                .listRowBackground(Color.clear)
             }
-            .listRowBackground(Color.clear)
 
             if selectedSource == .kiio {
                 Section {
@@ -166,10 +169,12 @@ private struct ReminderListScene: View {
         .kiioHidesTabBar()
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    isPresentingCreate = true
-                } label: {
-                    Image(systemName: "plus")
+                if showsSystemSource && selectedSource == .system {
+                    Button {
+                        isPresentingCreate = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
                 }
             }
         }
