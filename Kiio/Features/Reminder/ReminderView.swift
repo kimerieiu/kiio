@@ -1,34 +1,44 @@
 import SwiftUI
 
+private enum ReminderDataSource: String, CaseIterable, Identifiable {
+    case system
+    case kiio
+
+    var id: String { rawValue }
+}
+
 struct ReminderView: View {
     @EnvironmentObject private var dependencies: AppDependencies
 
     var body: some View {
-        ReminderListScene(store: ReminderStore(service: dependencies.reminderService))
+        ReminderListScene(
+            store: ReminderStore(service: dependencies.reminderService),
+            eventKitStore: dependencies.eventKitStore
+        )
     }
 }
 
 private struct ReminderListScene: View {
+    @EnvironmentObject private var dependencies: AppDependencies
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var syncStore: SyncStore
     @StateObject private var store: ReminderStore
+    @ObservedObject private var eventKitStore: EventKitStore
+    @State private var selectedSource: ReminderDataSource = .system
+    @State private var isPresentingCreate = false
 
-    init(store: ReminderStore) {
+    init(store: ReminderStore, eventKitStore: EventKitStore) {
         _store = StateObject(wrappedValue: store)
+        self.eventKitStore = eventKitStore
     }
 
     var body: some View {
         List {
             Section {
                 KiioCard(padding: 8, radius: 16) {
-                    Picker("", selection: Binding(
-                        get: { store.selectedFilter },
-                        set: { filter in Task { await store.selectFilter(filter) } }
-                    )) {
-                        ForEach(ReminderTaskFilter.allCases) { filter in
-                            Text(filterTitle(filter))
-                                .tag(filter)
-                        }
+                    Picker("", selection: $selectedSource) {
+                        Text("System").tag(ReminderDataSource.system)
+                        Text("Kiio").tag(ReminderDataSource.kiio)
                     }
                     .pickerStyle(.segmented)
                     .labelsHidden()
@@ -37,62 +47,116 @@ private struct ReminderListScene: View {
             }
             .listRowBackground(Color.clear)
 
-            if store.isLoading {
-                KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
-                    .kiioListCardRow()
-            } else if store.tasks.isEmpty {
-                KiioEmptyStateView(
-                    systemImage: "bell",
-                    title: L10n.tr("reminder.empty.title", locale: appState.locale),
-                    message: L10n.tr("reminder.empty.message", locale: appState.locale)
-                )
-                .kiioListCardRow()
-            } else {
-                ForEach(store.tasks) { task in
-                    NavigationLink {
-                        ReminderDetailView(taskId: task.id, store: store)
-                            .kiioHidesTabBar()
-                    } label: {
-                        ReminderTaskRow(task: task)
+            if selectedSource == .kiio {
+                Section {
+                    KiioCard(padding: 8, radius: 16) {
+                        Picker("", selection: Binding(
+                            get: { store.selectedFilter },
+                            set: { filter in Task { await store.selectFilter(filter) } }
+                        )) {
+                            ForEach(ReminderTaskFilter.allCases) { filter in
+                                Text(filterTitle(filter))
+                                    .tag(filter)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
                     }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        Button(role: .destructive) {
-                            Task { await delete(task) }
+                    .kiioListHeaderRow()
+                }
+                .listRowBackground(Color.clear)
+
+                if store.isLoading {
+                    KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                        .kiioListCardRow()
+                } else if store.tasks.isEmpty {
+                    KiioEmptyStateView(
+                        systemImage: "bell",
+                        title: L10n.tr("reminder.empty.title", locale: appState.locale),
+                        message: L10n.tr("reminder.empty.message", locale: appState.locale)
+                    )
+                    .kiioListCardRow()
+                } else {
+                    ForEach(store.tasks) { task in
+                        NavigationLink {
+                            ReminderDetailView(taskId: task.id, store: store)
+                                .kiioHidesTabBar()
                         } label: {
-                            Label(L10n.tr("common.delete", locale: appState.locale), systemImage: "trash")
+                            ReminderTaskRow(task: task)
                         }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                Task { await delete(task) }
+                            } label: {
+                                Label(L10n.tr("common.delete", locale: appState.locale), systemImage: "trash")
+                            }
 
-                        if task.status == "active" {
-                            Button {
-                                Task { await cancel(task) }
-                            } label: {
-                                Label(L10n.tr("common.cancel", locale: appState.locale), systemImage: "xmark.circle")
+                            if task.status == "active" {
+                                Button {
+                                    Task { await cancel(task) }
+                                } label: {
+                                    Label(L10n.tr("common.cancel", locale: appState.locale), systemImage: "xmark.circle")
+                                }
+                                .tint(KiioTheme.warning)
                             }
-                            .tint(KiioTheme.warning)
                         }
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                            if task.status == "active" {
+                                Button {
+                                    Task { await complete(task) }
+                                } label: {
+                                    Label(L10n.tr("common.complete", locale: appState.locale), systemImage: "checkmark.circle")
+                                }
+                                .tint(KiioTheme.success)
+                            }
+                        }
+                        .kiioListCardRow()
                     }
-                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                        if task.status == "active" {
-                            Button {
-                                Task { await complete(task) }
-                            } label: {
-                                Label(L10n.tr("common.complete", locale: appState.locale), systemImage: "checkmark.circle")
-                            }
-                            .tint(KiioTheme.success)
-                        }
+
+                    KiioPaginationFooter(
+                        isLoading: store.isLoadingMore,
+                        hasMore: store.hasMoreTasks,
+                        isEmpty: store.tasks.isEmpty,
+                        locale: appState.locale
+                    ) {
+                        Task { await store.loadMoreTasks() }
                     }
                     .kiioListCardRow()
                 }
-
-                KiioPaginationFooter(
-                    isLoading: store.isLoadingMore,
-                    hasMore: store.hasMoreTasks,
-                    isEmpty: store.tasks.isEmpty,
-                    locale: appState.locale
-                ) {
-                    Task { await store.loadMoreTasks() }
+            } else {
+                if eventKitStore.isLoading {
+                    KiioLoadingCard(message: L10n.tr("common.loading", locale: appState.locale))
+                        .kiioListCardRow()
+                } else if !eventKitStore.hasAccess {
+                    KiioCard {
+                        VStack(alignment: .leading, spacing: 14) {
+                            Label("Calendar & Reminders access", systemImage: "calendar.badge.exclamationmark")
+                                .font(.headline)
+                            Text("Allow access to read and create native reminders and calendar events.")
+                                .foregroundStyle(KiioTheme.secondaryText)
+                            Button("Allow Access") {
+                                Task {
+                                    await eventKitStore.load(requestAccess: true)
+                                    await syncBackendTasksToEventKit()
+                                }
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
+                    .kiioListCardRow()
+                } else if eventKitStore.items.isEmpty {
+                    KiioEmptyStateView(
+                        systemImage: "calendar",
+                        title: "No system items",
+                        message: "Create a reminder or calendar event with the add button."
+                    )
+                    .kiioListCardRow()
+                } else {
+                    ForEach(eventKitStore.items) { item in
+                        NativeCalendarItemRow(item: item)
+                            .kiioListCardRow()
+                    }
                 }
-                .kiioListCardRow()
             }
         }
         .scrollContentBackground(.hidden)
@@ -100,13 +164,50 @@ private struct ReminderListScene: View {
         .listStyle(.plain)
         .navigationTitle(L10n.tr("reminder.title", locale: appState.locale))
         .kiioHidesTabBar()
-        .task { await refreshFromBackend() }
-        .refreshable { await refreshFromBackend() }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    isPresentingCreate = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $isPresentingCreate) {
+            NativeCalendarCreateView(store: eventKitStore)
+        }
+        .task {
+            await refreshFromBackend()
+            await eventKitStore.load(requestAccess: false)
+            await syncBackendTasksToEventKit()
+        }
+        .refreshable {
+            if selectedSource == .system {
+                await eventKitStore.load(requestAccess: false)
+                await syncBackendTasksToEventKit()
+            } else {
+                await refreshFromBackend()
+            }
+        }
         .onReceive(syncStore.$latestEvent) { event in
             guard event?.notifyModule == .reminderTask else { return }
-            Task { await refreshFromBackend(version: event?.version) }
+            Task {
+                await refreshFromBackend(version: event?.version)
+                await syncBackendTasksToEventKit()
+            }
         }
-        .kiioErrorAlert(message: $store.errorMessage, locale: appState.locale)
+        .kiioErrorAlert(
+            message: Binding(
+                get: { store.errorMessage ?? eventKitStore.errorMessage },
+                set: { value in
+                    if value == nil {
+                        store.errorMessage = nil
+                        eventKitStore.errorMessage = nil
+                    }
+                }
+            ),
+            locale: appState.locale
+        )
     }
 
     private func refreshFromBackend(version: Int? = nil) async {
@@ -115,6 +216,23 @@ private struct ReminderListScene: View {
         syncStore.markSynced(.reminderTask, version: targetVersion)
         if syncStore.hasRemoteVersion(.reminderTask, after: targetVersion) {
             await refreshFromBackend()
+        }
+    }
+
+    private func syncBackendTasksToEventKit() async {
+        guard eventKitStore.hasAccess else { return }
+        do {
+            var tasks = try await dependencies.reminderService.allTasks()
+            let completedIds = await dependencies.eventKitService.completedBackendTaskIds(tasks)
+            for taskId in completedIds {
+                try await dependencies.reminderService.complete(id: taskId)
+            }
+            if !completedIds.isEmpty {
+                tasks = try await dependencies.reminderService.allTasks()
+            }
+            await eventKitStore.sync(tasks: tasks)
+        } catch {
+            eventKitStore.errorMessage = AppError.from(error).errorDescription
         }
     }
 
@@ -148,6 +266,116 @@ private struct ReminderListScene: View {
     private func delete(_ task: ReminderTaskDTO) async {
         if await store.delete(id: task.id) {
             await refreshFromBackend()
+        }
+    }
+}
+
+private struct NativeCalendarItemRow: View {
+    let item: NativeCalendarItem
+
+    var body: some View {
+        KiioCard {
+            HStack(alignment: .top, spacing: 12) {
+                KiioIconBadge(
+                    systemImage: item.kind == .reminder ? "checklist" : "calendar",
+                    size: 42,
+                    iconSize: 17
+                )
+                VStack(alignment: .leading, spacing: 7) {
+                    HStack {
+                        Text(item.title.isEmpty ? "--" : item.title)
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundStyle(KiioTheme.text)
+                        Spacer()
+                        KiioStatusBadge(
+                            text: item.kind == .reminder ? "Reminder" : "Event",
+                            tone: item.isCompleted ? .muted : .accent
+                        )
+                    }
+                    if let notes = item.notes, !notes.isEmpty {
+                        Text(notes.replacingOccurrences(
+                            of: #"\n\nkiio-task:[^\n]+"#,
+                            with: "",
+                            options: .regularExpression
+                        ))
+                        .font(.system(size: 13))
+                        .foregroundStyle(KiioTheme.secondaryText)
+                        .lineLimit(2)
+                    }
+                    if let startAt = item.startAt {
+                        KiioMetaPill(icon: "clock", text: startAt.formatted(date: .abbreviated, time: .shortened))
+                    }
+                    KiioMetaPill(icon: "tray", text: item.calendarTitle)
+                }
+            }
+        }
+    }
+}
+
+private struct NativeCalendarCreateView: View {
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject var store: EventKitStore
+    @State private var draft = NativeCalendarDraft()
+    @State private var isSaving = false
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Picker("Type", selection: $draft.kind) {
+                    Text("Reminder").tag(NativeCalendarItemKind.reminder)
+                    Text("Calendar Event").tag(NativeCalendarItemKind.event)
+                }
+                .pickerStyle(.segmented)
+
+                Section("Details") {
+                    TextField("Title", text: $draft.title)
+                    TextField("Notes", text: $draft.notes, axis: .vertical)
+                    DatePicker(
+                        draft.kind == .reminder ? "Remind me" : "Starts",
+                        selection: $draft.startAt,
+                        displayedComponents: draft.allDay ? [.date] : [.date, .hourAndMinute]
+                    )
+                    if draft.kind == .event {
+                        Toggle("All day", isOn: $draft.allDay)
+                        if !draft.allDay {
+                            DatePicker(
+                                "Ends",
+                                selection: $draft.endAt,
+                                in: draft.startAt...,
+                                displayedComponents: [.date, .hourAndMinute]
+                            )
+                        }
+                    }
+                }
+
+                Section("Repeat") {
+                    Picker("Repeat", selection: $draft.recurrence) {
+                        Text("Never").tag(NativeCalendarRecurrence.none)
+                        Text("Daily").tag(NativeCalendarRecurrence.daily)
+                        Text("Weekly").tag(NativeCalendarRecurrence.weekly)
+                        Text("Monthly").tag(NativeCalendarRecurrence.monthly)
+                    }
+                }
+            }
+            .navigationTitle(draft.kind == .reminder ? "New Reminder" : "New Event")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        Task {
+                            isSaving = true
+                            if await store.create(draft) {
+                                dismiss()
+                            }
+                            isSaving = false
+                        }
+                    }
+                    .disabled(isSaving || draft.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
         }
     }
 }
