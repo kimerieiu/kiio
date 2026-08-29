@@ -40,12 +40,14 @@ final class AppState: ObservableObject {
     @Published var rootRoute: RootRoute = .splash
     @Published var selectedTab: MainTab = .home
     @Published var locale: String
+    @Published private(set) var systemTimeZone: TimeZone
 
     private let settings: LocalSettingsStore
 
     init(settings: LocalSettingsStore) {
         self.settings = settings
         self.locale = settings.locale
+        self.systemTimeZone = .current
     }
 
     func finishSplash(isAuthenticated: Bool) {
@@ -67,6 +69,10 @@ final class AppState: ObservableObject {
     func setLocale(_ locale: String) {
         settings.locale = locale
         self.locale = settings.locale
+    }
+
+    func refreshSystemTimeZone() {
+        systemTimeZone = .current
     }
 
     func completeWelcome(isAuthenticated: Bool) {

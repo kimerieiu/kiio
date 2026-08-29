@@ -179,45 +179,56 @@ private struct AccountingDetailScene: View {
                     .kiioListCardRow()
             } else if let bill = store.detail {
                 Section {
-                    KiioCard {
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack(alignment: .top, spacing: 12) {
-                                KiioIconBadge(systemImage: "wallet.pass", tone: typeTone(for: bill), size: 48, iconSize: 20)
-                                VStack(alignment: .leading, spacing: 8) {
+                    KiioCard(padding: 20) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack(alignment: .top, spacing: 16) {
+                                KiioIconBadge(systemImage: iconName, tone: typeTone(for: bill), size: 56, iconSize: 24)
+                                VStack(alignment: .leading, spacing: 10) {
                                     Text(amountText(for: bill))
-                                        .font(.system(size: 32, weight: .bold))
+                                        .font(.system(size: 28, weight: .bold))
                                         .foregroundStyle(amountColor(for: bill))
                                     Text(bill.displayTitle)
-                                        .font(.system(size: 18, weight: .semibold))
+                                        .font(.system(size: 16, weight: .semibold))
                                         .foregroundStyle(KiioTheme.text)
+                                        .lineLimit(2)
                                     if let status = bill.status {
-                                        KiioStatusBadge(text: status, tone: statusTone(status))
+                                        KiioStatusBadge(text: status.capitalized.replacingOccurrences(of: "_", with: " "), tone: statusTone(status))
                                     }
                                 }
+                            }
+
+                            if let remark = bill.remark, !remark.isEmpty {
+                                Divider()
+                                    .background(KiioTheme.border)
+                                Text(remark)
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(KiioTheme.secondaryText)
+                                    .lineLimit(nil)
                             }
                         }
                     }
                 }
                 .kiioListCardRow()
 
-                Section(L10n.tr("common.detail", locale: appState.locale)) {
-                    labeled(L10n.tr("common.type", locale: appState.locale), bill.billType)
-                    labeled(L10n.tr("common.category", locale: appState.locale), bill.categoryName ?? bill.categoryCode)
-                    labeled(L10n.tr("accounting.account", locale: appState.locale), bill.accountName)
-                    labeled(L10n.tr("accounting.toAccount", locale: appState.locale), bill.toAccountName)
-                    labeled(L10n.tr("common.time", locale: appState.locale), bill.occurredAt)
-                    labeled(L10n.tr("common.status", locale: appState.locale), bill.status)
-                    labeled(L10n.tr("common.source", locale: appState.locale), bill.sourceType)
-                    labeled(L10n.tr("accounting.tags", locale: appState.locale), bill.displayTags)
-                    labeled(L10n.tr("common.createdAt", locale: appState.locale), bill.createdAt)
-                }
+                Section {
+                    KiioCard(padding: 16) {
+                        VStack(spacing: 12) {
+                            detailRow(icon: "tag", title: L10n.tr("common.category", locale: appState.locale), value: bill.categoryName ?? bill.categoryCode)
+                            detailRow(icon: "creditcard", title: L10n.tr("accounting.account", locale: appState.locale), value: bill.accountName)
 
-                if let remark = bill.remark, !remark.isEmpty {
-                    Section(L10n.tr("common.remark", locale: appState.locale)) {
-                        Text(remark)
-                            .foregroundStyle(KiioTheme.text)
+                            if bill.billType == "transfer", let toAccount = bill.toAccountName {
+                                detailRow(icon: "arrow.right.circle", title: L10n.tr("accounting.toAccount", locale: appState.locale), value: toAccount)
+                            }
+
+                            detailRow(icon: "clock", title: L10n.tr("common.time", locale: appState.locale), value: bill.occurredAt)
+
+                            if let tags = bill.displayTags, !tags.isEmpty {
+                                detailRow(icon: "number", title: L10n.tr("accounting.tags", locale: appState.locale), value: tags)
+                            }
+                        }
                     }
                 }
+                .kiioListCardRow()
 
                 if bill.status == "pending_confirm" {
                     Section {
@@ -351,13 +362,35 @@ private struct AccountingDetailScene: View {
         status == "pending_confirm" ? .warning : .accent
     }
 
-    private func labeled(_ title: String, _ value: String?) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
+    private func detailRow(icon: String, title: String, value: String?) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(KiioTheme.mutedText)
+                .frame(width: 20)
+
             Text(title)
-            Spacer()
-            Text(value?.isEmpty == false ? value! : "--")
+                .font(.system(size: 14))
                 .foregroundStyle(KiioTheme.secondaryText)
+
+            Spacer()
+
+            Text(value?.isEmpty == false ? value! : "--")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(value?.isEmpty == false ? KiioTheme.text : KiioTheme.mutedText)
                 .multilineTextAlignment(.trailing)
+                .lineLimit(2)
+        }
+    }
+
+    private var iconName: String {
+        switch store.detail?.billType {
+        case "income":
+            return "arrow.down.left"
+        case "transfer":
+            return "arrow.left.arrow.right"
+        default:
+            return "arrow.up.right"
         }
     }
 }
@@ -663,7 +696,7 @@ private enum AccountingDateFormatter {
     private static let backendFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone.current
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         return formatter
     }()
@@ -671,7 +704,7 @@ private enum AccountingDateFormatter {
     private static let backendMinuteFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone.current
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "yyyy-MM-dd HH:mm"
         return formatter
     }()

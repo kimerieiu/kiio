@@ -78,8 +78,8 @@ final class EventKitService {
 
         async let reminders = fetchReminderItems()
         let events = fetchEventItems(
-            from: Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date(),
-            to: Calendar.current.date(byAdding: .year, value: 3, to: Date()) ?? Date()
+            from: Calendar.autoupdatingCurrent.date(byAdding: .year, value: -1, to: Date()) ?? Date(),
+            to: Calendar.autoupdatingCurrent.date(byAdding: .year, value: 3, to: Date()) ?? Date()
         )
         let reminderItems = try await reminders
         return (reminderItems + events).sorted {
@@ -261,8 +261,8 @@ final class EventKitService {
         let reminders = await fetchReminders(
             matching: eventStore.predicateForReminders(in: nil)
         )
-        let eventStart = Calendar.current.date(byAdding: .year, value: -2, to: Date()) ?? .distantPast
-        let eventEnd = Calendar.current.date(byAdding: .year, value: 10, to: Date()) ?? .distantFuture
+        let eventStart = Calendar.autoupdatingCurrent.date(byAdding: .year, value: -2, to: Date()) ?? .distantPast
+        let eventEnd = Calendar.autoupdatingCurrent.date(byAdding: .year, value: 10, to: Date()) ?? .distantFuture
         let events = eventStore.events(
             matching: eventStore.predicateForEvents(
                 withStart: eventStart,
@@ -477,9 +477,9 @@ final class EventKitService {
     ) {
         event.title = title
         event.notes = notesWithMarker(notes, marker: marker)
-        event.startDate = allDay ? Calendar.current.startOfDay(for: startAt) : startAt
+        event.startDate = allDay ? Calendar.autoupdatingCurrent.startOfDay(for: startAt) : startAt
         event.endDate = allDay
-            ? (Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: startAt)) ?? endAt)
+            ? (Calendar.autoupdatingCurrent.date(byAdding: .day, value: 1, to: Calendar.autoupdatingCurrent.startOfDay(for: startAt)) ?? endAt)
             : endAt
         event.isAllDay = allDay
         event.alarms = [EKAlarm(absoluteDate: event.startDate)]
@@ -508,7 +508,7 @@ final class EventKitService {
 
     private func dateComponents(for date: Date) -> DateComponents {
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = .current
+        calendar.timeZone = .autoupdatingCurrent
         var components = calendar.dateComponents(
             [.calendar, .timeZone, .year, .month, .day, .hour, .minute, .second],
             from: date
@@ -556,7 +556,7 @@ final class EventKitService {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.calendar = Calendar(identifier: .gregorian)
-        formatter.timeZone = timezone.flatMap(TimeZone.init(identifier:)) ?? .current
+        formatter.timeZone = timezone.flatMap(TimeZone.init(identifier:)) ?? .autoupdatingCurrent
         for format in ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd"] {
             formatter.dateFormat = format
             if let date = formatter.date(from: value) {

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct LanguageSelectionView: View {
     @EnvironmentObject private var appState: AppState
-    @State private var selectedLocale = L10n.preferredLocale()
+    @State private var selectedLocale = "en_US"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {

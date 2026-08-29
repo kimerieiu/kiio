@@ -661,11 +661,9 @@ struct DeviceDetailView: View {
     let device: DeviceDTO
 
     @State private var currentDevice: DeviceDTO
-    @State private var isShowingRename = false
     @State private var isConfirmingUnbind = false
     @State private var activeRoute: DeviceRoute?
     @State private var isRefreshingStatus = false
-    @State private var aliasDraft = ""
     @State private var alertMessage: String?
 
     init(device: DeviceDTO) {
@@ -685,19 +683,6 @@ struct DeviceDetailView: View {
             .listRowInsets(EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 20))
 
             Section(L10n.tr("device.settings", locale: appState.locale)) {
-                Button {
-                    aliasDraft = currentDevice.alias ?? currentDevice.displayName
-                    isShowingRename = true
-                } label: {
-                    settingsRow(
-                        icon: "pencil",
-                        title: L10n.tr("device.rename", locale: appState.locale),
-                        subtitle: currentDevice.alias ?? L10n.tr("device.renameHint", locale: appState.locale),
-                        isLoading: deviceStore.isUpdating,
-                        showsChevron: true
-                    )
-                }
-
                 Button {
                     Task { await toggleAutoUpdate() }
                 } label: {
@@ -760,10 +745,6 @@ struct DeviceDetailView: View {
             guard event?.notifyModule == .device else { return }
             Task { await refreshDevicesFromBackend(version: event?.version) }
         }
-        .sheet(isPresented: $isShowingRename) {
-            renameSheet
-                .presentationDetents([.height(220)])
-        }
         .navigationDestination(isPresented: routeBinding) {
             switch activeRoute {
             case .some(.provisioning):
@@ -798,37 +779,6 @@ struct DeviceDetailView: View {
         .kiioErrorAlert(message: $alertMessage, locale: appState.locale)
     }
 
-    private var renameSheet: some View {
-        NavigationStack {
-            VStack(spacing: 16) {
-                TextField(L10n.tr("device.rename.placeholder", locale: appState.locale), text: $aliasDraft)
-                    .kiioTextField()
-                    .onChange(of: aliasDraft) { value in
-                        aliasDraft = String(value.prefix(64))
-                    }
-
-                KiioPrimaryButton(
-                    title: L10n.tr("common.save", locale: appState.locale),
-                    isLoading: deviceStore.isUpdating,
-                    isDisabled: aliasDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                ) {
-                    Task { await saveAlias() }
-                }
-            }
-            .padding(20)
-            .background(KiioTheme.background.ignoresSafeArea())
-            .navigationTitle(L10n.tr("device.rename", locale: appState.locale))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(L10n.tr("common.cancel", locale: appState.locale)) {
-                        isShowingRename = false
-                    }
-                }
-            }
-        }
-    }
-
     private func settingsRow(icon: String, title: String, subtitle: String, isLoading: Bool = false, showsChevron: Bool = false) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
@@ -855,19 +805,6 @@ struct DeviceDetailView: View {
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(KiioTheme.mutedText)
             }
-        }
-    }
-
-    private func saveAlias() async {
-        let alias = aliasDraft.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !alias.isEmpty else { return }
-
-        if await deviceStore.updateDevice(id: currentDevice.id, alias: alias) {
-            currentDevice = patchedDevice(alias: alias)
-            isShowingRename = false
-            syncCurrentDevice()
-        } else {
-            alertMessage = deviceStore.errorMessage
         }
     }
 
@@ -934,7 +871,7 @@ struct DeviceDetailView: View {
         )
     }
 
-    private func patchedDevice(alias: String? = nil, autoUpdate: Int? = nil) -> DeviceDTO {
+    private func patchedDevice(autoUpdate: Int? = nil) -> DeviceDTO {
         DeviceDTO(
             id: currentDevice.id,
             userId: currentDevice.userId,
@@ -942,7 +879,7 @@ struct DeviceDetailView: View {
             lastConnectedAt: currentDevice.lastConnectedAt,
             autoUpdate: autoUpdate ?? currentDevice.autoUpdate,
             board: currentDevice.board,
-            alias: alias ?? currentDevice.alias,
+            alias: currentDevice.alias,
             agentId: currentDevice.agentId,
             appVersion: currentDevice.appVersion,
             sort: currentDevice.sort,

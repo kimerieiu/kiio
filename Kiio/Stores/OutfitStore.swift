@@ -123,7 +123,7 @@ final class OutfitStore: ObservableObject {
         case .today:
             return (OutfitDateFormatter.backendDate(from: today), nil, nil)
         case .recent:
-            let start = Calendar.current.date(byAdding: .day, value: -6, to: today) ?? today
+            let start = Calendar.autoupdatingCurrent.date(byAdding: .day, value: -6, to: today) ?? today
             return (nil, OutfitDateFormatter.backendDate(from: start), OutfitDateFormatter.backendDate(from: today))
         }
     }
@@ -133,7 +133,7 @@ enum OutfitDateFormatter {
     private static let backendFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone.current
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()

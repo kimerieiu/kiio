@@ -9,6 +9,8 @@ final class SyncStore: ObservableObject {
     @Published private(set) var latestEvent: AppDataChangedEvent?
     @Published var isSyncingVersions = false
 
+    var onReminderTasksChanged: (() -> Void)?
+
     private let notifyService: NotifyService
     private var seenEventIds: [String] = []
     private let maxSeenEvents = 200
@@ -36,6 +38,10 @@ final class SyncStore: ObservableObject {
         remoteVersions[module] = nextVersion
         dirtyModules.insert(module)
         latestEvent = event ?? AppDataChangedEvent.sync(module: module, version: nextVersion)
+
+        if module == .reminderTask {
+            onReminderTasksChanged?()
+        }
     }
 
     func targetVersion(_ module: AppNotifyModule, incomingVersion: Int? = nil) -> Int {

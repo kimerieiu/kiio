@@ -485,6 +485,7 @@ private enum OrderDisplayFormatter {
         guard let date = DeviceConnectionHelper.date(from: value) else { return value }
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: locale.hasPrefix("zh") ? "zh_CN" : "en_US")
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = pattern
         return formatter.string(from: date)
     }

@@ -145,7 +145,7 @@ private struct OutfitDetailView: View {
                                 Text(outfit.displayTitle)
                                     .font(.system(size: 24, weight: .bold))
                                     .foregroundStyle(KiioTheme.text)
-                                KiioMetaPill(icon: "calendar", text: outfit.outfitDate ?? outfit.createdAt ?? "--")
+                                KiioMetaPill(icon: "calendar", text: formatDate(outfit.outfitDate ?? outfit.createdAt))
                             }
                         }
                     }
@@ -255,6 +255,12 @@ private struct OutfitDetailView: View {
         _ = await store.load(reset: true, silent: true)
         dismiss()
     }
+
+    private func formatDate(_ dateString: String?) -> String {
+        guard let dateString, !dateString.isEmpty else { return "--" }
+        let parts = dateString.split(separator: " ")
+        return parts.first.map(String.init) ?? dateString
+    }
 }
 
 private struct OutfitRow: View {
@@ -281,7 +287,7 @@ private struct OutfitRow: View {
                 }
 
                 if let date = outfit.outfitDate ?? outfit.createdAt {
-                    KiioMetaPill(icon: "calendar", text: date)
+                    KiioMetaPill(icon: "calendar", text: formatDate(date))
                 }
 
                 let tags = (outfit.items ?? [])
@@ -305,5 +311,11 @@ private struct OutfitRow: View {
                 .stroke(KiioTheme.border, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.03), radius: 12, y: 6)
+    }
+
+    private func formatDate(_ dateString: String?) -> String {
+        guard let dateString, !dateString.isEmpty else { return "--" }
+        let parts = dateString.split(separator: " ")
+        return parts.first.map(String.init) ?? dateString
     }
 }

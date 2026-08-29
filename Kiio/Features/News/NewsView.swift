@@ -205,14 +205,6 @@ private struct NewsDetailScene: View {
                         )
                     }
 
-                    if let content = nonEmpty(record.snippet) {
-                        NewsTextSectionCard(
-                            title: L10n.tr("common.content", locale: appState.locale),
-                            systemImage: "doc.text",
-                            text: linkified(content)
-                        )
-                    }
-
                     if let links = sourceLinks(record), !links.isEmpty {
                         originalLinksCard(links)
                     }

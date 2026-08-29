@@ -409,6 +409,7 @@ private struct SubscriptionScene: View {
         let formatter = DateFormatter()
         let localeId = appState.locale.hasPrefix("zh") ? "zh_CN" : "en_US"
         formatter.locale = Locale(identifier: localeId)
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "yyyy-MM-dd HH:mm"
         return formatter.string(from: date)
     }

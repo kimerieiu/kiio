@@ -58,7 +58,7 @@ enum DeviceConnectionHelper {
             return L10n.tr("device.justNow", locale: locale)
         }
 
-        let calendar = Calendar.current
+        let calendar = Calendar.autoupdatingCurrent
         if calendar.isDateInToday(date) {
             return L10n.tr("device.todayAt", locale: locale, clockFormatter(locale: locale).string(from: date))
         }
@@ -85,6 +85,7 @@ enum DeviceConnectionHelper {
     private static func clockFormatter(locale: String) -> DateFormatter {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: locale.hasPrefix("zh") ? "zh_CN" : "en_US")
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "HH:mm"
         return formatter
     }
@@ -92,6 +93,7 @@ enum DeviceConnectionHelper {
     private static func dateFormatter(locale: String) -> DateFormatter {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: locale.hasPrefix("zh") ? "zh_CN" : "en_US")
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "MM-dd HH:mm"
         return formatter
     }
@@ -99,7 +101,7 @@ enum DeviceConnectionHelper {
     private static let backendFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone.current
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         return formatter
     }()

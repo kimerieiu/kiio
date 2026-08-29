@@ -14,6 +14,6 @@ struct AgentDTO: Decodable, Identifiable, Equatable {
     let deviceCount: Int?
 
     var displayName: String {
-        agentName?.isEmpty == false ? agentName! : "Kiio Agent"
+        agentName ?? ""
     }
 }

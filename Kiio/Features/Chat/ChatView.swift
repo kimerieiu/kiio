@@ -298,7 +298,7 @@ private struct ChatSessionsScene: View {
         guard let date = ChatDateFormatter.date(from: value) else {
             return L10n.tr("chat.earlier", locale: appState.locale)
         }
-        let calendar = Calendar.current
+        let calendar = Calendar.autoupdatingCurrent
         if calendar.isDateInToday(date) {
             return L10n.tr("chat.today", locale: appState.locale)
         }
@@ -490,7 +490,7 @@ private enum ChatDateFormatter {
     private static let backendFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone.current
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         return formatter
     }()
@@ -518,17 +518,20 @@ private enum ChatDateFormatter {
 
     static func dayString(from date: Date) -> String {
         let formatter = DateFormatter()
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: date)
     }
 
     static func clockOrDayString(from date: Date) -> String {
-        if Calendar.current.isDateInToday(date) {
+        if Calendar.autoupdatingCurrent.isDateInToday(date) {
             let formatter = DateFormatter()
+            formatter.timeZone = .autoupdatingCurrent
             formatter.dateFormat = "HH:mm"
             return formatter.string(from: date)
         }
         let formatter = DateFormatter()
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "MM-dd"
         return formatter.string(from: date)
     }

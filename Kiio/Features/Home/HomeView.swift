@@ -362,7 +362,7 @@ struct HomeView: View {
     }
 
     private var greeting: String {
-        let hour = Calendar.current.component(.hour, from: Date())
+        let hour = Calendar.autoupdatingCurrent.component(.hour, from: Date())
         if hour < 12 { return L10n.tr("home.morning", locale: appState.locale) }
         if hour < 18 { return L10n.tr("home.afternoon", locale: appState.locale) }
         return L10n.tr("home.evening", locale: appState.locale)

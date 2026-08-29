@@ -1152,6 +1152,7 @@ private enum MailOperationDateFormatter {
         guard let date = date(from: value) else { return value }
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: locale.hasPrefix("zh") ? "zh_CN" : "en_US")
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "yyyy-MM-dd HH:mm"
         return formatter.string(from: date)
     }
@@ -1170,7 +1171,7 @@ private enum MailOperationDateFormatter {
     private static let backendSecondFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone.current
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         return formatter
     }()
@@ -1178,7 +1179,7 @@ private enum MailOperationDateFormatter {
     private static let backendMinuteFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone.current
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "yyyy-MM-dd HH:mm"
         return formatter
     }()

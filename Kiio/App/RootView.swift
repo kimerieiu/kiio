@@ -45,6 +45,7 @@ struct RootView: View {
         }
         .background(KiioTheme.background.ignoresSafeArea())
         .environment(\.locale, Locale(identifier: appState.locale))
+        .environment(\.timeZone, appState.systemTimeZone)
         .environment(
             \.layoutDirection,
             L10n.isRightToLeft(appState.locale) ? .rightToLeft : .leftToRight
@@ -65,6 +66,8 @@ struct RootView: View {
                 return
             }
 
+            appState.refreshSystemTimeZone()
+
             Task {
                 if appState.rootRoute == .splash, startupGateError != nil {
                     await runStartupGate()
@@ -72,6 +75,12 @@ struct RootView: View {
                     await syncNativeCalendar()
                 }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in
+            appState.refreshSystemTimeZone()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
+            appState.refreshSystemTimeZone()
         }
         .onReceive(dependencies.syncStore.$latestEvent) { event in
             guard event?.notifyModule == .reminderTask,
@@ -116,6 +125,13 @@ struct RootView: View {
             appState.setLocale(language)
         }
         authStore.updateUser(bootstrapStore.userInfo)
+
+        dependencies.syncStore.onReminderTasksChanged = { [self] in
+            Task { @MainActor in
+                await self.syncNativeCalendar()
+            }
+        }
+
         await dependencies.syncStore.syncVersions(silent: true)
         dependencies.notifyWebSocketClient.connect()
         await syncNativeCalendar()

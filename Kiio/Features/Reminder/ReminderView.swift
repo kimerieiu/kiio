@@ -183,16 +183,17 @@ private struct ReminderListScene: View {
         }
         .task {
             await refreshFromBackend()
-            await eventKitStore.load(requestAccess: false)
+            if !eventKitStore.hasAccess {
+                await eventKitStore.load(requestAccess: true)
+            }
             await syncBackendTasksToEventKit()
         }
         .refreshable {
             if selectedSource == .system {
                 await eventKitStore.load(requestAccess: false)
-                await syncBackendTasksToEventKit()
-            } else {
-                await refreshFromBackend()
             }
+            await refreshFromBackend()
+            await syncBackendTasksToEventKit()
         }
         .onReceive(syncStore.$latestEvent) { event in
             guard event?.notifyModule == .reminderTask else { return }
@@ -422,73 +423,101 @@ private struct ReminderDetailScene: View {
                     .kiioListCardRow()
             } else if let task = store.detail {
                 Section {
-                    KiioCard {
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack(alignment: .top, spacing: 12) {
-                                KiioIconBadge(systemImage: "bell", size: 48, iconSize: 20)
-                                VStack(alignment: .leading, spacing: 8) {
+                    KiioCard(padding: 20) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack(alignment: .top, spacing: 16) {
+                                KiioIconBadge(systemImage: "bell.fill", tone: statusTone(task.status ?? ""), size: 56, iconSize: 24)
+                                VStack(alignment: .leading, spacing: 10) {
                                     Text(task.displayTitle)
-                                        .font(.system(size: 24, weight: .bold))
+                                        .font(.system(size: 22, weight: .bold))
                                         .foregroundStyle(KiioTheme.text)
+                                        .lineLimit(3)
                                     if let status = task.status {
-                                        KiioStatusBadge(text: status, tone: statusTone(status))
+                                        KiioStatusBadge(text: status.capitalized, tone: statusTone(status))
                                     }
                                 }
+                            }
+
+                            if let content = task.displayContent, !content.isEmpty {
+                                Divider()
+                                    .background(KiioTheme.border)
+                                Text(content)
+                                    .font(.system(size: 15))
+                                    .foregroundStyle(KiioTheme.secondaryText)
+                                    .lineLimit(nil)
                             }
                         }
                     }
                 }
                 .kiioListCardRow()
 
-                if let content = task.displayContent {
-                    Section(L10n.tr("common.content", locale: appState.locale)) {
-                        Text(content)
-                            .foregroundStyle(KiioTheme.text)
-                    }
-                }
+                Section {
+                    KiioCard(padding: 16) {
+                        VStack(spacing: 12) {
+                            detailRow(icon: "tag", title: "Type", value: task.itemType)
+                            detailRow(icon: "clock", title: L10n.tr("common.time", locale: appState.locale), value: task.remindAt)
 
-                Section(L10n.tr("common.detail", locale: appState.locale)) {
-                    labeled("Type", task.itemType)
-                    labeled(L10n.tr("common.time", locale: appState.locale), task.remindAt)
-                    if task.itemType == "event" {
-                        labeled("Ends", task.endAt)
-                        labeled("All day", task.allDay == true ? "Yes" : "No")
-                    }
-                    labeled(L10n.tr("reminder.repeat", locale: appState.locale), task.repeatType)
-                    labeled(L10n.tr("reminder.repeatEnd", locale: appState.locale), task.repeatEndAt)
-                    labeled(L10n.tr("common.source", locale: appState.locale), task.sourceType)
-                    labeled(L10n.tr("reminder.timezone", locale: appState.locale), task.timezone)
-                    labeled(L10n.tr("reminder.lastTrigger", locale: appState.locale), task.lastTriggerAt)
-                    labeled(L10n.tr("common.createdAt", locale: appState.locale), task.createdAt)
-                }
-
-                if !store.logs.isEmpty {
-                    Section(L10n.tr("reminder.logs", locale: appState.locale)) {
-                        ForEach(store.logs) { log in
-                            VStack(alignment: .leading, spacing: 5) {
-                                HStack {
-                                    Text(log.notifyStatus ?? "--")
-                                        .font(.system(size: 13, weight: .semibold))
-                                        .foregroundStyle(KiioTheme.accent)
-                                    Spacer()
-                                    Text(log.displayTime ?? "--")
-                                        .font(.system(size: 12))
-                                        .foregroundStyle(KiioTheme.mutedText)
-                                }
-                                if let channel = log.notifyChannel {
-                                    Text(channel)
-                                        .font(.system(size: 12))
-                                        .foregroundStyle(KiioTheme.secondaryText)
-                                }
-                                if let error = log.errorMessage, !error.isEmpty {
-                                    Text(error)
-                                        .font(.system(size: 12))
-                                        .foregroundStyle(KiioTheme.danger)
-                                }
+                            if task.itemType == "event" {
+                                detailRow(icon: "clock.badge", title: "Ends", value: task.endAt)
                             }
-                            .padding(.vertical, 3)
+
+                            detailRow(icon: "repeat", title: L10n.tr("reminder.repeat", locale: appState.locale), value: task.repeatType)
+                            detailRow(icon: "calendar.badge.clock", title: L10n.tr("reminder.repeatEnd", locale: appState.locale), value: task.repeatEndAt)
                         }
                     }
+                }
+                .kiioListCardRow()
+
+                if !store.logs.isEmpty {
+                    Section {
+                        VStack(spacing: 10) {
+                            ForEach(store.logs) { log in
+                                KiioCard(padding: 14) {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        HStack {
+                                            HStack(spacing: 6) {
+                                                Circle()
+                                                    .fill(logStatusColor(log.notifyStatus ?? ""))
+                                                    .frame(width: 8, height: 8)
+                                                Text(log.notifyStatus ?? "--")
+                                                    .font(.system(size: 13, weight: .semibold))
+                                                    .foregroundStyle(KiioTheme.text)
+                                            }
+                                            Spacer()
+                                            Text(log.displayTime ?? "--")
+                                                .font(.system(size: 12))
+                                                .foregroundStyle(KiioTheme.mutedText)
+                                        }
+
+                                        if let channel = log.notifyChannel, !channel.isEmpty {
+                                            HStack(spacing: 4) {
+                                                Image(systemName: "antenna.radiowaves.left.and.right")
+                                                    .font(.system(size: 10))
+                                                Text(channel)
+                                                    .font(.system(size: 12))
+                                            }
+                                            .foregroundStyle(KiioTheme.secondaryText)
+                                        }
+
+                                        if let error = log.errorMessage, !error.isEmpty {
+                                            HStack(alignment: .top, spacing: 4) {
+                                                Image(systemName: "exclamationmark.triangle.fill")
+                                                    .font(.system(size: 10))
+                                                    .foregroundStyle(KiioTheme.danger)
+                                                Text(error)
+                                                    .font(.system(size: 12))
+                                                    .foregroundStyle(KiioTheme.danger)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } header: {
+                        KiioSectionTitle(title: L10n.tr("reminder.logs", locale: appState.locale), icon: "list.bullet.clipboard")
+                            .padding(.horizontal, 4)
+                    }
+                    .kiioListCardRow()
                 }
             } else {
                 KiioEmptyStateView(
@@ -568,13 +597,24 @@ private struct ReminderDetailScene: View {
         dismiss()
     }
 
-    private func labeled(_ title: String, _ value: String?) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
+    private func detailRow(icon: String, title: String, value: String?) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(KiioTheme.mutedText)
+                .frame(width: 20)
+
             Text(title)
-            Spacer()
-            Text(value?.isEmpty == false ? value! : "--")
+                .font(.system(size: 14))
                 .foregroundStyle(KiioTheme.secondaryText)
+
+            Spacer()
+
+            Text(value?.isEmpty == false ? value! : "--")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(value?.isEmpty == false ? KiioTheme.text : KiioTheme.mutedText)
                 .multilineTextAlignment(.trailing)
+                .lineLimit(2)
         }
     }
 
@@ -588,6 +628,19 @@ private struct ReminderDetailScene: View {
             return .danger
         default:
             return .accent
+        }
+    }
+
+    private func logStatusColor(_ status: String) -> Color {
+        switch status.lowercased() {
+        case "sent", "delivered", "success":
+            return KiioTheme.success
+        case "failed", "error":
+            return KiioTheme.danger
+        case "pending", "scheduled":
+            return KiioTheme.warning
+        default:
+            return KiioTheme.mutedText
         }
     }
 }
